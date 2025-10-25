@@ -6,6 +6,12 @@ interface Patient {
   id: number;
   name: string;
   email: string | null;
+  age: number | null;
+  city: string | null;
+  fatherName: string | null;
+  motherName: string | null;
+  uniqueId: string | null;
+  phoneNumber: string | null;
   score: number;
 }
 
@@ -17,28 +23,56 @@ export default function PatientList({ userId }: PatientListProps) {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
+
+  const fetchPatients = async () => {
+    try {
+      const res = await fetch(`/api/patients?userId=${userId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setPatients(data.patients);
+      } else {
+        setError('Failed to fetch patients');
+      }
+    } catch (err) {
+      setError('Error fetching patients');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        const res = await fetch(`/api/patients?userId=${userId}`);
-        if (res.ok) {
-          const data = await res.json();
-          setPatients(data.patients);
-        } else {
-          setError('Failed to fetch patients');
-        }
-      } catch (err) {
-        setError('Error fetching patients');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (userId) {
       fetchPatients();
     }
   }, [userId]);
+
+  const handleAddPatient = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/patients', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          ...formData,
+        }),
+      });
+
+        if (res.ok) {
+          setFormData({ name: '', email: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
+          setShowForm(false);
+          fetchPatients(); // Refresh the list
+        } else {
+          setError('Failed to add patient');
+        }
+    } catch (err) {
+      setError('Error adding patient');
+    }
+  };
 
   if (loading) {
     return <div className="text-center">Loading patients...</div>;
@@ -50,18 +84,154 @@ export default function PatientList({ userId }: PatientListProps) {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-4">Patient List</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Patient List</h2>
+        <button
+          onClick={() => setShowForm(true)}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Add Patient
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <h3 className="text-lg font-semibold mb-4">Add New Patient</h3>
+          <form onSubmit={handleAddPatient}>
+            <div className="mb-4">
+              <label className="block text-gray-700">Name</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Email</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Age</label>
+              <input
+                type="number"
+                value={formData.age}
+                onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">City</label>
+              <input
+                type="text"
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Father Name</label>
+              <input
+                type="text"
+                value={formData.fatherName}
+                onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Mother Name</label>
+              <input
+                type="text"
+                value={formData.motherName}
+                onChange={(e) => setFormData({ ...formData, motherName: e.target.value })}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Unique ID</label>
+              <input
+                type="text"
+                value={formData.uniqueId}
+                onChange={(e) => setFormData({ ...formData, uniqueId: e.target.value })}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Phone Number</label>
+              <input
+                type="tel"
+                value={formData.phoneNumber}
+                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700">Score</label>
+              <input
+                type="number"
+                value={formData.score}
+                onChange={(e) => setFormData({ ...formData, score: parseInt(e.target.value) || 0 })}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="flex space-x-2">
+              <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Add Patient
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {patients.length === 0 ? (
         <p>No patients found.</p>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {patients.map((patient) => (
-            <div key={patient.id} className="bg-white p-4 rounded-lg shadow-md">
-              <h3 className="text-lg font-semibold">{patient.name}</h3>
-              <p className="text-gray-600">{patient.email}</p>
-              <p className="text-sm text-gray-500">Score: {patient.score}</p>
-            </div>
-          ))}
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-300">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="py-2 px-4 border-b">ID</th>
+                <th className="py-2 px-4 border-b">Name</th>
+                <th className="py-2 px-4 border-b">Email</th>
+                <th className="py-2 px-4 border-b">Age</th>
+                <th className="py-2 px-4 border-b">City</th>
+                <th className="py-2 px-4 border-b">Father Name</th>
+                <th className="py-2 px-4 border-b">Mother Name</th>
+                <th className="py-2 px-4 border-b">Unique ID</th>
+                <th className="py-2 px-4 border-b">Phone Number</th>
+                <th className="py-2 px-4 border-b">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {patients.map((patient) => (
+                <tr key={patient.id} className="hover:bg-gray-50">
+                  <td className="py-2 px-4 border-b">{patient.id}</td>
+                  <td className="py-2 px-4 border-b">{patient.name}</td>
+                  <td className="py-2 px-4 border-b">{patient.email || '-'}</td>
+                  <td className="py-2 px-4 border-b">{patient.age || '-'}</td>
+                  <td className="py-2 px-4 border-b">{patient.city || '-'}</td>
+                  <td className="py-2 px-4 border-b">{patient.fatherName || '-'}</td>
+                  <td className="py-2 px-4 border-b">{patient.motherName || '-'}</td>
+                  <td className="py-2 px-4 border-b">{patient.uniqueId || '-'}</td>
+                  <td className="py-2 px-4 border-b">{patient.phoneNumber || '-'}</td>
+                  <td className="py-2 px-4 border-b">{patient.score}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
