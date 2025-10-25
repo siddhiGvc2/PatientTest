@@ -1,0 +1,79 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Users of the system
+model PatientTestUser {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  patients  Patient[]
+}
+
+// Each patient linked to a PatientTestUser
+model Patient {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String?   @unique
+  score     Int       @default(0)
+  userId    Int
+  user      PatientTestUser  @relation(fields: [userId], references: [id])
+  responses UserResponse[]
+}
+
+// Test Levels
+model TestLevel {
+  id        Int      @id @default(autoincrement())
+  level     Int      @unique
+  images    Image[]
+}
+
+// Images for each test level
+model Image {
+  id          Int        @id @default(autoincrement())
+  url         String
+  testLevelId Int
+  testLevel   TestLevel  @relation(fields: [testLevelId], references: [id])
+  questions   Question[]
+}
+
+model Question {
+  id        Int      @id @default(autoincrement())
+  text      String
+  imageId   Int
+  image     Image    @relation(fields: [imageId], references: [id])
+  options   Option[]
+  answerId  Int
+  answer    Option   @relation("AnswerOption", fields: [answerId], references: [id])
+  responses UserResponse[]
+}
+
+model Option {
+  id         Int       @id @default(autoincrement())
+  text       String
+  questionId Int
+  question   Question  @relation(fields: [questionId], references: [id])
+  isCorrect  Boolean   @default(false)
+  questionAnswer Question[] @relation("AnswerOption") // one-to-many from Option to Question
+  userResponses  UserResponse[]
+}
+
+
+// User responses per question
+model UserResponse {
+  id          Int       @id @default(autoincrement())
+  patientId   Int
+  questionId  Int
+  selectedId  Int
+  patient     Patient   @relation(fields: [patientId], references: [id])
+  question    Question  @relation(fields: [questionId], references: [id])
+  selected    Option    @relation(fields: [selectedId], references: [id])
+  isCorrect   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+}
