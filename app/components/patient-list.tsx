@@ -24,6 +24,7 @@ export default function PatientList({ userId }: PatientListProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [formData, setFormData] = useState({ name: '', email: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
 
   const fetchPatients = async () => {
@@ -51,8 +52,10 @@ export default function PatientList({ userId }: PatientListProps) {
   const handleAddPatient = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/patients', {
-        method: 'POST',
+      const method = editingPatient ? 'PUT' : 'POST';
+      const url = editingPatient ? `/api/patients/${editingPatient.id}` : '/api/patients';
+      const res = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -65,12 +68,46 @@ export default function PatientList({ userId }: PatientListProps) {
         if (res.ok) {
           setFormData({ name: '', email: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
           setShowForm(false);
+          setEditingPatient(null);
           fetchPatients(); // Refresh the list
         } else {
-          setError('Failed to add patient');
+          setError(editingPatient ? 'Failed to update patient' : 'Failed to add patient');
         }
     } catch (err) {
-      setError('Error adding patient');
+      setError(editingPatient ? 'Error updating patient' : 'Error adding patient');
+    }
+  };
+
+  const handleEditPatient = (patient: Patient) => {
+    setEditingPatient(patient);
+    setFormData({
+      name: patient.name,
+      email: patient.email || '',
+      age: patient.age?.toString() || '',
+      city: patient.city || '',
+      fatherName: patient.fatherName || '',
+      motherName: patient.motherName || '',
+      uniqueId: patient.uniqueId || '',
+      phoneNumber: patient.phoneNumber || '',
+      score: patient.score,
+    });
+    setShowForm(true);
+  };
+
+  const handleDeletePatient = async (patientId: number) => {
+    if (!confirm('Are you sure you want to delete this patient?')) return;
+    try {
+      const res = await fetch(`/api/patients/${patientId}?userId=${userId}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        fetchPatients(); // Refresh the list
+      } else {
+        setError('Failed to delete patient');
+      }
+    } catch (err) {
+      setError('Error deleting patient');
     }
   };
 
@@ -83,7 +120,7 @@ export default function PatientList({ userId }: PatientListProps) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="w-full p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Patient List</h2>
         <button
@@ -95,8 +132,8 @@ export default function PatientList({ userId }: PatientListProps) {
       </div>
 
       {showForm && (
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h3 className="text-lg font-semibold mb-4">Add New Patient</h3>
+        <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md mb-6">
+          <h3 className="text-lg font-semibold mb-4">{editingPatient ? 'Edit Patient' : 'Add New Patient'}</h3>
           <form onSubmit={handleAddPatient}>
             <div className="mb-4">
               <label className="block text-gray-700">Name</label>
@@ -182,11 +219,15 @@ export default function PatientList({ userId }: PatientListProps) {
             </div>
             <div className="flex space-x-2">
               <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                Add Patient
+                {editingPatient ? 'Update Patient' : 'Add Patient'}
               </button>
               <button
                 type="button"
-                onClick={() => setShowForm(false)}
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingPatient(null);
+                  setFormData({ name: '', email: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
+                }}
                 className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
               >
                 Cancel
@@ -213,12 +254,13 @@ export default function PatientList({ userId }: PatientListProps) {
                 <th className="py-2 px-4 border-b">Unique ID</th>
                 <th className="py-2 px-4 border-b">Phone Number</th>
                 <th className="py-2 px-4 border-b">Score</th>
+                <th className="py-2 px-4 border-b">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {patients.map((patient) => (
+              {patients.map((patient,i) => (
                 <tr key={patient.id} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b">{patient.id}</td>
+                  <td className="py-2 px-4 border-b">{i+1}</td>
                   <td className="py-2 px-4 border-b">{patient.name}</td>
                   <td className="py-2 px-4 border-b">{patient.email || '-'}</td>
                   <td className="py-2 px-4 border-b">{patient.age || '-'}</td>
@@ -228,6 +270,20 @@ export default function PatientList({ userId }: PatientListProps) {
                   <td className="py-2 px-4 border-b">{patient.uniqueId || '-'}</td>
                   <td className="py-2 px-4 border-b">{patient.phoneNumber || '-'}</td>
                   <td className="py-2 px-4 border-b">{patient.score}</td>
+                  <td className="py-2 px-4 border-b">
+                    <button
+                      onClick={() => handleEditPatient(patient)}
+                      className="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeletePatient(patient.id)}
+                      className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
