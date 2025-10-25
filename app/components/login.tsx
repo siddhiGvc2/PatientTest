@@ -1,18 +1,41 @@
 "use client";
 
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
-// import { jwt_decode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { useState } from "react";
 
 export default function LoginPage() {
   const [user, setUser] = useState<any>(null);
 
-  const handleSuccess = (response: CredentialResponse) => {
-    // if (response.credential) {
-    //   const decoded = jwt_decode<any>(response.credential);
-    //   setUser(decoded);
-    //   console.log(decoded); // name, email, picture
-    // }
+  const handleSuccess = async (response: CredentialResponse) => {
+    if (response.credential) {
+      const decoded = jwtDecode<any>(response.credential);
+      setUser(decoded);
+      console.log(decoded); // name, email, picture
+
+      // Save user to database
+      try {
+        const res = await fetch('/api/user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: decoded.name,
+            email: decoded.email,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log('User saved:', data);
+        } else {
+          console.error('Failed to save user');
+        }
+      } catch (error) {
+        console.error('Error saving user:', error);
+      }
+    }
   };
 
   const handleError = () => {
