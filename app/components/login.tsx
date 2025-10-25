@@ -10,8 +10,30 @@ export default function LoginPage({ onLogin }: { onLogin: (user: any) => void })
   const handleSuccess = async (response: CredentialResponse) => {
     if (response.credential) {
       const decoded = jwtDecode<any>(response.credential);
-      setUser(decoded);
       console.log(decoded); // name, email, picture
+
+      // Check if user is authorized
+      try {
+        const authRes = await fetch('/api/user');
+        if (authRes.ok) {
+          const authData = await authRes.json();
+          const authorizedEmails = authData.authorizedUsers.map((user: any) => user.email);
+          if (!authorizedEmails.includes(decoded.email)) {
+            alert('You are not authorized to log in.');
+            return;
+          }
+        } else {
+          console.error('Failed to fetch authorized users');
+          alert('Unable to verify authorization. Please try again.');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking authorization:', error);
+        alert('Error verifying authorization. Please try again.');
+        return;
+      }
+
+      setUser(decoded);
 
       // Save user to database
       try {

@@ -7,6 +7,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model AuthorizedUser {
+  id        Int       @id @default(autoincrement())
+  email     String   @unique
+}
+
 // Users of the system
 model PatientTestUser {
   id        Int       @id @default(autoincrement())
@@ -20,7 +25,6 @@ model PatientTestUser {
 model Patient {
   id          Int       @id @default(autoincrement())
   name        String
-  email       String?   @unique
   age         Int?
   city        String?
   fatherName  String?

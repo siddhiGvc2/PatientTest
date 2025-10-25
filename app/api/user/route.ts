@@ -28,3 +28,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function GET(request: NextRequest) {
+  try {
+    const authorizedUsers = await prisma.authorizedUser.findMany({
+      select: {
+        id: true,
+        email: true,
+      },
+    });
+
+    return NextResponse.json({ authorizedUsers }, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching authorized users:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

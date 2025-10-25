@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 interface Patient {
   id: number;
   name: string;
-  email: string | null;
   age: number | null;
   city: string | null;
   fatherName: string | null;
@@ -25,7 +24,7 @@ export default function PatientList({ userId }: PatientListProps) {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
-  const [formData, setFormData] = useState({ name: '', email: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
+  const [formData, setFormData] = useState({ name: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
 
   const fetchPatients = async () => {
     try {
@@ -66,7 +65,7 @@ export default function PatientList({ userId }: PatientListProps) {
       });
 
         if (res.ok) {
-          setFormData({ name: '', email: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
+          setFormData({ name: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
           setShowForm(false);
           setEditingPatient(null);
           fetchPatients(); // Refresh the list
@@ -82,7 +81,6 @@ export default function PatientList({ userId }: PatientListProps) {
     setEditingPatient(patient);
     setFormData({
       name: patient.name,
-      email: patient.email || '',
       age: patient.age?.toString() || '',
       city: patient.city || '',
       fatherName: patient.fatherName || '',
@@ -145,15 +143,7 @@ export default function PatientList({ userId }: PatientListProps) {
                 required
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Email</label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full p-2 border rounded"
-              />
-            </div>
+
             <div className="mb-4">
               <label className="block text-gray-700">Age</label>
               <input
@@ -226,7 +216,7 @@ export default function PatientList({ userId }: PatientListProps) {
                 onClick={() => {
                   setShowForm(false);
                   setEditingPatient(null);
-                  setFormData({ name: '', email: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
+                  setFormData({ name: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
                 }}
                 className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
               >
@@ -246,7 +236,7 @@ export default function PatientList({ userId }: PatientListProps) {
               <tr className="bg-gray-100">
                 <th className="py-2 px-4 border-b">ID</th>
                 <th className="py-2 px-4 border-b">Name</th>
-                <th className="py-2 px-4 border-b">Email</th>
+
                 <th className="py-2 px-4 border-b">Age</th>
                 <th className="py-2 px-4 border-b">City</th>
                 <th className="py-2 px-4 border-b">Father Name</th>
@@ -262,7 +252,7 @@ export default function PatientList({ userId }: PatientListProps) {
                 <tr key={patient.id} className="hover:bg-gray-50">
                   <td className="py-2 px-4 border-b">{i+1}</td>
                   <td className="py-2 px-4 border-b">{patient.name}</td>
-                  <td className="py-2 px-4 border-b">{patient.email || '-'}</td>
+
                   <td className="py-2 px-4 border-b">{patient.age || '-'}</td>
                   <td className="py-2 px-4 border-b">{patient.city || '-'}</td>
                   <td className="py-2 px-4 border-b">{patient.fatherName || '-'}</td>

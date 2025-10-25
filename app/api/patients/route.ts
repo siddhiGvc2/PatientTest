@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
       select: {
         id: true,
         name: true,
-        email: true,
         age: true,
         city: true,
         fatherName: true,
@@ -44,7 +43,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId, name, email, age, city, fatherName, motherName, uniqueId, phoneNumber, score } = await request.json();
+    const { userId, name,age, city, fatherName, motherName, uniqueId, phoneNumber, score } = await request.json();
 
     if (!userId || !name) {
       return NextResponse.json({ error: 'userId and name are required' }, { status: 400 });
@@ -60,7 +59,6 @@ export async function POST(request: NextRequest) {
       data: {
         userId: userIdInt,
         name,
-        email: email || null,
         age: age ? parseInt(age, 10) : null,
         city: city || null,
         fatherName: fatherName || null,
