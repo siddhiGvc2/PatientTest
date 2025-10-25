@@ -3,6 +3,8 @@
 - [x] Create API route at app/api/user/route.ts for saving user
 - [x] Update login component to decode JWT and call API on success
 - [x] Install jwt-decode package
+- [x] Create API route at app/api/patients/route.ts for getting patient list of a user
+- [x] Create UI for patient list using the API
 - [ ] Test the login flow: Run npm run dev, log in with Google, verify user saved in DB
 - [ ] Ensure DATABASE_URL is set in .env for MySQL connection
 - [ ] Optionally, update schema to make password optional for Google logins

@@ -4,7 +4,7 @@ import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import { useState } from "react";
 
-export default function LoginPage() {
+export default function LoginPage({ onLogin }: { onLogin: (user: any) => void }) {
   const [user, setUser] = useState<any>(null);
 
   const handleSuccess = async (response: CredentialResponse) => {
@@ -29,6 +29,7 @@ export default function LoginPage() {
         if (res.ok) {
           const data = await res.json();
           console.log('User saved:', data);
+          onLogin({ ...decoded, id: data.user.id }); // Pass user with id to parent
         } else {
           console.error('Failed to save user');
         }
