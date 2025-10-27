@@ -50,7 +50,10 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
 
   const fetchPatients = async () => {
     try {
-      const res = await fetch(`/api/patients?userId=${selectedUserId}&currentUserId=${currentUser.id}`);
+      const url = currentUser.userType === 'SUPERADMIN'
+        ? `/api/patients?currentUserId=${currentUser.id}`
+        : `/api/patients?userId=${selectedUserId}&currentUserId=${currentUser.id}`;
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         setPatients(data.patients);
@@ -146,19 +149,7 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Patient List</h2>
         <div className="flex items-center space-x-4">
-          {currentUser.userType === 'SUPERADMIN' && users.length > 0 && (
-            <select
-              value={selectedUserId}
-              onChange={(e) => setSelectedUserId(parseInt(e.target.value))}
-              className="p-2 border rounded"
-            >
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.email} ({user.userType})
-                </option>
-              ))}
-            </select>
-          )}
+         
           <button
             onClick={() => setShowForm(true)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"

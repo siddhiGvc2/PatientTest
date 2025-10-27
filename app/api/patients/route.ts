@@ -9,14 +9,13 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId');
     const currentUserId = searchParams.get('currentUserId');
 
-    if (!userId || !currentUserId) {
-      return NextResponse.json({ error: 'userId and currentUserId query parameters are required' }, { status: 400 });
+    if (!currentUserId) {
+      return NextResponse.json({ error: 'currentUserId query parameter is required' }, { status: 400 });
     }
 
-    const userIdInt = parseInt(userId, 10);
     const currentUserIdInt = parseInt(currentUserId, 10);
-    if (isNaN(userIdInt) || isNaN(currentUserIdInt)) {
-      return NextResponse.json({ error: 'userId and currentUserId must be valid integers' }, { status: 400 });
+    if (isNaN(currentUserIdInt)) {
+      return NextResponse.json({ error: 'currentUserId must be a valid integer' }, { status: 400 });
     }
 
     // Get current user to check permissions
@@ -28,74 +27,106 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Current user not found' }, { status: 404 });
     }
 
-    // Check if current user has permission to view patients for the specified userId
-    let hasPermission = false;
+    let patients: any[];
 
-    if (userIdInt === currentUserIdInt) {
-      // Users can always view their own patients
-      hasPermission = true;
-    } else if (currentUser.type === 'SUPERADMIN') {
-      // SUPERADMIN can view any user's patients
-      hasPermission = true;
-    } else if (currentUser.type === 'ADMIN') {
-      // ADMIN can view patients of users they created
-      const targetUser = await prisma.authorizedUser.findUnique({
-        where: { id: userIdInt },
-        select: { createdBy: true },
-      });
-      if (targetUser && targetUser.createdBy === currentUser.id) {
-        hasPermission = true;
-      }
-    } else if (currentUser.type === 'USER') {
-      // USER can only view their own patients
-      hasPermission = false;
-    }
-
-    if (!hasPermission) {
-      return NextResponse.json({ error: 'You do not have permission to view these patients' }, { status: 403 });
-    }
-
-    // Get the AuthorizedUser to find the corresponding PatientTestUser
-    const authorizedUser = await prisma.authorizedUser.findUnique({
-      where: { id: userIdInt },
-      select: { email: true },
-    });
-
-    if (!authorizedUser) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    // Find the PatientTestUser with the same email
-    const patientTestUser = await prisma.patientTestUser.findUnique({
-      where: { email: authorizedUser.email },
-    });
-
-    if (!patientTestUser) {
-      return NextResponse.json({ error: 'Patient test user not found' }, { status: 404 });
-    }
-
-    // Fetch patients for the PatientTestUser
-    const patients = await prisma.patient.findMany({
-      where: { userId: patientTestUser.id },
-      select: {
-        id: true,
-        name: true,
-        age: true,
-        city: true,
-        fatherName: true,
-        motherName: true,
-        uniqueId: true,
-        phoneNumber: true,
-        score: true,
-        user: {
-          select: {
-            email: true,
-            name: true,
+    if (currentUser.type === 'SUPERADMIN') {
+      // SUPERADMIN can view all patients in the system
+      patients = await prisma.patient.findMany({
+        select: {
+          id: true,
+          name: true,
+          age: true,
+          city: true,
+          fatherName: true,
+          motherName: true,
+          uniqueId: true,
+          phoneNumber: true,
+          score: true,
+          user: {
+            select: {
+              email: true,
+              name: true,
+              userType: true,
+            },
           },
         },
-        // Exclude userId and responses for simplicity
-      },
-    });
+      });
+    } else {
+      // For ADMIN and USER, require userId
+      if (!userId) {
+        return NextResponse.json({ error: 'userId query parameter is required' }, { status: 400 });
+      }
+
+      const userIdInt = parseInt(userId, 10);
+      if (isNaN(userIdInt)) {
+        return NextResponse.json({ error: 'userId must be a valid integer' }, { status: 400 });
+      }
+
+      // Check if current user has permission to view patients for the specified userId
+      let hasPermission = false;
+
+      if (userIdInt === currentUserIdInt) {
+        // Users can always view their own patients
+        hasPermission = true;
+      } else if (currentUser.type === 'ADMIN') {
+        // ADMIN can view patients of users they created
+        const targetUser = await prisma.authorizedUser.findUnique({
+          where: { id: userIdInt },
+          select: { createdBy: true },
+        });
+        if (targetUser && targetUser.createdBy === currentUser.id) {
+          hasPermission = true;
+        }
+      } else if (currentUser.type === 'USER') {
+        // USER can only view their own patients
+        hasPermission = false;
+      }
+
+      if (!hasPermission) {
+        return NextResponse.json({ error: 'You do not have permission to view these patients' }, { status: 403 });
+      }
+
+      // Get the AuthorizedUser to find the corresponding PatientTestUser
+      const authorizedUser = await prisma.authorizedUser.findUnique({
+        where: { id: userIdInt },
+        select: { email: true },
+      });
+
+      if (!authorizedUser) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+
+      // Find the PatientTestUser with the same email
+      const patientTestUser = await prisma.patientTestUser.findUnique({
+        where: { email: authorizedUser.email },
+      });
+
+      if (!patientTestUser) {
+        return NextResponse.json({ error: 'Patient test user not found' }, { status: 404 });
+      }
+
+      // Fetch patients for the PatientTestUser
+      patients = await prisma.patient.findMany({
+        where: { userId: patientTestUser.id },
+        select: {
+          id: true,
+          name: true,
+          age: true,
+          city: true,
+          fatherName: true,
+          motherName: true,
+          uniqueId: true,
+          phoneNumber: true,
+          score: true,
+          user: {
+            select: {
+              email: true,
+              name: true,
+            },
+          },
+        },
+      });
+    }
 
     return NextResponse.json({ patients }, { status: 200 });
   } catch (error) {
