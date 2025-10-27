@@ -172,10 +172,13 @@ export async function GET(request: NextRequest) {
         },
       });
     } else if (currentUser.type === UserType.ADMIN) {
-      // ADMIN sees only users they created
+      // ADMIN sees themselves and users they created
       authorizedUsers = await prisma.authorizedUser.findMany({
         where: {
-          createdBy: currentUser.id,
+          OR: [
+            { id: currentUser.id },
+            { createdBy: currentUser.id },
+          ],
         },
         select: {
           id: true,

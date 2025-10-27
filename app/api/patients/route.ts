@@ -51,8 +51,49 @@ export async function GET(request: NextRequest) {
           },
         },
       });
+    } else if (currentUser.type === 'ADMIN') {
+      // ADMIN can view patients for themselves and users they created
+      const adminUsers = await prisma.authorizedUser.findMany({
+        where: {
+          OR: [
+            { id: currentUser.id },
+            { createdBy: currentUser.id },
+          ],
+        },
+        select: { email: true },
+      });
+
+      const adminEmails = adminUsers.map(user => user.email);
+
+      patients = await prisma.patient.findMany({
+        where: {
+          user: {
+            email: {
+              in: adminEmails,
+            },
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          age: true,
+          city: true,
+          fatherName: true,
+          motherName: true,
+          uniqueId: true,
+          phoneNumber: true,
+          score: true,
+          user: {
+            select: {
+              email: true,
+              name: true,
+              userType: true,
+            },
+          },
+        },
+      });
     } else {
-      // For ADMIN and USER, require userId
+      // For USER, require userId and it must be their own
       if (!userId) {
         return NextResponse.json({ error: 'userId query parameter is required' }, { status: 400 });
       }
@@ -62,28 +103,8 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'userId must be a valid integer' }, { status: 400 });
       }
 
-      // Check if current user has permission to view patients for the specified userId
-      let hasPermission = false;
-
-      if (userIdInt === currentUserIdInt) {
-        // Users can always view their own patients
-        hasPermission = true;
-      } else if (currentUser.type === 'ADMIN') {
-        // ADMIN can view patients of users they created
-        const targetUser = await prisma.authorizedUser.findUnique({
-          where: { id: userIdInt },
-          select: { createdBy: true },
-        });
-        if (targetUser && targetUser.createdBy === currentUser.id) {
-          hasPermission = true;
-        }
-      } else if (currentUser.type === 'USER') {
-        // USER can only view their own patients
-        hasPermission = false;
-      }
-
-      if (!hasPermission) {
-        return NextResponse.json({ error: 'You do not have permission to view these patients' }, { status: 403 });
+      if (userIdInt !== currentUserIdInt) {
+        return NextResponse.json({ error: 'You can only view your own patients' }, { status: 403 });
       }
 
       // Get the AuthorizedUser to find the corresponding PatientTestUser

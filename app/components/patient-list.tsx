@@ -50,9 +50,10 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
 
   const fetchPatients = async () => {
     try {
-      const url = currentUser.userType === 'SUPERADMIN'
-        ? `/api/patients?currentUserId=${currentUser.id}`
-        : `/api/patients?userId=${selectedUserId}&currentUserId=${currentUser.id}`;
+      let url = `/api/patients?currentUserId=${currentUser.id}`;
+      if (currentUser.userType !== 'SUPERADMIN') {
+        url += `&userId=${selectedUserId}`;
+      }
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
