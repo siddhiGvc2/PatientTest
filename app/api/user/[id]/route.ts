@@ -73,6 +73,11 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return NextResponse.json({ error: 'Admins can only delete users they created' }, { status: 403 });
     }
 
+    // Prevent admins from deleting other admins
+    if (currentUser.type === 'ADMIN' && userToDelete.type === 'ADMIN' && userToDelete.id !== currentUserIdInt) {
+      return NextResponse.json({ error: 'Admins cannot delete other admins' }, { status: 403 });
+    }
+
     // Delete the authorized user
     await prisma.authorizedUser.delete({
       where: { id: userId },

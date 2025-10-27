@@ -16,19 +16,41 @@ interface Patient {
 
 interface PatientListProps {
   userId: number;
+  currentUser: any;
 }
 
-export default function PatientList({ userId }: PatientListProps) {
+interface User {
+  id: number;
+  email: string;
+  name: string;
+  userType: string;
+}
+
+export default function PatientList({ userId, currentUser }: PatientListProps) {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [formData, setFormData] = useState({ name: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
+  const [selectedUserId, setSelectedUserId] = useState<number>(userId);
+  const [users, setUsers] = useState<User[]>([]);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch(`/api/user?currentUserId=${currentUser.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data.authorizedUsers);
+      }
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    }
+  };
 
   const fetchPatients = async () => {
     try {
-      const res = await fetch(`/api/patients?userId=${userId}`);
+      const res = await fetch(`/api/patients?userId=${selectedUserId}&currentUserId=${currentUser.id}`);
       if (res.ok) {
         const data = await res.json();
         setPatients(data.patients);
@@ -43,10 +65,11 @@ export default function PatientList({ userId }: PatientListProps) {
   };
 
   useEffect(() => {
-    if (userId) {
+    if (currentUser) {
+      fetchUsers();
       fetchPatients();
     }
-  }, [userId]);
+  }, [currentUser, selectedUserId]);
 
   const handleAddPatient = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +82,8 @@ export default function PatientList({ userId }: PatientListProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId,
+          userId: selectedUserId,
+          currentUserId: currentUser.id,
           ...formData,
         }),
       });
@@ -95,7 +119,7 @@ export default function PatientList({ userId }: PatientListProps) {
   const handleDeletePatient = async (patientId: number) => {
     if (!confirm('Are you sure you want to delete this patient?')) return;
     try {
-      const res = await fetch(`/api/patients/${patientId}?userId=${userId}`, {
+      const res = await fetch(`/api/patients/${patientId}?userId=${selectedUserId}&currentUserId=${currentUser.id}`, {
         method: 'DELETE',
       });
 
@@ -121,12 +145,27 @@ export default function PatientList({ userId }: PatientListProps) {
     <div className="w-full p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Patient List</h2>
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Add Patient
-        </button>
+        <div className="flex items-center space-x-4">
+          {currentUser.userType === 'SUPERADMIN' && users.length > 0 && (
+            <select
+              value={selectedUserId}
+              onChange={(e) => setSelectedUserId(parseInt(e.target.value))}
+              className="p-2 border rounded"
+            >
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.email} ({user.userType})
+                </option>
+              ))}
+            </select>
+          )}
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Add Patient
+          </button>
+        </div>
       </div>
 
       {showForm && (

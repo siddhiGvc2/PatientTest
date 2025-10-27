@@ -56,7 +56,7 @@ export default function Home() {
             </div>
           )}
 
-          {activeTab === 'patients' && <PatientList userId={loggedInUser.id} />}
+          {activeTab === 'patients' && <PatientList userId={loggedInUser.id} currentUser={loggedInUser} />}
           {activeTab === 'users' && canManageUsers && <UserManagement currentUser={loggedInUser} />}
         </div>
       )}

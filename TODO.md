@@ -1,15 +1,15 @@
-# TODO: Implement user hierarchy and management system
+# Admin Permissions Implementation
 
-- [x] Define UserType enum with SUPERADMIN, ADMIN, USER in schema.prisma
-- [x] Add userType UserType @default(USER) @map("user_type") to PatientTestUser model in schema.prisma
-- [x] Add type, createdBy, and hierarchy relations to AuthorizedUser model
-- [x] Run `npx prisma db push` to apply schema changes to database
-- [x] Create seed script for superusers (me@vinaychaddha.in, vinay.gvc@gmail.com, sd@gvc.in)
-- [x] Run seed script to create superusers
-- [x] Update /api/user POST endpoint with permission checks and hierarchy logic
-- [x] Create /api/user/[id] DELETE endpoint with permission checks
-- [x] Update login component to pass userType
-- [x] Create UserManagement component for admins/superadmins
-- [x] Update main page with tabs for patients and user management
-- [x] Update GET /api/user to return full user details
-- [x] Test application to ensure user hierarchy works correctly
+## Tasks
+- [x] Update POST /api/user: Ensure createdBy is set correctly for ADMIN users
+- [x] Update GET /api/user: Filter users based on currentUser permissions (SUPERADMIN sees all, ADMIN sees their created users, USER sees none)
+- [x] Update PUT /api/user: Allow ADMIN to update only their created users (not other ADMINS)
+- [x] Update DELETE /api/user/[id]: Allow ADMIN to delete only their created users
+- [x] Update GET /api/patients: Filter patients by users under the current ADMIN
+- [x] Update frontend components: Modify user-management and patient-list to pass currentUserId and show only relevant data
+- [x] Test permissions with different user types
+
+## Progress
+- Completed backend API updates for user and patient permissions
+- Updated frontend components to pass currentUserId
+- Need to test the implementation with different user types

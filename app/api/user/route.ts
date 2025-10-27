@@ -71,10 +71,39 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, name, email, type } = await request.json();
+    const { id, name, email, type, currentUserId } = await request.json();
 
-    if (!id || !email) {
-      return NextResponse.json({ error: 'ID and email are required' }, { status: 400 });
+    if (!id || !email || !currentUserId) {
+      return NextResponse.json({ error: 'ID, email, and currentUserId are required' }, { status: 400 });
+    }
+
+    const currentUser = await prisma.authorizedUser.findUnique({
+      where: { id: parseInt(currentUserId) },
+    });
+
+    if (!currentUser) {
+      return NextResponse.json({ error: 'Current user not found' }, { status: 404 });
+    }
+
+    // Check permissions
+    const targetUser = await prisma.authorizedUser.findUnique({
+      where: { id },
+    });
+
+    if (!targetUser) {
+      return NextResponse.json({ error: 'Target user not found' }, { status: 404 });
+    }
+
+    if (currentUser.type === UserType.ADMIN) {
+      // ADMIN can only update users they created and cannot update other ADMINS
+      if (targetUser.createdBy !== currentUser.id) {
+        return NextResponse.json({ error: 'You can only update users you created' }, { status: 403 });
+      }
+      if (targetUser.type === UserType.ADMIN && type !== UserType.ADMIN) {
+        return NextResponse.json({ error: 'You cannot change the type of other admins' }, { status: 403 });
+      }
+    } else if (currentUser.type === UserType.USER) {
+      return NextResponse.json({ error: 'Users cannot update other users' }, { status: 403 });
     }
 
     // Prepare update objects conditionally
@@ -106,14 +135,59 @@ export async function PUT(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const authorizedUsers = await prisma.authorizedUser.findMany({
-      select: {
-        id: true,
-        email: true,
-        type: true,
-        createdBy: true,
-      },
+    const { searchParams } = new URL(request.url);
+    const currentUserId = searchParams.get('currentUserId');
+
+    // If no currentUserId or currentUserId=0, return all users for authorization check
+    if (!currentUserId || currentUserId === '0') {
+      const authorizedUsers = await prisma.authorizedUser.findMany({
+        select: {
+          id: true,
+          email: true,
+          type: true,
+          createdBy: true,
+        },
+      });
+      return NextResponse.json({ authorizedUsers }, { status: 200 });
+    }
+
+    const currentUser = await prisma.authorizedUser.findUnique({
+      where: { id: parseInt(currentUserId) },
     });
+
+    if (!currentUser) {
+      return NextResponse.json({ error: 'Current user not found' }, { status: 404 });
+    }
+
+    let authorizedUsers: any[];
+
+    if (currentUser.type === UserType.SUPERADMIN) {
+      // SUPERADMIN sees all users
+      authorizedUsers = await prisma.authorizedUser.findMany({
+        select: {
+          id: true,
+          email: true,
+          type: true,
+          createdBy: true,
+        },
+      });
+    } else if (currentUser.type === UserType.ADMIN) {
+      // ADMIN sees only users they created
+      authorizedUsers = await prisma.authorizedUser.findMany({
+        where: {
+          createdBy: currentUser.id,
+        },
+        select: {
+          id: true,
+          email: true,
+          type: true,
+          createdBy: true,
+        },
+      });
+    } else {
+      // USER sees no users
+      authorizedUsers = [];
+    }
 
     return NextResponse.json({ authorizedUsers }, { status: 200 });
   } catch (error) {

@@ -22,7 +22,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
 
   const fetchAuthorizedUsers = async () => {
     try {
-      const res = await fetch('/api/user');
+      const res = await fetch(`/api/user?currentUserId=${currentUser.id}`);
       if (res.ok) {
         const data = await res.json();
         setAuthorizedUsers(data.authorizedUsers);
@@ -104,6 +104,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
           id: userId,
           email,
           type: newType,
+          currentUserId: currentUser.id,
         }),
       });
 

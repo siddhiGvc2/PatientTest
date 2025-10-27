@@ -12,9 +12,9 @@ export default function LoginPage({ onLogin }: { onLogin: (user: any) => void })
       const decoded = jwtDecode<any>(response.credential);
       console.log(decoded); // name, email, picture
 
-      // Check if user is authorized
+      // Check if user is authorized - use a dummy currentUserId for authorization check
       try {
-        const authRes = await fetch('/api/user');
+        const authRes = await fetch('/api/user?currentUserId=0'); // Use 0 as dummy since we just need to check if email exists
         if (authRes.ok) {
           const authData = await authRes.json();
           const authorizedEmails = authData.authorizedUsers.map((user: any) => user.email);
