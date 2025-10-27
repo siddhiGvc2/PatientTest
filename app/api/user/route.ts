@@ -69,6 +69,41 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export async function PUT(request: NextRequest) {
+  try {
+    const { id, name, email, type } = await request.json();
+
+    if (!id || !email) {
+      return NextResponse.json({ error: 'ID and email are required' }, { status: 400 });
+    }
+
+    // Prepare update objects conditionally
+    const authorizedUpdate: any = {};
+    if (type !== undefined) authorizedUpdate.type = type;
+
+    const patientUpdate: any = {};
+    if (name !== undefined) patientUpdate.name = name;
+    if (type !== undefined) patientUpdate.userType = type;
+
+    // Update authorized user
+    const authorizedUser = await prisma.authorizedUser.update({
+      where: { id },
+      data: authorizedUpdate,
+    });
+
+    // Update patient test user
+    const user = await prisma.patientTestUser.update({
+      where: { email },
+      data: patientUpdate,
+    });
+
+    return NextResponse.json({ message: 'User updated successfully', user, authorizedUser }, { status: 200 });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const authorizedUsers = await prisma.authorizedUser.findMany({

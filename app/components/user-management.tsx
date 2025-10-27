@@ -93,6 +93,31 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
     }
   };
 
+  const handleTypeChange = async (userId: number, email: string, newType: string) => {
+    try {
+      const res = await fetch('/api/user', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: userId,
+          email,
+          type: newType,
+        }),
+      });
+
+      if (res.ok) {
+        fetchAuthorizedUsers(); // Refresh the list
+      } else {
+        const errorData = await res.json();
+        setError(errorData.error || 'Failed to update user type');
+      }
+    } catch (err) {
+      setError('Error updating user type');
+    }
+  };
+
   if (loading) {
     return <div className="text-center">Loading users...</div>;
   }
@@ -185,15 +210,28 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
                   <td className="py-2 px-4 border-b">{user.email}</td>
                   <td className="py-2 px-4 border-b">{user.type}</td>
                   <td className="py-2 px-4 border-b">
-                    {/* Only allow deletion if user is not a superadmin or if current user is superadmin */}
-                    {(currentUser.userType === 'SUPERADMIN' || user.type !== 'SUPERADMIN') && (
-                      <button
-                        onClick={() => handleDeleteUser(user.id)}
-                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
-                    )}
+                    <div className="flex space-x-2">
+                      {/* Toggle type if not SUPERADMIN */}
+                      {user.type !== 'SUPERADMIN' && (
+                        <select
+                          value={user.type}
+                          onChange={(e) => handleTypeChange(user.id, user.email, e.target.value)}
+                          className="p-1 border rounded text-sm"
+                        >
+                          <option value="USER">User</option>
+                          {currentUser.userType === 'SUPERADMIN' && <option value="ADMIN">Admin</option>}
+                        </select>
+                      )}
+                      {/* Only allow deletion if user is not a superadmin or if current user is superadmin */}
+                      {(currentUser.userType === 'SUPERADMIN' || user.type !== 'SUPERADMIN') && (
+                        <button
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
