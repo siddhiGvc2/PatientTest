@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const patientId = parseInt(id, 10);
@@ -36,7 +36,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       where: { id: patientId },
       data: {
         name: name || existingPatient.name,
-        email: email !== undefined ? email : existingPatient.email,
         age: age !== undefined ? (age ? parseInt(age, 10) : null) : existingPatient.age,
         city: city !== undefined ? city : existingPatient.city,
         fatherName: fatherName !== undefined ? fatherName : existingPatient.fatherName,
@@ -54,7 +53,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const patientId = parseInt(id, 10);

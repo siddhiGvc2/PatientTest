@@ -51,7 +51,7 @@ export default function LoginPage({ onLogin }: { onLogin: (user: any) => void })
         if (res.ok) {
           const data = await res.json();
           console.log('User saved:', data);
-          onLogin({ ...decoded, id: data.user.id }); // Pass user with id to parent
+          onLogin({ ...decoded, id: data.user.id, userType: data.user.userType }); // Pass user with id and userType to parent
         } else {
           console.error('Failed to save user');
         }
