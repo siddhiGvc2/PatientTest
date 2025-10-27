@@ -30,10 +30,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Prepare update objects conditionally
+    const authorizedUpdate: any = {};
+    if (type !== undefined) authorizedUpdate.type = type;
+    if (createdBy !== undefined) authorizedUpdate.createdBy = createdBy;
+
+    const patientUpdate: any = {};
+    if (name !== undefined) patientUpdate.name = name;
+    if (type !== undefined) patientUpdate.userType = type;
+
     // Upsert authorized user
     const authorizedUser = await prisma.authorizedUser.upsert({
       where: { email },
-      update: { type: type || UserType.USER, createdBy },
+      update: authorizedUpdate,
       create: {
         email,
         type: type || UserType.USER,
@@ -44,7 +53,7 @@ export async function POST(request: NextRequest) {
     // Upsert patient test user
     const user = await prisma.patientTestUser.upsert({
       where: { email },
-      update: { name },
+      update: patientUpdate,
       create: {
         name,
         email,

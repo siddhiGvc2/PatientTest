@@ -35,7 +35,7 @@ export default function LoginPage({ onLogin }: { onLogin: (user: any) => void })
 
       setUser(decoded);
 
-      // Save user to database
+      // Save user to database (without changing type)
       try {
         const res = await fetch('/api/user', {
           method: 'POST',
@@ -45,6 +45,7 @@ export default function LoginPage({ onLogin }: { onLogin: (user: any) => void })
           body: JSON.stringify({
             name: decoded.name,
             email: decoded.email,
+            // Do not pass type to avoid changing existing user type
           }),
         });
 
