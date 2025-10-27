@@ -12,6 +12,11 @@ interface Patient {
   uniqueId: string | null;
   phoneNumber: string | null;
   score: number;
+  user: {
+    email: string;
+    name: string;
+    userType: string;
+  };
 }
 
 interface PatientListProps {
@@ -267,7 +272,7 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
               <tr className="bg-gray-100">
                 <th className="py-2 px-4 border-b">ID</th>
                 <th className="py-2 px-4 border-b">Name</th>
-
+                <th className="py-2 px-4 border-b">Created By</th>
                 <th className="py-2 px-4 border-b">Age</th>
                 <th className="py-2 px-4 border-b">City</th>
                 <th className="py-2 px-4 border-b">Father Name</th>
@@ -283,7 +288,7 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
                 <tr key={patient.id} className="hover:bg-gray-50">
                   <td className="py-2 px-4 border-b">{i+1}</td>
                   <td className="py-2 px-4 border-b">{patient.name}</td>
-
+                  <td className="py-2 px-4 border-b">{patient.user.name}</td>
                   <td className="py-2 px-4 border-b">{patient.age || '-'}</td>
                   <td className="py-2 px-4 border-b">{patient.city || '-'}</td>
                   <td className="py-2 px-4 border-b">{patient.fatherName || '-'}</td>
