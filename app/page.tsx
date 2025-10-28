@@ -4,10 +4,11 @@ import { useState } from "react";
 import LoginPage from "./components/login";
 import PatientList from "./components/patient-list";
 import UserManagement from "./components/user-management";
+import TestLevel from "./components/test-level";
 
 export default function Home() {
   const [loggedInUser, setLoggedInUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'patients' | 'users'>('patients');
+  const [activeTab, setActiveTab] = useState<'patients' | 'users' | 'test'>('patients');
 
   const handleLogin = (user: any) => {
     setLoggedInUser(user);
@@ -52,12 +53,19 @@ export default function Home() {
                 >
                   User Management
                 </button>
+                <button
+                  onClick={() => setActiveTab('test')}
+                  className={`px-4 py-2 rounded ${activeTab === 'test' ? 'bg-blue-500 text-white' : 'bg-white'}`}
+                >
+                  Test Level
+                </button>
               </div>
             </div>
           )}
 
           {activeTab === 'patients' && <PatientList userId={loggedInUser.id} currentUser={loggedInUser} />}
           {activeTab === 'users' && canManageUsers && <UserManagement currentUser={loggedInUser} />}
+          {activeTab === 'test' && <TestLevel />}
         </div>
       )}
     </div>

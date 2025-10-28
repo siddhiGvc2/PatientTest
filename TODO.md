@@ -1,15 +1,6 @@
-# Admin Permissions Implementation
+# TODO for Schema Update
 
-## Tasks
-- [x] Update POST /api/user: Ensure createdBy is set correctly for ADMIN users
-- [x] Update GET /api/user: Filter users based on currentUser permissions (SUPERADMIN sees all, ADMIN sees their created users, USER sees none)
-- [x] Update PUT /api/user: Allow ADMIN to update only their created users (not other ADMINS)
-- [x] Update DELETE /api/user/[id]: Allow ADMIN to delete only their created users
-- [x] Update GET /api/patients: Filter patients by users under the current ADMIN
-- [x] Update frontend components: Modify user-management and patient-list to pass currentUserId and show only relevant data
-- [x] Test permissions with different user types
-
-## Progress
-- Completed backend API updates for user and patient permissions
-- Updated frontend components to pass currentUserId
-- Need to test the implementation with different user types
+- [x] Remove redundant 'isCorrect' field from Option model in prisma/schema.prisma
+- [x] Run `npx prisma generate` to regenerate Prisma client
+- [x] Run `npx prisma db push` to apply schema changes to the database
+- [x] Verify the schema supports: TestLevel -> 4 Images, Image -> 1+ Questions, Question -> 1+ Options with one correct answer via answerId

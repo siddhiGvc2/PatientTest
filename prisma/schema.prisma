@@ -14,87 +14,85 @@ enum UserType {
 }
 
 model AuthorizedUser {
-  id        Int       @id @default(autoincrement())
-  email     String   @unique
-  type      UserType  @default(USER)
-  createdBy Int?
-  creator   AuthorizedUser? @relation("UserHierarchy", fields: [createdBy], references: [id])
+  id           Int              @id @default(autoincrement())
+  email        String           @unique
+  type         UserType         @default(USER)
+  createdBy    Int?
+  creator      AuthorizedUser?  @relation("UserHierarchy", fields: [createdBy], references: [id])
   createdUsers AuthorizedUser[] @relation("UserHierarchy")
 }
 
 // Users of the system
 model PatientTestUser {
-  id        Int       @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  userType  UserType  @default(USER) @map("user_type")
-  patients  Patient[]
+  id       Int       @id @default(autoincrement())
+  name     String
+  email    String    @unique
+  password String
+  userType UserType  @default(USER) @map("user_type")
+  patients Patient[]
 }
 
 // Each patient linked to a PatientTestUser
 model Patient {
-  id          Int       @id @default(autoincrement())
+  id          Int             @id @default(autoincrement())
   name        String
   age         Int?
   city        String?
   fatherName  String?
   motherName  String?
-  uniqueId    String?   @unique
+  uniqueId    String?         @unique
   phoneNumber String?
-  score       Int       @default(0)
+  score       Int             @default(0)
   userId      Int
-  user        PatientTestUser  @relation(fields: [userId], references: [id])
+  user        PatientTestUser @relation(fields: [userId], references: [id])
   responses   UserResponse[]
 }
 
 // Test Levels
 model TestLevel {
-  id        Int      @id @default(autoincrement())
-  level     Int      @unique
-  images    Image[]
+  id        Int        @id @default(autoincrement())
+  level     Int        @unique
+  questions Question[]
 }
 
-// Images for each test level
+// Images for each question
 model Image {
-  id          Int        @id @default(autoincrement())
-  url         String
-  testLevelId Int
-  testLevel   TestLevel  @relation(fields: [testLevelId], references: [id])
-  questions   Question[]
+  id         Int      @id @default(autoincrement())
+  url        String
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id])
 }
 
 model Question {
-  id        Int      @id @default(autoincrement())
-  text      String
-  imageId   Int
-  image     Image    @relation(fields: [imageId], references: [id])
-  options   Option[]
-  answerId  Int
-  answer    Option   @relation("AnswerOption", fields: [answerId], references: [id])
-  responses UserResponse[]
+  id          Int            @id @default(autoincrement())
+  text        String
+  testLevelId Int
+  testLevel   TestLevel      @relation(fields: [testLevelId], references: [id])
+  images      Image[]
+  options     Option[]
+  answerId    Int?
+  answer      Option?        @relation("AnswerOption", fields: [answerId], references: [id])
+  responses   UserResponse[]
 }
 
 model Option {
-  id         Int       @id @default(autoincrement())
-  text       String
-  questionId Int
-  question   Question  @relation(fields: [questionId], references: [id])
-  isCorrect  Boolean   @default(false)
-  questionAnswer Question[] @relation("AnswerOption") // one-to-many from Option to Question
+  id             Int            @id @default(autoincrement())
+  text           String
+  questionId     Int
+  question       Question       @relation(fields: [questionId], references: [id])
+  questionAnswer Question[]     @relation("AnswerOption") // one-to-many from Option to Question
   userResponses  UserResponse[]
 }
 
-
 // User responses per question
 model UserResponse {
-  id          Int       @id @default(autoincrement())
-  patientId   Int
-  questionId  Int
-  selectedId  Int
-  patient     Patient   @relation(fields: [patientId], references: [id])
-  question    Question  @relation(fields: [questionId], references: [id])
-  selected    Option    @relation(fields: [selectedId], references: [id])
-  isCorrect   Boolean   @default(false)
-  createdAt   DateTime  @default(now())
+  id         Int      @id @default(autoincrement())
+  patientId  Int
+  questionId Int
+  selectedId Int
+  patient    Patient  @relation(fields: [patientId], references: [id])
+  question   Question @relation(fields: [questionId], references: [id])
+  selected   Option   @relation(fields: [selectedId], references: [id])
+  isCorrect  Boolean  @default(false)
+  createdAt  DateTime @default(now())
 }
