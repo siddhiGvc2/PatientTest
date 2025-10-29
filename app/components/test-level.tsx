@@ -115,9 +115,9 @@ export default function TestLevel() {
             return (
               <div
                 key={image.id}
-                onClick={() => correspondingOption && setSelectedOptions(prev => ({ ...prev, [currentQuestion.id]: correspondingOption.id }))} // select option on image click
+                onClick={() => setSelectedOptions(prev => ({ ...prev, [currentQuestion.id]: index+1 }))} // select option on image click
                 className={`bg-white p-4 rounded-lg shadow-md relative cursor-pointer  transition-all ${
-                  selectedOptions[currentQuestion.id] === correspondingOption?.id
+                  selectedOptions[currentQuestion.id] === index+1
                     ? 'ring-4 ring-blue-400'
                     : 'hover:shadow-lg'
                 }`}
