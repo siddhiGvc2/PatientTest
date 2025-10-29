@@ -71,19 +71,33 @@ export default function TestLevel() {
       {testLevel.questions.map((question) => (
         <div key={question.id} className="mb-8">
           <h3 className="text-xl font-semibold mb-4">{question.text}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
-            {question.images.map((image, index) => {
-              const labels = ['A', 'B', 'C', 'D'];
-              return (
-                <div key={image.id} className="bg-white p-4 rounded-lg shadow-md relative">
-                  <div className="absolute top-2 left-2 bg-black text-white px-2 py-1 rounded text-sm font-bold">
-                    {labels[index]}
-                  </div>
-                  <img src={image.url} alt={`Image ${image.id}`} className="w-full h-48 object-cover" />
-                </div>
-              );
-            })}
-          </div>
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
+  {question.images.map((image, index) => {
+    const labels = ['A', 'B', 'C', 'D'];
+    const correspondingOption = question.options[index]; // match image with option
+
+    return (
+      <div
+        key={image.id}
+        onClick={() => setSelectedOption(correspondingOption.id)} // select option on image click
+        className={`bg-white p-4 rounded-lg shadow-md relative cursor-pointer transition-all ${
+          selectedOption === correspondingOption.id
+            ? 'ring-4 ring-blue-400'
+            : 'hover:shadow-lg'
+        }`}
+      >
+        <div className="absolute top-2 left-2 bg-black text-white px-2 py-1 rounded text-sm font-bold">
+          {labels[index]}
+        </div>
+        <img
+          src={image.url}
+          alt={`Image ${image.id}`}
+          className="w-full h-48 object-cover rounded-md"
+        />
+      </div>
+    );
+  })}
+</div>
           <div className="mb-4">
             <h4 className="font-semibold mb-2">Options:</h4>
             <div className="space-y-2">
