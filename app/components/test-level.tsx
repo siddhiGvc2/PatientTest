@@ -31,7 +31,7 @@ export default function TestLevel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [showAnswer, setShowAnswer] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(true);
   const [currentLevel, setCurrentLevel] = useState(1);
 
   const fetchTestLevel = async (level: number) => {
@@ -122,14 +122,7 @@ export default function TestLevel() {
               ))}
             </div>
             <div style={{width:"100%",display:"flex"}}>
-            {selectedOption && (
-              <button
-                onClick={() => setShowAnswer(true)}
-                className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                Submit Answer
-              </button>
-            )}
+           
             {showAnswer && question.answer && (
               <p className={`mt-6 ml-4 text-md ${selectedOption === question.answer.id ? 'text-green-600' : 'text-red-600'}`}>
                 {selectedOption === question.answer.id ? 'Correct!' : `Incorrect. Correct Answer: ${question.answer.text}`}
