@@ -32,7 +32,6 @@ export default function TestLevel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number | null>>({});
-  const [showAnswer, setShowAnswer] = useState(true);
   const [currentLevel, setCurrentLevel] = useState(1);
 
   const fetchTestLevel = async (level: number) => {
@@ -96,14 +95,12 @@ export default function TestLevel() {
     const labels = ['A', 'B', 'C', 'D'];
     const correspondingOption = question.options[index]; // match image with option
 
-    if (!correspondingOption) return null;
-
     return (
       <div
         key={image.id}
-        onClick={() => setSelectedOptions(prev => ({ ...prev, [question.id]: correspondingOption.id }))} // select option on image click
-        className={`bg-white p-4 rounded-lg shadow-md relative cursor-pointer transition-all ${
-          selectedOptions[question.id] === correspondingOption.id
+        onClick={() => correspondingOption && setSelectedOptions(prev => ({ ...prev, [question.id]: correspondingOption.id }))} // select option on image click
+        className={`bg-white p-4 rounded-lg shadow-md relative ${correspondingOption ? 'cursor-pointer' : 'cursor-not-allowed'} transition-all ${
+          selectedOptions[question.id] === correspondingOption?.id
             ? 'ring-4 ring-blue-400'
             : 'hover:shadow-lg'
         }`}
@@ -140,7 +137,7 @@ export default function TestLevel() {
             </div>
             <div style={{width:"100%",display:"flex"}}>
            
-            {showAnswer && question.answer && (
+            {question.answer && (
               <p className={`mt-6 ml-4 text-md ${selectedOptions[question.id] === question.answer.id ? 'text-green-600' : 'text-red-600'}`}>
                 {selectedOptions[question.id] === question.answer.id ? 'Correct!' : `Incorrect. Correct Answer: ${question.answer.text}`}
               </p>
@@ -152,9 +149,24 @@ export default function TestLevel() {
       <div className="mt-8 text-center">
         <button
           onClick={() => {
+            if (currentLevel > 1) {
+              setCurrentLevel(currentLevel - 1);
+              setSelectedOptions({});
+            }
+          }}
+          disabled={currentLevel <= 1}
+          className={`px-6 py-3 mr-4 rounded ${
+            currentLevel <= 1
+              ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+              : 'bg-gray-500 text-white hover:bg-gray-600'
+          }`}
+        >
+          Previous Level
+        </button>
+        <button
+          onClick={() => {
             setCurrentLevel(currentLevel + 1);
             setSelectedOptions({});
-            setShowAnswer(false);
           }}
           className="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
