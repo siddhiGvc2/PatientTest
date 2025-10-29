@@ -74,7 +74,7 @@ export default function TestLevel() {
       <h2 className="text-2xl font-bold mb-4">Test Level {testLevel.level}</h2>
       {testLevel.questions.map((question) => (
         <div key={question.id} className="mb-8">
-          <h3 className="text-xl font-semibold mb-4">{question.text}</h3>
+         
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
   {question.images.map((image, index) => {
     const labels = ['A', 'B', 'C', 'D'];
@@ -104,10 +104,11 @@ export default function TestLevel() {
     );
   })}
 </div>
+      <h3 className="text-xl font-semibold mb-4">{question.text}</h3>
           <div className="mb-4">
             <h4 className="font-semibold mb-2">Options:</h4>
             <div className="space-y-2">
-              {question.options.map((option) => (
+              {testLevel.questions[0].options.map((option) => (
                 <button
                   key={option.id}
                   onClick={() => setSelectedOption(option.id)}
