@@ -34,6 +34,7 @@ export default function TestLevel() {
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number | null>>({});
   const [currentLevel, setCurrentLevel] = useState(1);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [testEnded,setTestEnded]=useState(false);
 
   const fetchTestLevel = async (level: number) => {
     setLoading(true);
@@ -45,7 +46,8 @@ export default function TestLevel() {
         console.log(data);
         setTestLevel(data);
       } else {
-        setError('Failed to fetch test level');
+        setTestEnded(true);
+        // setError('Failed to fetch test level');
       }
     } catch (err) {
       setError('Error fetching test level');
@@ -100,6 +102,22 @@ export default function TestLevel() {
     return <div className="text-center">No test level found.</div>;
   }
 
+  if(testEnded) {
+    return <div className="w-full flex justify-center">
+      <div className="text-2xl text-center">Test is Ended.</div>
+        <button
+            onClick={() => {
+              setCurrentLevel(1);
+              setSelectedOptions({});
+              setTestEnded(false);
+            }}
+            className="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Retake
+          </button>
+    </div> 
+  }
+
   const currentQuestion = testLevel.questions[currentQuestionIndex];
   const isAnswered = selectedOptions[currentQuestion.id] !== undefined;
 
@@ -152,13 +170,13 @@ export default function TestLevel() {
               </button>
             ))}
           </div>
-          <div style={{width:"100%",display:"flex"}}>
+          {/* <div style={{width:"100%",display:"flex"}}>
             {currentQuestion.answer && (
               <p className={`mt-6 ml-4 text-md ${selectedOptions[currentQuestion.id] === currentQuestion.answer.id ? 'text-green-600' : 'text-red-600'}`}>
                 {selectedOptions[currentQuestion.id] === currentQuestion.answer.id ? 'Correct!' : `Incorrect. Correct Answer: ${currentQuestion.answer.text}`}
               </p>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="mt-8 text-center">
