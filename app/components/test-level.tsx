@@ -102,21 +102,31 @@ export default function TestLevel() {
     return <div className="text-center">No test level found.</div>;
   }
 
-  if(testEnded) {
-    return <div className="w-full flex justify-center">
-      <div className="text-2xl text-center">Test is Ended.</div>
+  if (testEnded) {
+  return (
+    <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="bg-white shadow-xl rounded-2xl p-10 text-center transform transition-all duration-500 hover:scale-105">
+        <h2 className="text-3xl font-semibold text-gray-800 mb-4">
+          🎉 Test Completed!
+        </h2>
+        <p className="text-gray-600 mb-6">
+          Great job! You’ve reached the end of the test.
+        </p>
         <button
-            onClick={() => {
-              setCurrentLevel(1);
-              setSelectedOptions({});
-              setTestEnded(false);
-            }}
-            className="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Retake
-          </button>
-    </div> 
-  }
+          onClick={() => {
+            setCurrentLevel(1);
+            setSelectedOptions({});
+            setTestEnded(false);
+          }}
+          className="px-8 py-3 bg-blue-600 text-white text-lg font-medium rounded-lg shadow-md hover:bg-blue-700 transition-all"
+        >
+          🔁 Retake Test
+        </button>
+      </div>
+    </div>
+  );
+}
+
 
   const currentQuestion = testLevel.questions[currentQuestionIndex];
   const isAnswered = selectedOptions[currentQuestion.id] !== undefined;
