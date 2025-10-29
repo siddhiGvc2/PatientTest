@@ -85,7 +85,7 @@ export default function TestLevel() {
           setCurrentLevel(currentLevel + 1);
           setSelectedOptions({});
         }
-      }, 3000); // 3 seconds delay
+      }, 1000); // 3 seconds delay
       return () => clearTimeout(timer);
     }
   }, [selectedOptions, currentQuestionIndex, testLevel, currentLevel]);
