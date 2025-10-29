@@ -28,9 +28,10 @@ interface TestLevel {
 
 export default function TestLevel() {
   const [testLevel, setTestLevel] = useState<TestLevel | null>(null);
+  const [allOptions, setAllOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [selectedOptions, setSelectedOptions] = useState<Record<number, number | null>>({});
   const [showAnswer, setShowAnswer] = useState(true);
   const [currentLevel, setCurrentLevel] = useState(1);
 
@@ -53,8 +54,23 @@ export default function TestLevel() {
     }
   };
 
+  const fetchAllOptions = async () => {
+    try {
+      const res = await fetch('/api/options');
+      if (res.ok) {
+        const data = await res.json();
+        setAllOptions(data.options);
+      } else {
+        console.error('Failed to fetch options');
+      }
+    } catch (err) {
+      console.error('Error fetching options');
+    }
+  };
+
   useEffect(() => {
     fetchTestLevel(currentLevel);
+    fetchAllOptions();
   }, [currentLevel]);
 
   if (loading) {
@@ -85,9 +101,9 @@ export default function TestLevel() {
     return (
       <div
         key={image.id}
-        onClick={() => setSelectedOption(correspondingOption.id)} // select option on image click
+        onClick={() => setSelectedOptions(prev => ({ ...prev, [question.id]: correspondingOption.id }))} // select option on image click
         className={`bg-white p-4 rounded-lg shadow-md relative cursor-pointer transition-all ${
-          selectedOption === correspondingOption.id
+          selectedOptions[question.id] === correspondingOption.id
             ? 'ring-4 ring-blue-400'
             : 'hover:shadow-lg'
         }`}
@@ -108,12 +124,12 @@ export default function TestLevel() {
           <div className="mb-4">
             <h4 className="font-semibold mb-2">Options:</h4>
             <div className="space-y-2">
-              {testLevel.questions[0].options.map((option) => (
+              {allOptions.map((option) => (
                 <button
                   key={option.id}
-                  onClick={() => setSelectedOption(option.id)}
+                  onClick={() => setSelectedOptions(prev => ({ ...prev, [question.id]: option.id }))}
                   className={`block w-full text-left p-2 border rounded ${
-                    selectedOption === option.id
+                    selectedOptions[question.id] === option.id
                       ? 'bg-blue-200 border-blue-500'
                       : 'bg-white border-gray-300 hover:bg-gray-100'
                   }`}
@@ -125,8 +141,8 @@ export default function TestLevel() {
             <div style={{width:"100%",display:"flex"}}>
            
             {showAnswer && question.answer && (
-              <p className={`mt-6 ml-4 text-md ${selectedOption === question.answer.id ? 'text-green-600' : 'text-red-600'}`}>
-                {selectedOption === question.answer.id ? 'Correct!' : `Incorrect. Correct Answer: ${question.answer.text}`}
+              <p className={`mt-6 ml-4 text-md ${selectedOptions[question.id] === question.answer.id ? 'text-green-600' : 'text-red-600'}`}>
+                {selectedOptions[question.id] === question.answer.id ? 'Correct!' : `Incorrect. Correct Answer: ${question.answer.text}`}
               </p>
             )}
             </div>
@@ -137,7 +153,7 @@ export default function TestLevel() {
         <button
           onClick={() => {
             setCurrentLevel(currentLevel + 1);
-            setSelectedOption(null);
+            setSelectedOptions({});
             setShowAnswer(false);
           }}
           className="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"
