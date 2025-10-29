@@ -32,12 +32,16 @@ export default function TestLevel() {
   const [error, setError] = useState<string | null>(null);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [currentLevel, setCurrentLevel] = useState(1);
 
-  const fetchTestLevel = async () => {
+  const fetchTestLevel = async (level: number) => {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch('/api/test-level/1');
+      const res = await fetch(`/api/test-level/${level}`);
       if (res.ok) {
         const data = await res.json();
+        console.log(data);
         setTestLevel(data);
       } else {
         setError('Failed to fetch test level');
@@ -50,8 +54,8 @@ export default function TestLevel() {
   };
 
   useEffect(() => {
-    fetchTestLevel();
-  }, []);
+    fetchTestLevel(currentLevel);
+  }, [currentLevel]);
 
   if (loading) {
     return <div className="text-center">Loading test level...</div>;
@@ -76,6 +80,8 @@ export default function TestLevel() {
     const labels = ['A', 'B', 'C', 'D'];
     const correspondingOption = question.options[index]; // match image with option
 
+    if (!correspondingOption) return null;
+
     return (
       <div
         key={image.id}
@@ -87,7 +93,7 @@ export default function TestLevel() {
         }`}
       >
         <div className="absolute top-2 left-2 bg-black text-white px-2 py-1 rounded text-sm font-bold">
-          {labels[index]}
+          {labels[index] || ''}
         </div>
         <img
           src={image.url}
@@ -133,6 +139,18 @@ export default function TestLevel() {
           </div>
         </div>
       ))}
+      <div className="mt-8 text-center">
+        <button
+          onClick={() => {
+            setCurrentLevel(currentLevel + 1);
+            setSelectedOption(null);
+            setShowAnswer(false);
+          }}
+          className="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Next Level
+        </button>
+      </div>
     </div>
   );
 }
