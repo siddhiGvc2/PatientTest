@@ -28,9 +28,11 @@ interface TestLevel {
 
 interface TestLevelProps {
   onTestEnd?: () => void;
+  onExit?: () => void;
+  onRetake?: () => void;
 }
 
-export default function TestLevel({ onTestEnd }: TestLevelProps) {
+export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProps) {
   const [testLevel, setTestLevel] = useState<TestLevel | null>(null);
   const [allOptions, setAllOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
@@ -139,7 +141,7 @@ export default function TestLevel({ onTestEnd }: TestLevelProps) {
             setCurrentLevel(1);
             setSelectedOptions({});
             setTestEnded(false);
-            // Call the callback to show header again
+            onRetake?.(); // Call the callback to hide header again
           }}
           className="px-8 py-3 bg-blue-600 text-white text-lg font-medium rounded-lg shadow-md hover:bg-blue-700 transition-all"
         >
@@ -156,7 +158,20 @@ export default function TestLevel({ onTestEnd }: TestLevelProps) {
 
   return (
     <div className="w-full p-6">
-      <h2 className="text-2xl font-bold mb-4">Test Level {testLevel.level}</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Test Level {testLevel.level}</h2>
+        <button
+          onClick={() => {
+            setTestEnded(true);
+            setCurrentLevel(1);
+            setCurrentQuestionIndex(0);
+            onExit?.();
+          }}
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        >
+          Exit Test
+        </button>
+      </div>
       <div className="mb-8">
          <div className="flex items-center mb-4">
            <h3 className="text-xl font-semibold">Q{currentLevel}/{currentQuestionIndex+1}  {currentQuestion.text}</h3>

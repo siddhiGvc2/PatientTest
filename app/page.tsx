@@ -17,6 +17,15 @@ export default function Home() {
     setTestEnded(true);
   };
 
+  const handleExitTest = () => {
+    setTestEnded(true);
+    setActiveTab('patients');
+  };
+
+  const handleRetakeTest = () => {
+    setTestEnded(false);
+  };
+
   const handleLogin = (user: any) => {
     setLoggedInUser(user);
   };
@@ -63,7 +72,7 @@ export default function Home() {
                       User Management
                     </button>
                     <button
-                      onClick={() => setActiveTab('test')}
+                      onClick={() => {setActiveTab('test');setTestEnded(false)}}
                       className={`px-4 py-2 rounded ${activeTab === 'test' ? 'bg-blue-500 text-white' : 'bg-white'}`}
                     >
                       Test Level
@@ -78,7 +87,7 @@ export default function Home() {
           {activeTab === 'users' && canManageUsers && <UserManagement currentUser={loggedInUser} />}
           {activeTab === 'test' && (
             <div className="min-h-screen bg-gray-50">
-              <TestLevel onTestEnd={handleTestEnd} />
+              <TestLevel onTestEnd={handleTestEnd} onExit={handleExitTest} onRetake={handleRetakeTest} />
             </div>
           )}
         </div>
