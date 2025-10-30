@@ -17,6 +17,7 @@ interface Question {
   id: number;
   text: string;
   screenId: number;
+  answerId: number;
 }
 
 interface Image {
