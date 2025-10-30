@@ -204,7 +204,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
                 <img
                   src={image.url}
                   alt={`Image ${image.id}`}
-                  className="w-full h-48 object-cover rounded-md"
+                  className="w-full h-80 object-cover rounded-md"
                 />
               </div>
             );
