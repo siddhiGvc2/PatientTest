@@ -26,7 +26,11 @@ interface TestLevel {
   questions: Question[];
 }
 
-export default function TestLevel() {
+interface TestLevelProps {
+  onTestEnd?: () => void;
+}
+
+export default function TestLevel({ onTestEnd }: TestLevelProps) {
   const [testLevel, setTestLevel] = useState<TestLevel | null>(null);
   const [allOptions, setAllOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +62,7 @@ export default function TestLevel() {
         setCurrentQuestionIndex(0);
       } else {
         setTestEnded(true);
+         onTestEnd?.();
         // setError('Failed to fetch test level');
       }
     } catch (err) {
@@ -134,6 +139,7 @@ export default function TestLevel() {
             setCurrentLevel(1);
             setSelectedOptions({});
             setTestEnded(false);
+            // Call the callback to show header again
           }}
           className="px-8 py-3 bg-blue-600 text-white text-lg font-medium rounded-lg shadow-md hover:bg-blue-700 transition-all"
         >
