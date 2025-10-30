@@ -17,7 +17,7 @@ interface Question {
   id: number;
   text: string;
   screenId: number;
-  answerId: number;
+  answerImageId: number;
 }
 
 interface Image {
@@ -42,7 +42,7 @@ export default function AdminPanel() {
   // Form states
   const [newTestLevel, setNewTestLevel] = useState({ level: "" });
   const [newScreen, setNewScreen] = useState({ screenNumber: "", testLevelId: "" });
-  const [newQuestion, setNewQuestion] = useState({ text: "", screenId: "", answerId: "" });
+  const [newQuestion, setNewQuestion] = useState({ text: "", screenId: "", options: [{ text: "" }, { text: "" }, { text: "" }, { text: "" }], answerImageId: "" });
   const [newImage, setNewImage] = useState({ url: "", screenId: "" });
 
   const [message, setMessage] = useState("");
@@ -120,12 +120,13 @@ export default function AdminPanel() {
         body: JSON.stringify({
           text: newQuestion.text,
           screenId: parseInt(newQuestion.screenId),
-          answerId: parseInt(newQuestion.answerId),
+          options: newQuestion.options.filter(opt => opt.text.trim() !== ""),
+          answerImageId: parseInt(newQuestion.answerImageId),
         }),
       });
       if (res.ok) {
         setMessage("Question added successfully!");
-        setNewQuestion({ text: "", screenId: "", answerId: "" });
+        setNewQuestion({ text: "", screenId: "", options: [{ text: "" }, { text: "" }, { text: "" }, { text: "" }], answerImageId: "" });
         fetchData();
       } else {
         setMessage("Error adding Question");
@@ -225,14 +226,31 @@ export default function AdminPanel() {
               <option key={s.id} value={s.id}>Screen {s.screenNumber} (Level {testLevels.find(tl => tl.id === s.testLevelId)?.level})</option>
             ))}
           </select>
+          <div className="mb-2">
+            <label className="block text-sm font-medium mb-1">Options:</label>
+            {newQuestion.options.map((option, index) => (
+              <input
+                key={index}
+                type="text"
+                placeholder={`Option ${index + 1}`}
+                value={option.text}
+                onChange={(e) => {
+                  const updatedOptions = [...newQuestion.options];
+                  updatedOptions[index].text = e.target.value;
+                  setNewQuestion({ ...newQuestion, options: updatedOptions });
+                }}
+                className="w-full p-2 border rounded mb-1"
+              />
+            ))}
+          </div>
           <select
-            value={newQuestion.answerId}
-            onChange={(e) => setNewQuestion({ ...newQuestion, answerId: e.target.value })}
+            value={newQuestion.answerImageId}
+            onChange={(e) => setNewQuestion({ ...newQuestion, answerImageId: e.target.value })}
             className="w-full p-2 border rounded mb-2"
           >
-            <option value="">Select Answer Option</option>
-            {options.map(o => (
-              <option key={o.id} value={o.id}>{o.text}</option>
+            <option value="">Select Answer Image</option>
+            {images.map(img => (
+              <option key={img.id} value={img.id}>Image {img.id} ({img.url})</option>
             ))}
           </select>
           <button onClick={handleAddQuestion} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
@@ -323,7 +341,7 @@ export default function AdminPanel() {
                 <th className="border border-gray-300 p-2">ID</th>
                 <th className="border border-gray-300 p-2">Text</th>
                 <th className="border border-gray-300 p-2">Screen</th>
-                <th className="border border-gray-300 p-2">Answer Option</th>
+                <th className="border border-gray-300 p-2">Answer Image ID</th>
               </tr>
             </thead>
             <tbody>
@@ -332,7 +350,7 @@ export default function AdminPanel() {
                   <td className="border border-gray-300 p-2">{q.id}</td>
                   <td className="border border-gray-300 p-2">{q.text}</td>
                   <td className="border border-gray-300 p-2">{screens.find(s => s.id === q.screenId)?.screenNumber}</td>
-                  <td className="border border-gray-300 p-2">{options.find(o => o.id === q.answerId)?.text}</td>
+                  <td className="border border-gray-300 p-2">{q.answerImageId !== undefined ? q.answerImageId : 'N/A'}</td>
                 </tr>
               ))}
             </tbody>

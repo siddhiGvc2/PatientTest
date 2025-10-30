@@ -33,7 +33,6 @@ export async function GET() {
         questions: {
           include: {
             options: true,
-            answer: true,
           },
         },
         images: true,

@@ -17,7 +17,7 @@ interface Question {
   text: string;
   images: Image[];
   options: Option[];
-  answer: Option | null;
+  answerImageId: number;
 }
 
 interface Screen {
@@ -178,10 +178,21 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
 
   const currentScreen = testLevel.screens[currentScreenIndex];
   if (!currentScreen) {
-    return <div className="text-center">No screen found.</div>;
+    setTimeout(() => {
+      setTestEnded(true);
+      onTestEnd?.();
+    }, 0);
+    return null;
   }
   const currentQuestion = currentScreen.questions && currentScreen.questions[currentQuestionIndexInScreen];
-  const isAnswered = currentQuestion ? selectedOptions[currentQuestion.id] !== undefined : false;
+  if (!currentQuestion) {
+    setTimeout(() => {
+      setTestEnded(true);
+      onTestEnd?.();
+    }, 0);
+    return null;
+  }
+  const isAnswered = selectedOptions[currentQuestion.id] !== undefined;
 
   return (
     <div className="w-full p-6">
@@ -218,9 +229,9 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
             return (
               <div
                 key={image.id}
-                onClick={() => setSelectedOptions(prev => ({ ...prev, [currentQuestion.id]: index+1 }))} // select option on image click
+                onClick={() => setSelectedOptions(prev => ({ ...prev, [currentQuestion.id]: image.id }))} // select option on image click
                 className={`bg-white p-4 rounded-lg shadow-md relative cursor-pointer  transition-all ${
-                  selectedOptions[currentQuestion.id] === index+1
+                  selectedOptions[currentQuestion.id] === image.id
                     ? 'ring-4 ring-blue-400'
                     : 'hover:shadow-lg'
                 }`}

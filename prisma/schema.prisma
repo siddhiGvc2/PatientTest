@@ -50,9 +50,9 @@ model Patient {
 
 // Test Levels
 model TestLevel {
-  id        Int        @id @default(autoincrement())
-  level     Int        @unique
-  screens   Screen[]
+  id      Int      @id @default(autoincrement())
+  level   Int      @unique
+  screens Screen[]
 }
 
 // Screens within a test level
@@ -69,30 +69,30 @@ model Screen {
 
 // Images for each screen
 model Image {
-  id       Int    @id @default(autoincrement())
+  id       Int        @id @default(autoincrement())
   url      String
   screenId Int
-  screen   Screen @relation(fields: [screenId], references: [id])
+  screen   Screen     @relation(fields: [screenId], references: [id])
+  Question Question[]
 }
 
 model Question {
-  id          Int            @id @default(autoincrement())
-  text        String
-  screenId    Int
-  screen      Screen         @relation(fields: [screenId], references: [id])
-  options     Option[]
-  answerId    Int?
-  answer      Option?        @relation("AnswerOption", fields: [answerId], references: [id])
-  responses   UserResponse[]
+  id            Int            @id @default(autoincrement())
+  text          String
+  screenId      Int
+  screen        Screen         @relation(fields: [screenId], references: [id])
+  options       Option[]
+  answerImageId Int?
+  answerImage   Image?         @relation(fields: [answerImageId], references: [id])
+  responses     UserResponse[]
 }
 
 model Option {
-  id             Int            @id @default(autoincrement())
-  text           String
-  questionId     Int
-  question       Question       @relation(fields: [questionId], references: [id])
-  questionAnswer Question[]     @relation("AnswerOption") // one-to-many from Option to Question
-  userResponses  UserResponse[]
+  id            Int            @id @default(autoincrement())
+  text          String
+  questionId    Int
+  question      Question       @relation(fields: [questionId], references: [id])
+  userResponses UserResponse[]
 }
 
 // User responses per question

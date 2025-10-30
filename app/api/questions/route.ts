@@ -5,20 +5,17 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
-    const { text, screenId, options, answerId } = await request.json();
+    const { text, screenId, options, answerImageId } = await request.json();
 
-    if (!text || typeof text !== 'string' || !screenId || typeof screenId !== 'number' || !options || !Array.isArray(options)) {
-      return NextResponse.json({ error: 'text, screenId, and options are required. options must be an array' }, { status: 400 });
+    if (!text || typeof text !== 'string' || !screenId || typeof screenId !== 'number' || !options || !Array.isArray(options) || answerImageId === undefined || typeof answerImageId !== 'number') {
+      return NextResponse.json({ error: 'text, screenId, options, and valid answerImageId are required. options must be an array, answerImageId must be a number' }, { status: 400 });
     }
 
     const question = await prisma.question.create({
       data: {
         text,
         screenId,
-        options: {
-          create: options.map((opt: { text: string }) => ({ text: opt.text })),
-        },
-        answerId,
+        answerImageId: answerImageId,
       },
     });
 
@@ -34,8 +31,6 @@ export async function GET() {
     const questions = await prisma.question.findMany({
       include: {
         screen: true,
-        options: true,
-        answer: true,
         responses: true,
       },
     });
