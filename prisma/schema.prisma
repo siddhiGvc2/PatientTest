@@ -52,23 +52,34 @@ model Patient {
 model TestLevel {
   id        Int        @id @default(autoincrement())
   level     Int        @unique
-  questions Question[]
+  screens   Screen[]
 }
 
-// Images for each question
+// Screens within a test level
+model Screen {
+  id           Int        @id @default(autoincrement())
+  screenNumber Int
+  testLevelId  Int
+  testLevel    TestLevel  @relation(fields: [testLevelId], references: [id])
+  questions    Question[]
+  images       Image[]
+
+  @@unique([testLevelId, screenNumber])
+}
+
+// Images for each screen
 model Image {
-  id         Int      @id @default(autoincrement())
-  url        String
-  questionId Int
-  question   Question @relation(fields: [questionId], references: [id])
+  id       Int    @id @default(autoincrement())
+  url      String
+  screenId Int
+  screen   Screen @relation(fields: [screenId], references: [id])
 }
 
 model Question {
   id          Int            @id @default(autoincrement())
   text        String
-  testLevelId Int
-  testLevel   TestLevel      @relation(fields: [testLevelId], references: [id])
-  images      Image[]
+  screenId    Int
+  screen      Screen         @relation(fields: [screenId], references: [id])
   options     Option[]
   answerId    Int?
   answer      Option?        @relation("AnswerOption", fields: [answerId], references: [id])

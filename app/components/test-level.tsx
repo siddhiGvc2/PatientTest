@@ -20,10 +20,17 @@ interface Question {
   answer: Option | null;
 }
 
+interface Screen {
+  id: number;
+  screenNumber: number;
+  questions: Question[];
+  images: Image[];
+}
+
 interface TestLevel {
   id: number;
   level: number;
-  questions: Question[];
+  screens: Screen[];
 }
 
 interface TestLevelProps {
@@ -39,7 +46,8 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
   const [error, setError] = useState<string | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number | null>>({});
   const [currentLevel, setCurrentLevel] = useState(1);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
+  const [currentQuestionIndexInScreen, setCurrentQuestionIndexInScreen] = useState(0);
   const [testEnded,setTestEnded]=useState(false);
 
   const speakText = (text: string) => {
@@ -61,7 +69,8 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
         const data = await res.json();
         console.log(data);
         setTestLevel(data);
-        setCurrentQuestionIndex(0);
+        setCurrentScreenIndex(0);
+        setCurrentQuestionIndexInScreen(0);
       } else {
         setTestEnded(true);
          onTestEnd?.();
@@ -91,28 +100,42 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
   useEffect(() => {
     fetchTestLevel(currentLevel);
     fetchAllOptions();
-    
+
   }, [currentLevel]);
 
   useEffect(() => {
-    if (testLevel && testLevel.questions[currentQuestionIndex]) {
-      speakText(testLevel.questions[currentQuestionIndex].text);
+    if (testLevel && currentScreenIndex >= testLevel.screens.length) {
+      setTestEnded(true);
+       onTestEnd?.();
     }
-  }, [currentQuestionIndex, testLevel]);
+  }, [testLevel, currentScreenIndex]);
 
   useEffect(() => {
-    if (testLevel && selectedOptions[testLevel.questions[currentQuestionIndex].id] !== undefined) {
-      const timer = setTimeout(() => {
-        if (currentQuestionIndex < testLevel.questions.length - 1) {
-          setCurrentQuestionIndex(currentQuestionIndex + 1);
-        } else {
-          setCurrentLevel(currentLevel + 1);
-          setSelectedOptions({});
-        }
-      }, 1000); // 1 seconds delay
-      return () => clearTimeout(timer);
+    if (testLevel && testLevel.screens[currentScreenIndex] && testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen]) {
+      speakText(testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen].text);
     }
-  }, [selectedOptions, currentQuestionIndex, testLevel]);
+  }, [currentScreenIndex, currentQuestionIndexInScreen, testLevel]);
+
+  useEffect(() => {
+    if (testLevel && testLevel.screens[currentScreenIndex] && testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen]) {
+      const currentQuestion = testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen];
+      if (selectedOptions[currentQuestion.id] !== undefined) {
+        const timer = setTimeout(() => {
+          const currentScreen = testLevel.screens[currentScreenIndex];
+          if (currentQuestionIndexInScreen < currentScreen.questions.length - 1) {
+            setCurrentQuestionIndexInScreen(currentQuestionIndexInScreen + 1);
+          } else if (currentScreenIndex < testLevel.screens.length - 1) {
+            setCurrentScreenIndex(currentScreenIndex + 1);
+            setCurrentQuestionIndexInScreen(0);
+          } else {
+            setCurrentLevel(currentLevel + 1);
+            setSelectedOptions({});
+          }
+        }, 1000); // 1 seconds delay
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [selectedOptions, currentScreenIndex, currentQuestionIndexInScreen, testLevel]);
 
   if (loading) {
     return <div className="text-center">Loading test level...</div>;
@@ -153,8 +176,12 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
 }
 
 
-  const currentQuestion = testLevel.questions[currentQuestionIndex];
-  const isAnswered = selectedOptions[currentQuestion.id] !== undefined;
+  const currentScreen = testLevel.screens[currentScreenIndex];
+  if (!currentScreen) {
+    return <div className="text-center">No screen found.</div>;
+  }
+  const currentQuestion = currentScreen.questions && currentScreen.questions[currentQuestionIndexInScreen];
+  const isAnswered = currentQuestion ? selectedOptions[currentQuestion.id] !== undefined : false;
 
   return (
     <div className="w-full p-6">
@@ -164,7 +191,8 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
           onClick={() => {
             setTestEnded(true);
             setCurrentLevel(1);
-            setCurrentQuestionIndex(0);
+            setCurrentScreenIndex(0);
+            setCurrentQuestionIndexInScreen(0);
             onExit?.();
           }}
           className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
@@ -174,7 +202,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
       </div>
       <div className="mb-8">
          <div className="flex items-center mb-4">
-           <h3 className="text-xl font-semibold">Q{currentLevel}/{currentQuestionIndex+1}  {currentQuestion.text}</h3>
+           <h3 className="text-xl font-semibold">S{currentScreen.screenNumber}/{currentQuestionIndexInScreen+1}  {currentQuestion.text}</h3>
            <button
              onClick={() => speakText(`${currentQuestion.text}`)}
              className="ml-4 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -184,9 +212,8 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
            </button>
          </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
-          {testLevel.questions[0].images.map((image, index) => {
+          {currentScreen.images.map((image, index) => {
             const labels = ['A', 'B', 'C', 'D'];
-            const correspondingOption = currentQuestion.options[index]; // match image with option
 
             return (
               <div
@@ -240,28 +267,44 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
       <div className="mt-8 text-center">
         <button
           onClick={() => {
-            if (currentQuestionIndex > 0) {
-              setCurrentQuestionIndex(currentQuestionIndex - 1);
+            if (currentQuestionIndexInScreen > 0) {
+              setCurrentQuestionIndexInScreen(currentQuestionIndexInScreen - 1);
+            } else if (currentScreenIndex > 0) {
+              const prevScreenIndex = currentScreenIndex - 1;
+              const prevScreen = testLevel.screens[prevScreenIndex];
+              setCurrentScreenIndex(prevScreenIndex);
+              setCurrentQuestionIndexInScreen(prevScreen.questions.length - 1);
             }
           }}
-          disabled={currentQuestionIndex <= 0}
+          disabled={currentScreenIndex === 0 && currentQuestionIndexInScreen === 0}
           className={`px-6 py-3 mr-4 rounded ${
-            currentQuestionIndex <= 0
+            currentScreenIndex === 0 && currentQuestionIndexInScreen === 0
               ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
               : 'bg-gray-500 text-white hover:bg-gray-600'
           }`}
         >
           Previous Question
         </button>
-        {isAnswered && currentQuestionIndex < testLevel.questions.length - 1 && (
+        {isAnswered && currentQuestionIndexInScreen < currentScreen.questions.length - 1 && (
           <button
-            onClick={() => setCurrentQuestionIndex(currentQuestionIndex + 1)}
+            onClick={() => setCurrentQuestionIndexInScreen(currentQuestionIndexInScreen + 1)}
             className="px-6 py-3 mr-4 bg-green-500 text-white rounded hover:bg-green-600"
           >
             Next Question
           </button>
         )}
-        {isAnswered && currentQuestionIndex === testLevel.questions.length - 1 && (
+        {isAnswered && currentQuestionIndexInScreen === currentScreen.questions.length - 1 && currentScreenIndex < testLevel.screens.length - 1 && (
+          <button
+            onClick={() => {
+              setCurrentScreenIndex(currentScreenIndex + 1);
+              setCurrentQuestionIndexInScreen(0);
+            }}
+            className="px-6 py-3 mr-4 bg-green-500 text-white rounded hover:bg-green-600"
+          >
+            Next Screen
+          </button>
+        )}
+        {isAnswered && currentScreenIndex === testLevel.screens.length - 1 && currentQuestionIndexInScreen === currentScreen.questions.length - 1 && (
           <button
             onClick={() => {
               setCurrentLevel(currentLevel + 1);

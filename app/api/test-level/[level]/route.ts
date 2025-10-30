@@ -21,11 +21,18 @@ export async function GET(
     const testLevel = await prisma.testLevel.findUnique({
       where: { level },
       include: {
-        questions: {
+        screens: {
           include: {
             images: true,
-            options: true,
-            answer: true,
+            questions: {
+              include: {
+                options: true,
+                answer: true,
+              },
+            },
+          },
+          orderBy: {
+            screenNumber: 'asc',
           },
         },
       },

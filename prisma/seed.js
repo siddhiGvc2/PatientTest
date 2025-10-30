@@ -15,11 +15,29 @@ async function main() {
     });
   }
 
-  // Create 1 question for the level
+  // Create Screen 1 for the test level
+  let screen1 = await prisma.screen.findUnique({
+    where: {
+      testLevelId_screenNumber: {
+        testLevelId: testLevel.id,
+        screenNumber: 1,
+      },
+    },
+  });
+  if (!screen1) {
+    screen1 = await prisma.screen.create({
+      data: {
+        screenNumber: 1,
+        testLevelId: testLevel.id,
+      },
+    });
+  }
+
+  // Create 1 question for Screen 1
   const question = await prisma.question.create({
     data: {
       text: 'What is the correct answer based on the images?',
-      testLevelId: testLevel.id,
+      screenId: screen1.id,
       options: {
         create: [
           { text: 'Option A' },
@@ -31,12 +49,12 @@ async function main() {
     },
   });
 
-  // Create 4 images for the question
+  // Create 4 images for the screen
   for (let i = 1; i <= 4; i++) {
     await prisma.image.create({
       data: {
         url: `https://example.com/image${i}.jpg`, // Replace with actual image URLs
-        questionId: question.id,
+        screenId: screen1.id,
       },
     });
   }
@@ -51,7 +69,7 @@ async function main() {
     data: { answerId: correctOption.id },
   });
 
-  console.log('Seeded database with 4 images, each with 1 question and 4 options.');
+  console.log('Seeded database with 1 screen, 1 question with 4 images and 4 options.');
 }
 
 main()

@@ -1,12 +1,4 @@
-# TODO: Update UI for Shared Options
+# TODO: Modify seed.js according to Image schema and seed the database
 
-- [x] Modify test-level.tsx to fetch all options and display them for every question
-- [x] Update the component logic to handle shared options across all questions
-
-# TODO: Add Audio for Question Text
-
-- [x] Add speakText function to test-level.tsx using Web Speech API
-- [x] Modify JSX to include speaker button next to question h3
-- [x] Set language to Hindi for text-to-speech
-- [x] Add auto-speak when question is fetched
-- [ ] Test audio functionality in browser
+- [x] Modify prisma/seed.js: Update image creation to use screenId instead of questionId, linking images to the screen (screen1.id).
+- [x] Run the seed script to populate the database with the corrected data.
