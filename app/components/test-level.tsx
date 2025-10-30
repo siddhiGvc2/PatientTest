@@ -36,6 +36,16 @@ export default function TestLevel() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [testEnded,setTestEnded]=useState(false);
 
+  const speakText = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'hi-IN'; // Set language to Hindi (India)
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert('Text-to-speech is not supported in this browser.');
+    }
+  };
+
   const fetchTestLevel = async (level: number) => {
     setLoading(true);
     setError(null);
@@ -45,6 +55,7 @@ export default function TestLevel() {
         const data = await res.json();
         console.log(data);
         setTestLevel(data);
+        setCurrentQuestionIndex(0);
       } else {
         setTestEnded(true);
         // setError('Failed to fetch test level');
@@ -73,8 +84,14 @@ export default function TestLevel() {
   useEffect(() => {
     fetchTestLevel(currentLevel);
     fetchAllOptions();
-    setCurrentQuestionIndex(0);
+    
   }, [currentLevel]);
+
+  useEffect(() => {
+    if (testLevel && testLevel.questions[currentQuestionIndex]) {
+      speakText(testLevel.questions[currentQuestionIndex].text);
+    }
+  }, [currentQuestionIndex, testLevel]);
 
   useEffect(() => {
     if (testLevel && selectedOptions[testLevel.questions[currentQuestionIndex].id] !== undefined) {
@@ -85,10 +102,10 @@ export default function TestLevel() {
           setCurrentLevel(currentLevel + 1);
           setSelectedOptions({});
         }
-      }, 1000); // 3 seconds delay
+      }, 1000); // 1 seconds delay
       return () => clearTimeout(timer);
     }
-  }, [selectedOptions, currentQuestionIndex, testLevel, currentLevel]);
+  }, [selectedOptions, currentQuestionIndex, testLevel]);
 
   if (loading) {
     return <div className="text-center">Loading test level...</div>;
@@ -135,6 +152,16 @@ export default function TestLevel() {
     <div className="w-full p-6">
       <h2 className="text-2xl font-bold mb-4">Test Level {testLevel.level}</h2>
       <div className="mb-8">
+         <div className="flex items-center mb-4">
+           <h3 className="text-xl font-semibold">Q{currentLevel}/{currentQuestionIndex+1}  {currentQuestion.text}</h3>
+           <button
+             onClick={() => speakText(`${currentQuestion.text}`)}
+             className="ml-4 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+             title="Speak question"
+           >
+             🔊
+           </button>
+         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
           {testLevel.questions[0].images.map((image, index) => {
             const labels = ['A', 'B', 'C', 'D'];
@@ -162,10 +189,10 @@ export default function TestLevel() {
             );
           })}
         </div>
-        <h3 className="text-xl font-semibold mb-4">{currentQuestion.text}</h3>
-        <div className="mb-4">
-          <h4 className="font-semibold mb-2">Options:</h4>
-          <div className="space-y-2">
+       
+        {/* <div className="mb-4">
+          <h4 className="font-semibold mb-2">Options:</h4> */}
+          {/* <div className="space-y-2">
             {allOptions.map((option) => (
               <button
                 key={option.id}
@@ -179,7 +206,7 @@ export default function TestLevel() {
                 {option.text}
               </button>
             ))}
-          </div>
+          </div> */}
           {/* <div style={{width:"100%",display:"flex"}}>
             {currentQuestion.answer && (
               <p className={`mt-6 ml-4 text-md ${selectedOptions[currentQuestion.id] === currentQuestion.answer.id ? 'text-green-600' : 'text-red-600'}`}>
@@ -187,7 +214,7 @@ export default function TestLevel() {
               </p>
             )}
           </div> */}
-        </div>
+        {/* </div> */}
       </div>
       <div className="mt-8 text-center">
         <button
