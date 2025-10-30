@@ -279,12 +279,18 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
         <button
           onClick={() => {
             if (currentQuestionIndexInScreen > 0) {
-              setCurrentQuestionIndexInScreen(currentQuestionIndexInScreen - 1);
+              const newQuestionIndex = currentQuestionIndexInScreen - 1;
+              const newQuestion = currentScreen.questions[newQuestionIndex];
+              setCurrentQuestionIndexInScreen(newQuestionIndex);
+              setSelectedOptions({});
             } else if (currentScreenIndex > 0) {
               const prevScreenIndex = currentScreenIndex - 1;
               const prevScreen = testLevel.screens[prevScreenIndex];
+              const newQuestionIndex = prevScreen.questions.length - 1;
+              const newQuestion = prevScreen.questions[newQuestionIndex];
               setCurrentScreenIndex(prevScreenIndex);
-              setCurrentQuestionIndexInScreen(prevScreen.questions.length - 1);
+              setCurrentQuestionIndexInScreen(newQuestionIndex);
+              setSelectedOptions({});
             }
           }}
           disabled={currentScreenIndex === 0 && currentQuestionIndexInScreen === 0}
