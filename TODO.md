@@ -1,4 +1,6 @@
-# TODO: Modify seed.js according to Image schema and seed the database
+# TODO: Create UI for adding TestLevel, Screen, Question, Image
 
-- [x] Modify prisma/seed.js: Update image creation to use screenId instead of questionId, linking images to the screen (screen1.id).
-- [x] Run the seed script to populate the database with the corrected data.
+- [x] Create app/components/admin-panel.tsx: Component with forms for adding TestLevel, Screen, Question, Image.
+- [x] Integrate forms with the created APIs using fetch.
+- [x] Add state management for form data and success/error messages.
+- [x] Optionally, display lists of existing entities.

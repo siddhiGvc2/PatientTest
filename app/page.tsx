@@ -77,6 +77,12 @@ export default function Home() {
                     >
                       Test Level
                     </button>
+                    <a
+                      href="/admin"
+                      className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600"
+                    >
+                      Admin Panel
+                    </a>
                   </div>
                 </div>
               )}
