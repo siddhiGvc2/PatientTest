@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import AnswerImageSelect from "./Image-Select";
 
 interface TestLevel {
   id: number;
@@ -17,7 +18,7 @@ interface Question {
   id: number;
   text: string;
   screenId: number;
-  answerImageId: number;
+  answerImageId: string | number;
 }
 
 interface Image {
@@ -32,22 +33,32 @@ interface Option {
   questionId: number;
 }
 
+interface NewQuestionState {
+  text: string;
+  screenId: string;
+  answerImageId: string | number | '';
+}
+
+
+
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState('testLevel');
   const [testLevels, setTestLevels] = useState<TestLevel[]>([]);
   const [screens, setScreens] = useState<Screen[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [images, setImages] = useState<Image[]>([]);
-  const [options, setOptions] = useState<Option[]>([]);
+  
+  
 
   // Form states
   const [newTestLevel, setNewTestLevel] = useState({ level: "" });
   const [newScreen, setNewScreen] = useState({ screenNumber: "", testLevelId: "" });
-  const [newQuestion, setNewQuestion] = useState({ text: "", screenId: "", options: [{ text: "" }, { text: "" }, { text: "" }, { text: "" }], answerImageId: "" });
+  const [newQuestion, setNewQuestion] = useState<NewQuestionState>({ text: "", screenId: "", options: [{ text: "" }, { text: "" }, { text: "" }, { text: "" }], answerImageId: "" });
   const [newImage, setNewImage] = useState({ url: "", screenId: "" });
 
   // Edit states
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+  const [editingQuestionData, setEditingQuestionData] = useState<NewQuestionState | null>(null);
   const [editingImage, setEditingImage] = useState<Image | null>(null);
 
   const [message, setMessage] = useState("");
@@ -70,7 +81,7 @@ export default function AdminPanel() {
       if (sRes.ok) setScreens(await sRes.json());
       if (qRes.ok) setQuestions(await qRes.json());
       if (iRes.ok) setImages(await iRes.json());
-      if (oRes.ok) setOptions((await oRes.json()).options);
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -125,13 +136,12 @@ export default function AdminPanel() {
         body: JSON.stringify({
           text: newQuestion.text,
           screenId: parseInt(newQuestion.screenId),
-          options: newQuestion.options.filter(opt => opt.text.trim() !== ""),
-          answerImageId: parseInt(newQuestion.answerImageId),
+          answerImageId:newQuestion.answerImageId,
         }),
       });
       if (res.ok) {
         setMessage("Question added successfully!");
-        setNewQuestion({ text: "", screenId: "", options: [{ text: "" }, { text: "" }, { text: "" }, { text: "" }], answerImageId: "" });
+        setNewQuestion({ text: "", screenId: "", answerImageId: "" });
         fetchData();
       } else {
         setMessage("Error adding Question");
@@ -164,25 +174,30 @@ export default function AdminPanel() {
   };
 
   const handleEditQuestion = (question: Question) => {
-    const questionOptions = options.filter(o => o.questionId === question.id).map(o => ({ text: o.text }));
     setEditingQuestion({ ...question });
+    setEditingQuestionData({
+      text: question.text,
+      screenId: question.screenId.toString(),
+      answerImageId: question.answerImageId,
+    });
   };
 
   const handleUpdateQuestion = async () => {
-    if (!editingQuestion) return;
+    if (!editingQuestion || !editingQuestionData) return;
     try {
       const res = await fetch(`/api/questions/${editingQuestion.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          text: editingQuestion.text,
-          screenId: editingQuestion.screenId,
-          answerImageId: editingQuestion.answerImageId,
+          text: editingQuestionData.text,
+          screenId: parseInt(editingQuestionData.screenId),
+          answerImageId: editingQuestionData.answerImageId,
         }),
       });
       if (res.ok) {
         setMessage("Question updated successfully!");
         setEditingQuestion(null);
+        setEditingQuestionData(null);
         fetchData();
       } else {
         setMessage("Error updating Question");
@@ -194,6 +209,7 @@ export default function AdminPanel() {
 
   const handleCancelEditQuestion = () => {
     setEditingQuestion(null);
+    setEditingQuestionData(null);
   };
 
   const handleEditImage = (image: Image) => {
@@ -325,16 +341,11 @@ export default function AdminPanel() {
             ))}
           </select>
          
-          <select
-            value={newQuestion.answerImageId}
-            onChange={(e) => setNewQuestion({ ...newQuestion, answerImageId: e.target.value })}
-            className="w-full p-2 border rounded mb-2"
-          >
-            <option value="">Select Answer Image</option>
-            {images.map(img => (
-              <option key={img.id} value={img.id}>Image {img.id} ({img.url})</option>
-            ))}
-          </select>
+          <AnswerImageSelect
+            images={images}
+            newQuestion={newQuestion}
+            setNewQuestion={setNewQuestion}
+            />
           <button onClick={handleAddQuestion} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
             Add Question
           </button>
@@ -368,19 +379,19 @@ export default function AdminPanel() {
       )}
 
       {/* Edit Forms */}
-      {editingQuestion && (
+      {editingQuestion && editingQuestionData && (
         <div className="bg-yellow-100 p-4 rounded shadow mb-6">
           <h2 className="text-xl font-semibold mb-4">Edit Question</h2>
           <input
             type="text"
             placeholder="Question Text"
-            value={editingQuestion.text}
-            onChange={(e) => setEditingQuestion({ ...editingQuestion, text: e.target.value })}
+            value={editingQuestionData.text}
+            onChange={(e) => setEditingQuestionData({ ...editingQuestionData, text: e.target.value })}
             className="w-full p-2 border rounded mb-2"
           />
           <select
-            value={editingQuestion.screenId}
-            onChange={(e) => setEditingQuestion({ ...editingQuestion, screenId: parseInt(e.target.value) })}
+            value={editingQuestionData.screenId}
+            onChange={(e) => setEditingQuestionData({ ...editingQuestionData, screenId: e.target.value })}
             className="w-full p-2 border rounded mb-2"
           >
             <option value="">Select Screen</option>
@@ -388,17 +399,12 @@ export default function AdminPanel() {
               <option key={s.id} value={s.id}>Screen {s.screenNumber} (Level {testLevels.find(tl => tl.id === s.testLevelId)?.level})</option>
             ))}
           </select>
-        
-          <select
-            value={editingQuestion.answerImageId}
-            onChange={(e) => setEditingQuestion({ ...editingQuestion, answerImageId: parseInt(e.target.value) })}
-            className="w-full p-2 border rounded mb-2"
-          >
-            <option value="">Select Answer Image</option>
-            {images.map(img => (
-              <option key={img.id} value={img.id}>Image {img.id} ({img.url})</option>
-            ))}
-          </select>
+
+           <AnswerImageSelect
+            images={images}
+            newQuestion={editingQuestionData}
+            setNewQuestion={setEditingQuestionData}
+            />
           <button onClick={handleUpdateQuestion} className="bg-green-500 text-white p-2 rounded hover:bg-green-600 mr-2">
             Update Question
           </button>
