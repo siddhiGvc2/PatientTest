@@ -33,6 +33,7 @@ interface Option {
 }
 
 export default function AdminPanel() {
+  const [activeTab, setActiveTab] = useState('testLevel');
   const [testLevels, setTestLevels] = useState<TestLevel[]>([]);
   const [screens, setScreens] = useState<Screen[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -44,6 +45,10 @@ export default function AdminPanel() {
   const [newScreen, setNewScreen] = useState({ screenNumber: "", testLevelId: "" });
   const [newQuestion, setNewQuestion] = useState({ text: "", screenId: "", options: [{ text: "" }, { text: "" }, { text: "" }, { text: "" }], answerImageId: "" });
   const [newImage, setNewImage] = useState({ url: "", screenId: "" });
+
+  // Edit states
+  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+  const [editingImage, setEditingImage] = useState<Image | null>(null);
 
   const [message, setMessage] = useState("");
 
@@ -158,6 +163,89 @@ export default function AdminPanel() {
     }
   };
 
+  const handleEditQuestion = (question: Question) => {
+    const questionOptions = options.filter(o => o.questionId === question.id).map(o => ({ text: o.text }));
+    setEditingQuestion({ ...question });
+  };
+
+  const handleUpdateQuestion = async () => {
+    if (!editingQuestion) return;
+    try {
+      const res = await fetch(`/api/questions/${editingQuestion.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: editingQuestion.text,
+          screenId: editingQuestion.screenId,
+          answerImageId: editingQuestion.answerImageId,
+        }),
+      });
+      if (res.ok) {
+        setMessage("Question updated successfully!");
+        setEditingQuestion(null);
+        fetchData();
+      } else {
+        setMessage("Error updating Question");
+      }
+    } catch (error) {
+      setMessage("Error updating Question");
+    }
+  };
+
+  const handleCancelEditQuestion = () => {
+    setEditingQuestion(null);
+  };
+
+  const handleEditImage = (image: Image) => {
+    setEditingImage(image);
+  };
+
+  const handleUpdateImage = async () => {
+    if (!editingImage) return;
+    try {
+      const res = await fetch(`/api/images/${editingImage.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: editingImage.url,
+          screenId: editingImage.screenId,
+        }),
+      });
+      if (res.ok) {
+        setMessage("Image updated successfully!");
+        setEditingImage(null);
+        fetchData();
+      } else {
+        setMessage("Error updating Image");
+      }
+    } catch (error) {
+      setMessage("Error updating Image");
+    }
+  };
+
+  const handleCancelEditImage = () => {
+    setEditingImage(null);
+  };
+
+  const handleDeleteQuestion = async (questionId: number) => {
+    if (!confirm('Are you sure you want to delete this question? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/questions/${questionId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setMessage("Question deleted successfully!");
+        fetchData();
+      } else {
+        setMessage("Error deleting Question");
+      }
+    } catch (error) {
+      setMessage("Error deleting Question");
+    }
+  };
+
 
 
   return (
@@ -165,9 +253,17 @@ export default function AdminPanel() {
       <h1 className="text-3xl font-bold mb-6">Admin Panel</h1>
       {message && <p className="mb-4 text-green-600">{message}</p>}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Add TestLevel */}
-        <div className="bg-white p-4 rounded shadow">
+      {/* Tabs */}
+      <div className="flex mb-6">
+        <button onClick={() => setActiveTab('testLevel')} className={`px-4 py-2 mr-2 rounded ${activeTab === 'testLevel' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>TestLevel</button>
+        <button onClick={() => setActiveTab('screen')} className={`px-4 py-2 mr-2 rounded ${activeTab === 'screen' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Screen</button>
+        <button onClick={() => setActiveTab('images')} className={`px-4 py-2 mr-2 rounded ${activeTab === 'images' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Images</button>
+        <button onClick={() => setActiveTab('question')} className={`px-4 py-2 rounded ${activeTab === 'question' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Question</button>
+      </div>
+
+      {/* Add Forms */}
+      {activeTab === 'testLevel' && (
+        <div className="bg-white p-4 rounded shadow mb-6">
           <h2 className="text-xl font-semibold mb-4">Add TestLevel</h2>
           <input
             type="number"
@@ -180,9 +276,10 @@ export default function AdminPanel() {
             Add TestLevel
           </button>
         </div>
+      )}
 
-        {/* Add Screen */}
-        <div className="bg-white p-4 rounded shadow">
+      {activeTab === 'screen' && (
+        <div className="bg-white p-4 rounded shadow mb-6">
           <h2 className="text-xl font-semibold mb-4">Add Screen</h2>
           <input
             type="number"
@@ -205,9 +302,10 @@ export default function AdminPanel() {
             Add Screen
           </button>
         </div>
+      )}
 
-        {/* Add Question */}
-        <div className="bg-white p-4 rounded shadow">
+      {activeTab === 'question' && (
+        <div className="bg-white p-4 rounded shadow mb-6">
           <h2 className="text-xl font-semibold mb-4">Add Question</h2>
           <input
             type="text"
@@ -226,23 +324,7 @@ export default function AdminPanel() {
               <option key={s.id} value={s.id}>Screen {s.screenNumber} (Level {testLevels.find(tl => tl.id === s.testLevelId)?.level})</option>
             ))}
           </select>
-          <div className="mb-2">
-            <label className="block text-sm font-medium mb-1">Options:</label>
-            {newQuestion.options.map((option, index) => (
-              <input
-                key={index}
-                type="text"
-                placeholder={`Option ${index + 1}`}
-                value={option.text}
-                onChange={(e) => {
-                  const updatedOptions = [...newQuestion.options];
-                  updatedOptions[index].text = e.target.value;
-                  setNewQuestion({ ...newQuestion, options: updatedOptions });
-                }}
-                className="w-full p-2 border rounded mb-1"
-              />
-            ))}
-          </div>
+         
           <select
             value={newQuestion.answerImageId}
             onChange={(e) => setNewQuestion({ ...newQuestion, answerImageId: e.target.value })}
@@ -257,9 +339,10 @@ export default function AdminPanel() {
             Add Question
           </button>
         </div>
+      )}
 
-        {/* Add Image */}
-        <div className="bg-white p-4 rounded shadow">
+      {activeTab === 'images' && (
+        <div className="bg-white p-4 rounded shadow mb-6">
           <h2 className="text-xl font-semibold mb-4">Add Image</h2>
           <input
             type="text"
@@ -282,126 +365,192 @@ export default function AdminPanel() {
             Add Image
           </button>
         </div>
-      </div>
+      )}
+
+      {/* Edit Forms */}
+      {editingQuestion && (
+        <div className="bg-yellow-100 p-4 rounded shadow mb-6">
+          <h2 className="text-xl font-semibold mb-4">Edit Question</h2>
+          <input
+            type="text"
+            placeholder="Question Text"
+            value={editingQuestion.text}
+            onChange={(e) => setEditingQuestion({ ...editingQuestion, text: e.target.value })}
+            className="w-full p-2 border rounded mb-2"
+          />
+          <select
+            value={editingQuestion.screenId}
+            onChange={(e) => setEditingQuestion({ ...editingQuestion, screenId: parseInt(e.target.value) })}
+            className="w-full p-2 border rounded mb-2"
+          >
+            <option value="">Select Screen</option>
+            {screens.map(s => (
+              <option key={s.id} value={s.id}>Screen {s.screenNumber} (Level {testLevels.find(tl => tl.id === s.testLevelId)?.level})</option>
+            ))}
+          </select>
+        
+          <select
+            value={editingQuestion.answerImageId}
+            onChange={(e) => setEditingQuestion({ ...editingQuestion, answerImageId: parseInt(e.target.value) })}
+            className="w-full p-2 border rounded mb-2"
+          >
+            <option value="">Select Answer Image</option>
+            {images.map(img => (
+              <option key={img.id} value={img.id}>Image {img.id} ({img.url})</option>
+            ))}
+          </select>
+          <button onClick={handleUpdateQuestion} className="bg-green-500 text-white p-2 rounded hover:bg-green-600 mr-2">
+            Update Question
+          </button>
+          <button onClick={handleCancelEditQuestion} className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600">
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {editingImage && (
+        <div className="bg-yellow-100 p-4 rounded shadow mb-6">
+          <h2 className="text-xl font-semibold mb-4">Edit Image</h2>
+          <input
+            type="text"
+            placeholder="Image URL"
+            value={editingImage.url}
+            onChange={(e) => setEditingImage({ ...editingImage, url: e.target.value })}
+            className="w-full p-2 border rounded mb-2"
+          />
+          <select
+            value={editingImage.screenId}
+            onChange={(e) => setEditingImage({ ...editingImage, screenId: parseInt(e.target.value) })}
+            className="w-full p-2 border rounded mb-2"
+          >
+            <option value="">Select Screen</option>
+            {screens.map(s => (
+              <option key={s.id} value={s.id}>Screen {s.screenNumber} (Level {testLevels.find(tl => tl.id === s.testLevelId)?.level})</option>
+            ))}
+          </select>
+          <button onClick={handleUpdateImage} className="bg-green-500 text-white p-2 rounded hover:bg-green-600 mr-2">
+            Update Image
+          </button>
+          <button onClick={handleCancelEditImage} className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600">
+            Cancel
+          </button>
+        </div>
+      )}
 
       {/* Tables */}
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4">Existing Data</h2>
 
-        {/* TestLevels Table */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">TestLevels</h3>
-          <table className="w-full border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 p-2">ID</th>
-                <th className="border border-gray-300 p-2">Level</th>
-              </tr>
-            </thead>
-            <tbody>
-              {testLevels.map(tl => (
-                <tr key={tl.id}>
-                  <td className="border border-gray-300 p-2">{tl.id}</td>
-                  <td className="border border-gray-300 p-2">{tl.level}</td>
+        {activeTab === 'testLevel' && (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">TestLevels</h3>
+            <table className="w-full border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-300 p-2">ID</th>
+                  <th className="border border-gray-300 p-2">Level</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {testLevels.map(tl => (
+                  <tr key={tl.id}>
+                    <td className="border border-gray-300 p-2">{tl.id}</td>
+                    <td className="border border-gray-300 p-2">{tl.level}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-        {/* Screens Table */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Screens</h3>
-          <table className="w-full border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 p-2">ID</th>
-                <th className="border border-gray-300 p-2">Screen Number</th>
-                <th className="border border-gray-300 p-2">TestLevel</th>
-              </tr>
-            </thead>
-            <tbody>
-              {screens.map(s => (
-                <tr key={s.id}>
-                  <td className="border border-gray-300 p-2">{s.id}</td>
-                  <td className="border border-gray-300 p-2">{s.screenNumber}</td>
-                  <td className="border border-gray-300 p-2">{testLevels.find(tl => tl.id === s.testLevelId)?.level}</td>
+        {activeTab === 'screen' && (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">Screens</h3>
+            <table className="w-full border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-300 p-2">ID</th>
+                  <th className="border border-gray-300 p-2">Screen Number</th>
+                  <th className="border border-gray-300 p-2">TestLevel</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {screens.map(s => (
+                  <tr key={s.id}>
+                    <td className="border border-gray-300 p-2">{s.id}</td>
+                    <td className="border border-gray-300 p-2">{s.screenNumber}</td>
+                    <td className="border border-gray-300 p-2">{testLevels.find(tl => tl.id === s.testLevelId)?.level}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-        {/* Questions Table */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Questions</h3>
-          <table className="w-full border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 p-2">ID</th>
-                <th className="border border-gray-300 p-2">Text</th>
-                <th className="border border-gray-300 p-2">Screen</th>
-                <th className="border border-gray-300 p-2">Answer Image ID</th>
-              </tr>
-            </thead>
-            <tbody>
-              {questions.map(q => (
-                <tr key={q.id}>
-                  <td className="border border-gray-300 p-2">{q.id}</td>
-                  <td className="border border-gray-300 p-2">{q.text}</td>
-                  <td className="border border-gray-300 p-2">{screens.find(s => s.id === q.screenId)?.screenNumber}</td>
-                  <td className="border border-gray-300 p-2">{q.answerImageId !== undefined ? q.answerImageId : 'N/A'}</td>
+        {activeTab === 'question' && (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">Questions</h3>
+            <table className="w-full border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-300 p-2">ID</th>
+                  <th className="border border-gray-300 p-2">Text</th>
+                  <th className="border border-gray-300 p-2">Screen</th>
+                  <th className="border border-gray-300 p-2">Answer Image ID</th>
+                  <th className="border border-gray-300 p-2">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {questions.map(q => (
+                  <tr key={q.id}>
+                    <td className="border border-gray-300 p-2">{q.id}</td>
+                    <td className="border border-gray-300 p-2">{q.text}</td>
+                    <td className="border border-gray-300 p-2">{screens.find(s => s.id === q.screenId)?.screenNumber}</td>
+                    <td className="border border-gray-300 p-2">{q.answerImageId !== undefined ? q.answerImageId : 'N/A'}</td>
+                    <td className="border border-gray-300 p-2">
+                      <button onClick={() => handleEditQuestion(q)} className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 mr-2">
+                        Edit
+                      </button>
+                      <button onClick={() => handleDeleteQuestion(q.id)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-        {/* Images Table */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Images</h3>
-          <table className="w-full border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 p-2">ID</th>
-                <th className="border border-gray-300 p-2">Image</th>
-                <th className="border border-gray-300 p-2">Screen</th>
-              </tr>
-            </thead>
-            <tbody>
-              {images.map(i => (
-                <tr key={i.id}>
-                  <td className="border border-gray-300 p-2">{i.id}</td>
-                  <td className="border border-gray-300 p-2"><img src={i.url} width={50} height={50} alt="" /></td>
-                  <td className="border border-gray-300 p-2">{screens.find(s => s.id === i.screenId)?.screenNumber}</td>
+        {activeTab === 'images' && (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">Images</h3>
+            <table className="w-full border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-300 p-2">ID</th>
+                  <th className="border border-gray-300 p-2">Image</th>
+                  <th className="border border-gray-300 p-2">Screen</th>
+                  <th className="border border-gray-300 p-2">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Options Table */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Options</h3>
-          <table className="w-full border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 p-2">ID</th>
-                <th className="border border-gray-300 p-2">Text</th>
-                <th className="border border-gray-300 p-2">Question ID</th>
-              </tr>
-            </thead>
-            <tbody>
-              {options.map(o => (
-                <tr key={o.id}>
-                  <td className="border border-gray-300 p-2">{o.id}</td>
-                  <td className="border border-gray-300 p-2">{o.text}</td>
-                  <td className="border border-gray-300 p-2">{o.questionId}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {images.map(i => (
+                  <tr key={i.id}>
+                    <td className="border border-gray-300 p-2">{i.id}</td>
+                    <td className="border border-gray-300 p-2"><img src={i.url} width={50} height={50} alt="" /></td>
+                    <td className="border border-gray-300 p-2">{screens.find(s => s.id === i.screenId)?.screenNumber}</td>
+                    <td className="border border-gray-300 p-2">
+                      <button onClick={() => handleEditImage(i)} className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
