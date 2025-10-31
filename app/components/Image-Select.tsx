@@ -8,8 +8,8 @@ interface ImageData {
 
 interface NewQuestionState {
   text: string;
-  screenId: number;
-  answerImageId: string | number;
+  screenId: string;
+  answerImageId: string | number | '';
 }
 
 interface ImageOption {
@@ -20,7 +20,7 @@ interface ImageOption {
 interface AnswerImageSelectProps {
   images: ImageData[];
   newQuestion: NewQuestionState;
-  setNewQuestion: React.Dispatch<React.SetStateAction<NewQuestionState | null>>;
+  setNewQuestion: React.Dispatch<React.SetStateAction<NewQuestionState>>;
 }
 
 const AnswerImageSelect: React.FC<AnswerImageSelectProps> = ({

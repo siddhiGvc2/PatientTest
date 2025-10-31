@@ -17,7 +17,7 @@ interface Screen {
 interface Question {
   id: number;
   text: string;
-  screenId: number;
+  screenId: string;
   answerImageId: string | number;
 }
 
@@ -53,7 +53,7 @@ export default function AdminPanel() {
   // Form states
   const [newTestLevel, setNewTestLevel] = useState({ level: "" });
   const [newScreen, setNewScreen] = useState({ screenNumber: "", testLevelId: "" });
-  const [newQuestion, setNewQuestion] = useState<NewQuestionState>({ text: "", screenId: "", options: [{ text: "" }, { text: "" }, { text: "" }, { text: "" }], answerImageId: "" });
+  const [newQuestion, setNewQuestion] = useState<NewQuestionState>({ text: "", screenId: "", answerImageId: "" });
   const [newImage, setNewImage] = useState({ url: "", screenId: "" });
 
   // Edit states
