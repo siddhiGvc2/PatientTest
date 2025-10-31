@@ -56,36 +56,38 @@ export default function Home() {
                 </button>
               </div>
 
-              {canManageUsers && (
-                <div className="bg-gray-100 p-4">
-                  <div className="flex space-x-4">
-                    <button
-                      onClick={() => setActiveTab('patients')}
-                      className={`px-4 py-2 rounded ${activeTab === 'patients' ? 'bg-blue-500 text-white' : 'bg-white'}`}
-                    >
-                      Patients
-                    </button>
+              <div className="bg-gray-100 p-4">
+                <div className="flex space-x-4">
+                  <button
+                    onClick={() => setActiveTab('patients')}
+                    className={`px-4 py-2 rounded ${activeTab === 'patients' ? 'bg-blue-500 text-white' : 'bg-white'}`}
+                  >
+                    Patients
+                  </button>
+                  {canManageUsers && (
                     <button
                       onClick={() => setActiveTab('users')}
                       className={`px-4 py-2 rounded ${activeTab === 'users' ? 'bg-blue-500 text-white' : 'bg-white'}`}
                     >
                       User Management
                     </button>
-                    <button
-                      onClick={() => {setActiveTab('test');setTestEnded(false)}}
-                      className={`px-4 py-2 rounded ${activeTab === 'test' ? 'bg-blue-500 text-white' : 'bg-white'}`}
-                    >
-                      Test Level
-                    </button>
+                  )}
+                  <button
+                    onClick={() => {setActiveTab('test');setTestEnded(false)}}
+                    className={`px-4 py-2 rounded ${activeTab === 'test' ? 'bg-blue-500 text-white' : 'bg-white'}`}
+                  >
+                    Test Level
+                  </button>
+                  {canManageUsers && (
                     <a
                       href="/admin"
                       className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600"
                     >
                       Admin Panel
                     </a>
-                  </div>
+                  )}
                 </div>
-              )}
+              </div>
             </>
           )}
 

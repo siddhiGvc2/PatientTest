@@ -155,13 +155,14 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Patient List</h2>
         <div className="flex items-center space-x-4">
-         
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Add Patient
-          </button>
+          {currentUser.userType === 'USER' && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Add Patient
+            </button>
+          )}
         </div>
       </div>
 
