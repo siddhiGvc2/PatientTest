@@ -67,17 +67,17 @@ export default function LoginPage({ onLogin }: { onLogin: (user: any) => void })
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center h-screen bg-[var(--background)]">
       {!user ? (
-        <div className="bg-white p-8 rounded-2xl shadow-lg flex flex-col items-center space-y-6">
+        <div className="bg-[var(--card-bg)] p-8 rounded-2xl shadow-lg flex flex-col items-center space-y-6 border border-[var(--border-color)]">
           <h1 className="text-2xl font-bold">Login with Google</h1>
           <GoogleLogin onSuccess={handleSuccess} onError={handleError}/>
         </div>
       ) : (
-        <div className="bg-white p-8 rounded-2xl shadow-lg flex flex-col items-center space-y-4">
+        <div className="bg-[var(--card-bg)] p-8 rounded-2xl shadow-lg flex flex-col items-center space-y-4 border border-[var(--border-color)]">
           <h2>Welcome, {user.name}</h2>
           <img src={user.picture} alt={user.name} className="w-20 h-20 rounded-full" />
-          <p>{user.email}</p>
+          <p className="text-[var(--secondary-text)]">{user.email}</p>
         </div>
       )}
     </div>

@@ -99,7 +99,6 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
 
   useEffect(() => {
     fetchTestLevel(currentLevel);
-    fetchAllOptions();
 
   }, [currentLevel]);
 

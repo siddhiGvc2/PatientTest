@@ -1,19 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import multer from 'multer';
+import { uploadToCloudinary } from '../../utils/cloudinary';
 
 const prisma = new PrismaClient();
 
+// Configure multer for memory storage
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  },
+});
+
 export async function POST(request: NextRequest) {
   try {
-    const { url, screenId } = await request.json();
+    const formData = await request.formData();
+    const file = formData.get('file') as File;
+    const screenIdStr = formData.get('screenId') as string;
 
-    if (!url || typeof url !== 'string' || !screenId || typeof screenId !== 'number') {
-      return NextResponse.json({ error: 'url and screenId are required. url must be a string, screenId must be a number' }, { status: 400 });
+    if (!file || !screenIdStr) {
+      return NextResponse.json({ error: 'file and screenId are required' }, { status: 400 });
     }
 
+    const screenId = parseInt(screenIdStr);
+    if (isNaN(screenId)) {
+      return NextResponse.json({ error: 'screenId must be a number' }, { status: 400 });
+    }
+
+    // Convert file to buffer
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+
+    // Upload to Cloudinary
+    const cloudinaryUrl = await uploadToCloudinary(fileBuffer, 'patient-test-images');
+
+    // Save to database
     const image = await prisma.image.create({
       data: {
-        url,
+        url: cloudinaryUrl,
         screenId,
       },
     });

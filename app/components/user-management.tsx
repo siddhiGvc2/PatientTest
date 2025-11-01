@@ -140,32 +140,32 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
         <h2 className="text-2xl font-bold">User Management</h2>
         <button
           onClick={() => setShowForm(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="bg-[var(--button-bg)] text-white px-4 py-2 rounded hover:bg-[var(--button-hover)]"
         >
           Add User
         </button>
       </div>
 
       {showForm && (
-        <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md mb-6">
+        <div className="max-w-md mx-auto bg-[var(--card-bg)] p-6 rounded-lg shadow-md mb-6 border border-[var(--border-color)]">
           <h3 className="text-lg font-semibold mb-4">Add New User</h3>
           <form onSubmit={handleAddUser}>
             <div className="mb-4">
-              <label className="block text-gray-700">Email</label>
+              <label className="block text-[var(--foreground)]">Email</label>
               <input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
                 required
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700">Type</label>
+              <label className="block text-[var(--foreground)]">Type</label>
               <select
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
               >
                 <option value="USER">User</option>
                 {currentUser.userType === 'SUPERADMIN' && <option value="ADMIN">Admin</option>}
@@ -173,7 +173,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
               </select>
             </div>
             <div className="flex space-x-2">
-              <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+              <button type="submit" className="bg-[var(--success-bg)] text-white px-4 py-2 rounded hover:bg-[var(--success-hover)]">
                 Add User
               </button>
               <button
@@ -182,7 +182,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
                   setShowForm(false);
                   setFormData({ email: '', type: 'USER' });
                 }}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                className="bg-[var(--secondary-bg)] text-[var(--foreground)] px-4 py-2 rounded hover:bg-[var(--border-color)]"
               >
                 Cancel
               </button>
@@ -195,29 +195,29 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
         <p>No authorized users found.</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300">
+          <table className="min-w-full bg-[var(--card-bg)] border border-[var(--border-color)]">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="py-2 px-4 border-b">ID</th>
-                <th className="py-2 px-4 border-b">Email</th>
-                <th className="py-2 px-4 border-b">Type</th>
-                <th className="py-2 px-4 border-b">Actions</th>
+              <tr className="bg-[var(--secondary-bg)]">
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">ID</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Email</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Type</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Actions</th>
               </tr>
             </thead>
             <tbody>
               {authorizedUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b">{user.id}</td>
-                  <td className="py-2 px-4 border-b">{user.email}</td>
-                  <td className="py-2 px-4 border-b">{user.type}</td>
-                  <td className="py-2 px-4 border-b">
+                <tr key={user.id} className="hover:bg-[var(--secondary-bg)]">
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{user.id}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{user.email}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{user.type}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] ">
                     <div className="flex space-x-2">
                       {/* Toggle type if not SUPERADMIN */}
                       {user.type !== 'SUPERADMIN' && (
                         <select
                           value={user.type}
                           onChange={(e) => handleTypeChange(user.id, user.email, e.target.value)}
-                          className="p-1 border rounded text-sm"
+                          className="p-1 border border-[var(--border-color)] rounded text-sm bg-[var(--card-bg)] text-[var(--foreground)]"
                         >
                           <option value="USER">User</option>
                           {currentUser.userType === 'SUPERADMIN' && <option value="ADMIN">Admin</option>}
@@ -227,7 +227,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
                       {(currentUser.userType === 'SUPERADMIN' || user.type !== 'SUPERADMIN') && (
                         <button
                           onClick={() => handleDeleteUser(user.id)}
-                          className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
+                          className="bg-[var(--danger-bg)] text-white px-2 py-1 rounded hover:bg-[var(--danger-hover)] text-sm"
                         >
                           Delete
                         </button>
