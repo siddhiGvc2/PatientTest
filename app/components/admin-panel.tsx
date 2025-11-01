@@ -17,7 +17,7 @@ interface Screen {
 interface Question {
   id: number;
   text: string;
-  screenId: string;
+  screenId: number;
   answerImageId: string | number;
 }
 
@@ -58,7 +58,7 @@ export default function AdminPanel() {
 
   // Edit states
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
-  const [editingQuestionData, setEditingQuestionData] = useState<NewQuestionState | null>(null);
+  const [editingQuestionData, setEditingQuestionData] = useState<NewQuestionState>({ text: "", screenId: "", answerImageId: "" });
   const [editingImage, setEditingImage] = useState<Image | null>(null);
 
   const [message, setMessage] = useState("");
@@ -69,12 +69,12 @@ export default function AdminPanel() {
 
   const fetchData = async () => {
     try {
-      const [tlRes, sRes, qRes, iRes, oRes] = await Promise.all([
+      const [tlRes, sRes, qRes, iRes] = await Promise.all([
         fetch("/api/test-level"),
         fetch("/api/screens"),
         fetch("/api/questions"),
         fetch("/api/images"),
-        fetch("/api/options"),
+        
       ]);
 
       if (tlRes.ok) setTestLevels(await tlRes.json());
@@ -197,7 +197,7 @@ export default function AdminPanel() {
       if (res.ok) {
         setMessage("Question updated successfully!");
         setEditingQuestion(null);
-        setEditingQuestionData(null);
+        setEditingQuestionData({ text: "", screenId: "", answerImageId: "" });
         fetchData();
       } else {
         setMessage("Error updating Question");
@@ -209,7 +209,7 @@ export default function AdminPanel() {
 
   const handleCancelEditQuestion = () => {
     setEditingQuestion(null);
-    setEditingQuestionData(null);
+    setEditingQuestionData({ text: "", screenId: "", answerImageId: "" });
   };
 
   const handleEditImage = (image: Image) => {
