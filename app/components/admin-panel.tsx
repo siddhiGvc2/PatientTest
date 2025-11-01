@@ -23,6 +23,8 @@ export default function AdminPanel() {
   // Edit states
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [editingImage, setEditingImage] = useState<ImageType | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editType, setEditType] = useState<'question' | 'image' | null>(null);
 
   const [message, setMessage] = useState("");
 
@@ -126,6 +128,8 @@ export default function AdminPanel() {
 
   const handleEditQuestion = (question: Question) => {
     setEditingQuestion(question);
+    setEditType('question');
+    setShowEditModal(true);
   };
 
   const handleUpdateQuestion = async (question: Question, data: NewQuestionState) => {
@@ -142,6 +146,8 @@ export default function AdminPanel() {
       if (res.ok) {
         setMessage("Question updated successfully!");
         setEditingQuestion(null);
+        setShowEditModal(false);
+        setEditType(null);
         fetchData();
       } else {
         setMessage("Error updating Question");
@@ -153,10 +159,14 @@ export default function AdminPanel() {
 
   const handleCancelEditQuestion = () => {
     setEditingQuestion(null);
+    setShowEditModal(false);
+    setEditType(null);
   };
 
   const handleEditImage = (image: ImageType) => {
     setEditingImage(image);
+    setEditType('image');
+    setShowEditModal(true);
   };
 
   const handleUpdateImage = async (image: ImageType) => {
@@ -172,6 +182,8 @@ export default function AdminPanel() {
       if (res.ok) {
         setMessage("Image updated successfully!");
         setEditingImage(null);
+        setShowEditModal(false);
+        setEditType(null);
         fetchData();
       } else {
         setMessage("Error updating Image");
@@ -183,6 +195,8 @@ export default function AdminPanel() {
 
   const handleCancelEditImage = () => {
     setEditingImage(null);
+    setShowEditModal(false);
+    setEditType(null);
   };
 
   const handleDeleteQuestion = async (questionId: number) => {
@@ -226,26 +240,31 @@ export default function AdminPanel() {
 
       {activeTab === 'images' && <AddImageForm screens={screens} testLevels={testLevels} onAdd={handleAddImage} />}
 
-      {/* Edit Forms */}
-      {editingQuestion && (
-        <EditQuestionForm
-          question={editingQuestion}
-          screens={screens}
-          images={images}
-          testLevels={testLevels}
-          onUpdate={handleUpdateQuestion}
-          onCancel={handleCancelEditQuestion}
-        />
-      )}
-
-      {editingImage && (
-        <EditImageForm
-          image={editingImage}
-          screens={screens}
-          testLevels={testLevels}
-          onUpdate={handleUpdateImage}
-          onCancel={handleCancelEditImage}
-        />
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            {editType === 'question' && editingQuestion && (
+              <EditQuestionForm
+                question={editingQuestion}
+                screens={screens}
+                images={images}
+                testLevels={testLevels}
+                onUpdate={handleUpdateQuestion}
+                onCancel={handleCancelEditQuestion}
+              />
+            )}
+            {editType === 'image' && editingImage && (
+              <EditImageForm
+                image={editingImage}
+                screens={screens}
+                testLevels={testLevels}
+                onUpdate={handleUpdateImage}
+                onCancel={handleCancelEditImage}
+              />
+            )}
+          </div>
+        </div>
       )}
 
       {/* Tables */}
