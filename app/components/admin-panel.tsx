@@ -460,8 +460,8 @@ export default function AdminPanel() {
               <tbody>
                 {testLevels.map(tl => (
                   <tr key={tl.id} className="bg-[var(--card-bg)]">
-                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{tl.id}</td>
-                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{tl.level}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)] text-center">{tl.id}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)] text-center">{tl.level}</td>
                   </tr>
                 ))}
               </tbody>
@@ -483,9 +483,9 @@ export default function AdminPanel() {
               <tbody>
                 {screens.map(s => (
                   <tr key={s.id} className="bg-[var(--card-bg)]">
-                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{s.id}</td>
-                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{s.screenNumber}</td>
-                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{testLevels.find(tl => tl.id === s.testLevelId)?.level}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)] text-center">{s.id}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)] text-center">{s.screenNumber}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)] text-center">{testLevels.find(tl => tl.id === s.testLevelId)?.level}</td>
                   </tr>
                 ))}
               </tbody>
@@ -509,14 +509,15 @@ export default function AdminPanel() {
               <tbody>
                 {questions.map(q => (
                   <tr key={q.id} className="bg-[var(--card-bg)]">
-                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{q.id}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)] text-center">{q.id}</td>
                     <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{q.text}</td>
-                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{screens.find(s => s.id === q.screenId)?.screenNumber}</td>
-                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{q.answerImageId !== undefined ? q.answerImageId : 'N/A'}</td>
-                    <td className="border border-[var(--border-color)] p-2">
-                      <button onClick={() => handleEditQuestion(q)} className="bg-[var(--warning-bg)] text-white px-2 py-1 rounded hover:bg-[var(--warning-hover)] mr-2">
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)] text-center">{screens.find(s => s.id === q.screenId)?.screenNumber}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)] text-center">{q.answerImageId !== undefined ? q.answerImageId : 'N/A'}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-center">
+                        <button onClick={() => handleEditQuestion(q)} className="bg-[var(--danger-bg)] text-white px-2 py-1 rounded hover:bg-[var(--danger-hover)]">
                         Edit
                       </button>
+                     
                       <button onClick={() => handleDeleteQuestion(q.id)} className="bg-[var(--danger-bg)] text-white px-2 py-1 rounded hover:bg-[var(--danger-hover)]">
                         Delete
                       </button>
@@ -543,13 +544,14 @@ export default function AdminPanel() {
               <tbody>
                 {images.map(i => (
                   <tr key={i.id} className="bg-[var(--card-bg)]">
-                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{i.id}</td>
-                    <td className="border border-[var(--border-color)] p-2"><img src={i.url} width={50} height={50} alt="" /></td>
-                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{screens.find(s => s.id === i.screenId)?.screenNumber}</td>
-                    <td className="border border-[var(--border-color)] p-2">
-                      <button onClick={() => handleEditImage(i)} className="bg-[var(--warning-bg)] text-white px-2 py-1 rounded hover:bg-[var(--warning-hover)]">
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)] text-center">{i.id}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-center"><img src={i.url} width={50} height={50} alt="" /></td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)] text-center">{screens.find(s => s.id === i.screenId)?.screenNumber}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-center">
+                       <button onClick={() => handleEditImage(i)} className="bg-[var(--danger-bg)] text-white px-2 py-1 rounded hover:bg-[var(--danger-hover)]">
                         Edit
                       </button>
+
                     </td>
                   </tr>
                 ))}

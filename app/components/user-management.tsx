@@ -207,10 +207,10 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
             <tbody>
               {authorizedUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-[var(--secondary-bg)]">
-                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{user.id}</td>
-                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{user.email}</td>
-                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{user.type}</td>
-                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{user.id}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{user.email}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{user.type}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] ">
                     <div className="flex space-x-2">
                       {/* Toggle type if not SUPERADMIN */}
                       {user.type !== 'SUPERADMIN' && (
