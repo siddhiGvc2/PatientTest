@@ -108,12 +108,15 @@ export default function AdminPanel() {
     }
   };
 
-  const handleAddImage = async (url: string, screenId: number) => {
+  const handleAddImage = async (file: File, screenId: number) => {
     try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('screenId', screenId.toString());
+
       const res = await fetch("/api/images", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, screenId }),
+        body: formData,
       });
       if (res.ok) {
         setMessage("Image added successfully!");
@@ -169,15 +172,17 @@ export default function AdminPanel() {
     setShowEditModal(true);
   };
 
-  const handleUpdateImage = async (image: ImageType) => {
+  const handleUpdateImage = async (image: ImageType, file?: File) => {
     try {
+      const formData = new FormData();
+      formData.append('screenId', image.screenId.toString());
+      if (file) {
+        formData.append('file', file);
+      }
+
       const res = await fetch(`/api/images/${image.id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          url: image.url,
-          screenId: image.screenId,
-        }),
+        body: formData,
       });
       if (res.ok) {
         setMessage("Image updated successfully!");

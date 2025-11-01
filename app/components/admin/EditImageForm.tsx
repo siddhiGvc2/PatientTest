@@ -5,28 +5,28 @@ interface EditImageFormProps {
   image: ImageType;
   screens: Screen[];
   testLevels: TestLevel[];
-  onUpdate: (image: ImageType) => Promise<void>;
+  onUpdate: (image: ImageType, file?: File) => Promise<void>;
   onCancel: () => void;
 }
 
 export default function EditImageForm({ image, screens, testLevels, onUpdate, onCancel }: EditImageFormProps) {
-  const [url, setUrl] = useState(image.url);
+  const [file, setFile] = useState<File | null>(null);
   const [screenId, setScreenId] = useState(image.screenId);
 
   const handleSubmit = async () => {
-    await onUpdate({ ...image, url, screenId });
+    await onUpdate({ ...image, screenId }, file || undefined);
   };
 
   return (
     <div className="bg-[var(--card-bg)] p-4 rounded shadow mb-6 border border-[var(--border-color)]">
       <h2 className="text-xl font-semibold mb-4">Edit Image</h2>
       <input
-        type="text"
-        placeholder="Image URL"
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
+        type="file"
+        accept="image/*"
+        onChange={(e) => setFile(e.target.files?.[0] || null)}
         className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
       />
+      <p className="text-sm text-gray-500 mb-2">Leave empty to keep current image</p>
       <select
         value={screenId}
         onChange={(e) => setScreenId(parseInt(e.target.value))}
