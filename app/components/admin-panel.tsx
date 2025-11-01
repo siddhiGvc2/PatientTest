@@ -275,9 +275,9 @@ export default function AdminPanel() {
 
         {activeTab === 'screen' && <ScreenTable screens={screens} testLevels={testLevels} />}
 
-        {activeTab === 'question' && <QuestionTable questions={questions} screens={screens} onEdit={handleEditQuestion} onDelete={handleDeleteQuestion} />}
+        {activeTab === 'question' && <QuestionTable questions={questions} testLevels={testLevels} screens={screens} onEdit={handleEditQuestion} onDelete={handleDeleteQuestion} />}
 
-        {activeTab === 'images' && <ImageTable images={images} screens={screens} onEdit={handleEditImage} />}
+        {activeTab === 'images' && <ImageTable images={images} testLevels={testLevels} screens={screens} onEdit={handleEditImage} />}
       </div>
     </div>
   );
