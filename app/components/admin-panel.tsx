@@ -271,108 +271,108 @@ export default function AdminPanel() {
 
       {/* Tabs */}
       <div className="flex mb-6">
-        <button onClick={() => setActiveTab('testLevel')} className={`px-4 py-2 mr-2 rounded ${activeTab === 'testLevel' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>TestLevel</button>
-        <button onClick={() => setActiveTab('screen')} className={`px-4 py-2 mr-2 rounded ${activeTab === 'screen' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Screen</button>
-        <button onClick={() => setActiveTab('images')} className={`px-4 py-2 mr-2 rounded ${activeTab === 'images' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Images</button>
-        <button onClick={() => setActiveTab('question')} className={`px-4 py-2 rounded ${activeTab === 'question' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Question</button>
+        <button onClick={() => setActiveTab('testLevel')} className={`px-4 py-2 mr-2 rounded ${activeTab === 'testLevel' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>TestLevel</button>
+        <button onClick={() => setActiveTab('screen')} className={`px-4 py-2 mr-2 rounded ${activeTab === 'screen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Screen</button>
+        <button onClick={() => setActiveTab('images')} className={`px-4 py-2 mr-2 rounded ${activeTab === 'images' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Images</button>
+        <button onClick={() => setActiveTab('question')} className={`px-4 py-2 rounded ${activeTab === 'question' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Question</button>
       </div>
 
       {/* Add Forms */}
       {activeTab === 'testLevel' && (
-        <div className="bg-white p-4 rounded shadow mb-6">
+        <div className="bg-[var(--card-bg)] p-4 rounded shadow mb-6 border border-[var(--border-color)]">
           <h2 className="text-xl font-semibold mb-4">Add TestLevel</h2>
           <input
             type="number"
             placeholder="Level"
             value={newTestLevel.level}
             onChange={(e) => setNewTestLevel({ level: e.target.value })}
-            className="w-full p-2 border rounded mb-2"
+            className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
           />
-          <button onClick={handleAddTestLevel} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+          <button onClick={handleAddTestLevel} className="w-full bg-[var(--button-bg)] text-white p-2 rounded hover:bg-[var(--button-hover)]">
             Add TestLevel
           </button>
         </div>
       )}
 
       {activeTab === 'screen' && (
-        <div className="bg-white p-4 rounded shadow mb-6">
+        <div className="bg-[var(--card-bg)] p-4 rounded shadow mb-6 border border-[var(--border-color)]">
           <h2 className="text-xl font-semibold mb-4">Add Screen</h2>
           <input
             type="number"
             placeholder="Screen Number"
             value={newScreen.screenNumber}
             onChange={(e) => setNewScreen({ ...newScreen, screenNumber: e.target.value })}
-            className="w-full p-2 border rounded mb-2"
+            className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
           />
           <select
             value={newScreen.testLevelId}
             onChange={(e) => setNewScreen({ ...newScreen, testLevelId: e.target.value })}
-            className="w-full p-2 border rounded mb-2"
+            className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
           >
             <option value="">Select TestLevel</option>
             {testLevels.map(tl => (
               <option key={tl.id} value={tl.id}>{tl.level}</option>
             ))}
           </select>
-          <button onClick={handleAddScreen} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+          <button onClick={handleAddScreen} className="w-full bg-[var(--button-bg)] text-white p-2 rounded hover:bg-[var(--button-hover)]">
             Add Screen
           </button>
         </div>
       )}
 
       {activeTab === 'question' && (
-        <div className="bg-white p-4 rounded shadow mb-6">
+        <div className="bg-[var(--card-bg)] p-4 rounded shadow mb-6 border border-[var(--border-color)]">
           <h2 className="text-xl font-semibold mb-4">Add Question</h2>
           <input
             type="text"
             placeholder="Question Text"
             value={newQuestion.text}
             onChange={(e) => setNewQuestion({ ...newQuestion, text: e.target.value })}
-            className="w-full p-2 border rounded mb-2"
+            className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
           />
           <select
             value={newQuestion.screenId}
             onChange={(e) => setNewQuestion({ ...newQuestion, screenId: e.target.value })}
-            className="w-full p-2 border rounded mb-2"
+            className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
           >
             <option value="">Select Screen</option>
             {screens.map(s => (
               <option key={s.id} value={s.id}>Screen {s.screenNumber} (Level {testLevels.find(tl => tl.id === s.testLevelId)?.level})</option>
             ))}
           </select>
-         
+
           <AnswerImageSelect
             images={images}
             newQuestion={newQuestion}
             setNewQuestion={setNewQuestion}
             />
-          <button onClick={handleAddQuestion} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+          <button onClick={handleAddQuestion} className="w-full bg-[var(--button-bg)] text-white p-2 rounded hover:bg-[var(--button-hover)]">
             Add Question
           </button>
         </div>
       )}
 
       {activeTab === 'images' && (
-        <div className="bg-white p-4 rounded shadow mb-6">
+        <div className="bg-[var(--card-bg)] p-4 rounded shadow mb-6 border border-[var(--border-color)]">
           <h2 className="text-xl font-semibold mb-4">Add Image</h2>
           <input
             type="text"
             placeholder="Image URL"
             value={newImage.url}
             onChange={(e) => setNewImage({ ...newImage, url: e.target.value })}
-            className="w-full p-2 border rounded mb-2"
+            className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
           />
           <select
             value={newImage.screenId}
             onChange={(e) => setNewImage({ ...newImage, screenId: e.target.value })}
-            className="w-full p-2 border rounded mb-2"
+            className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
           >
             <option value="">Select Screen</option>
             {screens.map(s => (
               <option key={s.id} value={s.id}>Screen {s.screenNumber} (Level {testLevels.find(tl => tl.id === s.testLevelId)?.level})</option>
             ))}
           </select>
-          <button onClick={handleAddImage} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+          <button onClick={handleAddImage} className="w-full bg-[var(--button-bg)] text-white p-2 rounded hover:bg-[var(--button-hover)]">
             Add Image
           </button>
         </div>
@@ -380,19 +380,19 @@ export default function AdminPanel() {
 
       {/* Edit Forms */}
       {editingQuestion && editingQuestionData && (
-        <div className="bg-yellow-100 p-4 rounded shadow mb-6">
+        <div className="bg-[var(--card-bg)] p-4 rounded shadow mb-6 border border-[var(--border-color)]">
           <h2 className="text-xl font-semibold mb-4">Edit Question</h2>
           <input
             type="text"
             placeholder="Question Text"
             value={editingQuestionData.text}
             onChange={(e) => setEditingQuestionData({ ...editingQuestionData, text: e.target.value })}
-            className="w-full p-2 border rounded mb-2"
+            className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
           />
           <select
             value={editingQuestionData.screenId}
             onChange={(e) => setEditingQuestionData({ ...editingQuestionData, screenId: e.target.value })}
-            className="w-full p-2 border rounded mb-2"
+            className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
           >
             <option value="">Select Screen</option>
             {screens.map(s => (
@@ -405,39 +405,39 @@ export default function AdminPanel() {
             newQuestion={editingQuestionData}
             setNewQuestion={setEditingQuestionData}
             />
-          <button onClick={handleUpdateQuestion} className="bg-green-500 text-white p-2 rounded hover:bg-green-600 mr-2">
+          <button onClick={handleUpdateQuestion} className="bg-[var(--success-bg)] text-white p-2 rounded hover:bg-[var(--success-hover)] mr-2">
             Update Question
           </button>
-          <button onClick={handleCancelEditQuestion} className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600">
+          <button onClick={handleCancelEditQuestion} className="bg-[var(--secondary-bg)] text-[var(--foreground)] p-2 rounded hover:bg-[var(--border-color)]">
             Cancel
           </button>
         </div>
       )}
 
       {editingImage && (
-        <div className="bg-yellow-100 p-4 rounded shadow mb-6">
+        <div className="bg-[var(--card-bg)] p-4 rounded shadow mb-6 border border-[var(--border-color)]">
           <h2 className="text-xl font-semibold mb-4">Edit Image</h2>
           <input
             type="text"
             placeholder="Image URL"
             value={editingImage.url}
             onChange={(e) => setEditingImage({ ...editingImage, url: e.target.value })}
-            className="w-full p-2 border rounded mb-2"
+            className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
           />
           <select
             value={editingImage.screenId}
             onChange={(e) => setEditingImage({ ...editingImage, screenId: parseInt(e.target.value) })}
-            className="w-full p-2 border rounded mb-2"
+            className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
           >
             <option value="">Select Screen</option>
             {screens.map(s => (
               <option key={s.id} value={s.id}>Screen {s.screenNumber} (Level {testLevels.find(tl => tl.id === s.testLevelId)?.level})</option>
             ))}
           </select>
-          <button onClick={handleUpdateImage} className="bg-green-500 text-white p-2 rounded hover:bg-green-600 mr-2">
+          <button onClick={handleUpdateImage} className="bg-[var(--success-bg)] text-white p-2 rounded hover:bg-[var(--success-hover)] mr-2">
             Update Image
           </button>
-          <button onClick={handleCancelEditImage} className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600">
+          <button onClick={handleCancelEditImage} className="bg-[var(--secondary-bg)] text-[var(--foreground)] p-2 rounded hover:bg-[var(--border-color)]">
             Cancel
           </button>
         </div>
@@ -450,18 +450,18 @@ export default function AdminPanel() {
         {activeTab === 'testLevel' && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2">TestLevels</h3>
-            <table className="w-full border-collapse border border-gray-300">
+            <table className="w-full border-collapse border border-[var(--border-color)] bg-[var(--card-bg)]">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="border border-gray-300 p-2">ID</th>
-                  <th className="border border-gray-300 p-2">Level</th>
+                <tr className="bg-[var(--secondary-bg)]">
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">ID</th>
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">Level</th>
                 </tr>
               </thead>
               <tbody>
                 {testLevels.map(tl => (
-                  <tr key={tl.id}>
-                    <td className="border border-gray-300 p-2">{tl.id}</td>
-                    <td className="border border-gray-300 p-2">{tl.level}</td>
+                  <tr key={tl.id} className="bg-[var(--card-bg)]">
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{tl.id}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{tl.level}</td>
                   </tr>
                 ))}
               </tbody>
@@ -472,20 +472,20 @@ export default function AdminPanel() {
         {activeTab === 'screen' && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2">Screens</h3>
-            <table className="w-full border-collapse border border-gray-300">
+            <table className="w-full border-collapse border border-[var(--border-color)] bg-[var(--card-bg)]">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="border border-gray-300 p-2">ID</th>
-                  <th className="border border-gray-300 p-2">Screen Number</th>
-                  <th className="border border-gray-300 p-2">TestLevel</th>
+                <tr className="bg-[var(--secondary-bg)]">
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">ID</th>
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">Screen Number</th>
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">TestLevel</th>
                 </tr>
               </thead>
               <tbody>
                 {screens.map(s => (
-                  <tr key={s.id}>
-                    <td className="border border-gray-300 p-2">{s.id}</td>
-                    <td className="border border-gray-300 p-2">{s.screenNumber}</td>
-                    <td className="border border-gray-300 p-2">{testLevels.find(tl => tl.id === s.testLevelId)?.level}</td>
+                  <tr key={s.id} className="bg-[var(--card-bg)]">
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{s.id}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{s.screenNumber}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{testLevels.find(tl => tl.id === s.testLevelId)?.level}</td>
                   </tr>
                 ))}
               </tbody>
@@ -496,28 +496,28 @@ export default function AdminPanel() {
         {activeTab === 'question' && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2">Questions</h3>
-            <table className="w-full border-collapse border border-gray-300">
+            <table className="w-full border-collapse border border-[var(--border-color)] bg-[var(--card-bg)]">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="border border-gray-300 p-2">ID</th>
-                  <th className="border border-gray-300 p-2">Text</th>
-                  <th className="border border-gray-300 p-2">Screen</th>
-                  <th className="border border-gray-300 p-2">Answer Image ID</th>
-                  <th className="border border-gray-300 p-2">Actions</th>
+                <tr className="bg-[var(--secondary-bg)]">
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">ID</th>
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">Text</th>
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">Screen</th>
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">Answer Image ID</th>
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {questions.map(q => (
-                  <tr key={q.id}>
-                    <td className="border border-gray-300 p-2">{q.id}</td>
-                    <td className="border border-gray-300 p-2">{q.text}</td>
-                    <td className="border border-gray-300 p-2">{screens.find(s => s.id === q.screenId)?.screenNumber}</td>
-                    <td className="border border-gray-300 p-2">{q.answerImageId !== undefined ? q.answerImageId : 'N/A'}</td>
-                    <td className="border border-gray-300 p-2">
-                      <button onClick={() => handleEditQuestion(q)} className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 mr-2">
+                  <tr key={q.id} className="bg-[var(--card-bg)]">
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{q.id}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{q.text}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{screens.find(s => s.id === q.screenId)?.screenNumber}</td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{q.answerImageId !== undefined ? q.answerImageId : 'N/A'}</td>
+                    <td className="border border-[var(--border-color)] p-2">
+                      <button onClick={() => handleEditQuestion(q)} className="bg-[var(--warning-bg)] text-white px-2 py-1 rounded hover:bg-[var(--warning-hover)] mr-2">
                         Edit
                       </button>
-                      <button onClick={() => handleDeleteQuestion(q.id)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">
+                      <button onClick={() => handleDeleteQuestion(q.id)} className="bg-[var(--danger-bg)] text-white px-2 py-1 rounded hover:bg-[var(--danger-hover)]">
                         Delete
                       </button>
                     </td>
@@ -531,23 +531,23 @@ export default function AdminPanel() {
         {activeTab === 'images' && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2">Images</h3>
-            <table className="w-full border-collapse border border-gray-300">
+            <table className="w-full border-collapse border border-[var(--border-color)] bg-[var(--card-bg)]">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="border border-gray-300 p-2">ID</th>
-                  <th className="border border-gray-300 p-2">Image</th>
-                  <th className="border border-gray-300 p-2">Screen</th>
-                  <th className="border border-gray-300 p-2">Actions</th>
+                <tr className="bg-[var(--secondary-bg)]">
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">ID</th>
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">Image</th>
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">Screen</th>
+                  <th className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {images.map(i => (
-                  <tr key={i.id}>
-                    <td className="border border-gray-300 p-2">{i.id}</td>
-                    <td className="border border-gray-300 p-2"><img src={i.url} width={50} height={50} alt="" /></td>
-                    <td className="border border-gray-300 p-2">{screens.find(s => s.id === i.screenId)?.screenNumber}</td>
-                    <td className="border border-gray-300 p-2">
-                      <button onClick={() => handleEditImage(i)} className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">
+                  <tr key={i.id} className="bg-[var(--card-bg)]">
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{i.id}</td>
+                    <td className="border border-[var(--border-color)] p-2"><img src={i.url} width={50} height={50} alt="" /></td>
+                    <td className="border border-[var(--border-color)] p-2 text-[var(--foreground)]">{screens.find(s => s.id === i.screenId)?.screenNumber}</td>
+                    <td className="border border-[var(--border-color)] p-2">
+                      <button onClick={() => handleEditImage(i)} className="bg-[var(--warning-bg)] text-white px-2 py-1 rounded hover:bg-[var(--warning-hover)]">
                         Edit
                       </button>
                     </td>

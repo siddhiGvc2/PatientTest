@@ -3,6 +3,16 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --card-bg: #ffffff;
+  --secondary-bg: #f3f4f6;
+  --border-color: #d1d5db;
+  --secondary-text: #6b7280;
+  --button-bg: #3b82f6;
+  --button-hover: #2563eb;
+  --danger-bg: #ef4444;
+  --danger-hover: #dc2626;
+  --success-bg: #10b981;
+  --success-hover: #059669;
 }
 
 @theme inline {
@@ -16,6 +26,16 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --card-bg: #1f2937;
+    --secondary-bg: #374151;
+    --border-color: #4b5563;
+    --secondary-text: #9ca3af;
+    --button-bg: #3b82f6;
+    --button-hover: #2563eb;
+    --danger-bg: #ef4444;
+    --danger-hover: #dc2626;
+    --success-bg: #10b981;
+    --success-hover: #059669;
   }
 }
 

@@ -158,7 +158,7 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
           
             <button
               onClick={() => setShowForm(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="bg-[var(--button-bg)] text-white px-4 py-2 rounded hover:bg-[var(--button-hover)]"
             >
               Add Patient
             </button>
@@ -167,85 +167,85 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
       </div>
 
       {showForm && (
-        <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md mb-6">
+        <div className="max-w-4xl mx-auto bg-[var(--card-bg)] p-6 rounded-lg shadow-md mb-6 border border-[var(--border-color)]">
           <h3 className="text-lg font-semibold mb-4">{editingPatient ? 'Edit Patient' : 'Add New Patient'}</h3>
           <form onSubmit={handleAddPatient}>
             <div className="mb-4">
-              <label className="block text-gray-700">Name</label>
+              <label className="block text-[var(--foreground)]">Name</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
                 required
               />
             </div>
 
             <div className="mb-4">
-              <label className="block text-gray-700">Age</label>
+              <label className="block text-[var(--foreground)]">Age</label>
               <input
                 type="number"
                 value={formData.age}
                 onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700">City</label>
+              <label className="block text-[var(--foreground)]">City</label>
               <input
                 type="text"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700">Father Name</label>
+              <label className="block text-[var(--foreground)]">Father Name</label>
               <input
                 type="text"
                 value={formData.fatherName}
                 onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700">Mother Name</label>
+              <label className="block text-[var(--foreground)]">Mother Name</label>
               <input
                 type="text"
                 value={formData.motherName}
                 onChange={(e) => setFormData({ ...formData, motherName: e.target.value })}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700">Unique ID</label>
+              <label className="block text-[var(--foreground)]">Unique ID</label>
               <input
                 type="text"
                 value={formData.uniqueId}
                 onChange={(e) => setFormData({ ...formData, uniqueId: e.target.value })}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700">Phone Number</label>
+              <label className="block text-[var(--foreground)]">Phone Number</label>
               <input
                 type="tel"
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700">Score</label>
+              <label className="block text-[var(--foreground)]">Score</label>
               <input
                 type="number"
                 value={formData.score}
                 onChange={(e) => setFormData({ ...formData, score: parseInt(e.target.value) || 0 })}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
               />
             </div>
             <div className="flex space-x-2">
-              <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+              <button type="submit" className="bg-[var(--success-bg)] text-white px-4 py-2 rounded hover:bg-[var(--success-hover)]">
                 {editingPatient ? 'Update Patient' : 'Add Patient'}
               </button>
               <button
@@ -255,7 +255,7 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
                   setEditingPatient(null);
                   setFormData({ name: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
                 }}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                className="bg-[var(--secondary-bg)] text-[var(--foreground)] px-4 py-2 rounded hover:bg-[var(--border-color)]"
               >
                 Cancel
               </button>
@@ -268,45 +268,45 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
         <p>No patients found.</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300">
+          <table className="min-w-full bg-[var(--card-bg)] border border-[var(--border-color)]">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="py-2 px-4 border-b">ID</th>
-                <th className="py-2 px-4 border-b">Name</th>
-                <th className="py-2 px-4 border-b">Created By</th>
-                <th className="py-2 px-4 border-b">Age</th>
-                <th className="py-2 px-4 border-b">City</th>
-                <th className="py-2 px-4 border-b">Father Name</th>
-                <th className="py-2 px-4 border-b">Mother Name</th>
-                <th className="py-2 px-4 border-b">Unique ID</th>
-                <th className="py-2 px-4 border-b">Phone Number</th>
-                <th className="py-2 px-4 border-b">Score</th>
-                <th className="py-2 px-4 border-b">Actions</th>
+              <tr className="bg-[var(--secondary-bg)]">
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">ID</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Name</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Created By</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Age</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">City</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Father Name</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Mother Name</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Unique ID</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Phone Number</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Score</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Actions</th>
               </tr>
             </thead>
             <tbody>
               {patients.map((patient,i) => (
-                <tr key={patient.id} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b">{i+1}</td>
-                  <td className="py-2 px-4 border-b">{patient.name}</td>
-                  <td className="py-2 px-4 border-b">{patient.user.name}</td>
-                  <td className="py-2 px-4 border-b">{patient.age || '-'}</td>
-                  <td className="py-2 px-4 border-b">{patient.city || '-'}</td>
-                  <td className="py-2 px-4 border-b">{patient.fatherName || '-'}</td>
-                  <td className="py-2 px-4 border-b">{patient.motherName || '-'}</td>
-                  <td className="py-2 px-4 border-b">{patient.uniqueId || '-'}</td>
-                  <td className="py-2 px-4 border-b">{patient.phoneNumber || '-'}</td>
-                  <td className="py-2 px-4 border-b">{patient.score}</td>
-                  <td className="py-2 px-4 border-b">
+                <tr key={patient.id} className="hover:bg-[var(--secondary-bg)]">
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{i+1}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.name}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.user.name}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.age || '-'}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.city || '-'}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.fatherName || '-'}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.motherName || '-'}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.uniqueId || '-'}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.phoneNumber || '-'}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.score}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">
                     <button
                       onClick={() => handleEditPatient(patient)}
-                      className="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600"
+                      className="bg-[var(--button-bg)] text-white px-2 py-1 rounded mr-2 hover:bg-[var(--button-hover)]"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeletePatient(patient.id)}
-                      className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                      className="bg-[var(--danger-bg)] text-white px-2 py-1 rounded hover:bg-[var(--danger-hover)]"
                     >
                       Delete
                     </button>

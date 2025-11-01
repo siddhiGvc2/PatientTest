@@ -45,48 +45,48 @@ export default function Home() {
         <div>
           {showHeader && (
             <>
-              <div className="bg-white p-4 shadow-md flex items-center justify-between">
+              <div className="bg-[var(--card-bg)] p-4 shadow-md flex items-center justify-between border-b border-[var(--border-color)]">
                 <div className="flex items-center space-x-4">
                   <img src={loggedInUser.picture} alt={loggedInUser.name} className="w-10 h-10 rounded-full" />
                   <div>
                     <h2 className="text-lg font-semibold">{loggedInUser.name}</h2>
-                    <p className="text-gray-600">{loggedInUser.email} ({loggedInUser.userType})</p>
+                    <p className="text-[var(--secondary-text)]">{loggedInUser.email} ({loggedInUser.userType})</p>
                   </div>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                  className="bg-[var(--danger-bg)] text-white px-4 py-2 rounded hover:bg-[var(--danger-hover)]"
                 >
                   Logout
                 </button>
               </div>
 
-              <div className="bg-gray-100 p-4">
+              <div className="bg-[var(--secondary-bg)] p-4 border-b border-[var(--border-color)]">
                 <div className="flex space-x-4">
                   <button
                     onClick={() => setActiveTab('patients')}
-                    className={`px-4 py-2 rounded ${activeTab === 'patients' ? 'bg-blue-500 text-white' : 'bg-white'}`}
+                    className={`px-4 py-2 rounded ${activeTab === 'patients' ? 'bg-[var(--button-bg)] text-white hover:bg-[var(--button-hover)]' : 'bg-[var(--card-bg)] hover:bg-[var(--secondary-bg)]'}`}
                   >
                     Patients
                   </button>
                   {canManageUsers && (
                     <button
                       onClick={() => setActiveTab('users')}
-                      className={`px-4 py-2 rounded ${activeTab === 'users' ? 'bg-blue-500 text-white' : 'bg-white'}`}
+                      className={`px-4 py-2 rounded ${activeTab === 'users' ? 'bg-[var(--button-bg)] text-white hover:bg-[var(--button-hover)]' : 'bg-[var(--card-bg)] hover:bg-[var(--secondary-bg)]'}`}
                     >
                       User Management
                     </button>
                   )}
                   <button
                     onClick={() => {setActiveTab('test');setTestEnded(false)}}
-                    className={`px-4 py-2 rounded ${activeTab === 'test' ? 'bg-blue-500 text-white' : 'bg-white'}`}
+                    className={`px-4 py-2 rounded ${activeTab === 'test' ? 'bg-[var(--button-bg)] text-white hover:bg-[var(--button-hover)]' : 'bg-[var(--card-bg)] hover:bg-[var(--secondary-bg)]'}`}
                   >
                     Test Level
                   </button>
                   {canManageUsers && (
                     <a
                       href="/admin"
-                      className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600"
+                      className="px-4 py-2 rounded bg-[var(--success-bg)] text-white hover:bg-[var(--success-hover)]"
                     >
                       Admin Panel
                     </a>
@@ -99,7 +99,7 @@ export default function Home() {
           {activeTab === 'patients' && <PatientList userId={loggedInUser.id} currentUser={loggedInUser} />}
           {activeTab === 'users' && canManageUsers && <UserManagement currentUser={loggedInUser} />}
           {activeTab === 'test' && (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-[var(--background)]">
               <TestLevel onTestEnd={handleTestEnd} onExit={handleExitTest} onRetake={handleRetakeTest} />
             </div>
           )}
