@@ -5,9 +5,10 @@ import LoginPage from "./components/login";
 import PatientList from "./components/patient-list";
 import UserManagement from "./components/user-management";
 import TestLevel from "./components/test-level";
+import { useAuth } from "./contexts/AuthContext";
 
 export default function Home() {
-  const [loggedInUser, setLoggedInUser] = useState<any>(null);
+  const { loggedInUser, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<'patients' | 'users' | 'test'>('patients');
   const [testEnded, setTestEnded] = useState(false);
 
@@ -27,7 +28,11 @@ export default function Home() {
   };
 
   const handleLogin = (user: any) => {
-    setLoggedInUser(user);
+    login(user);
+  };
+
+  const handleLogout = () => {
+    logout();
   };
 
   const canManageUsers = loggedInUser && (loggedInUser.userType === 'SUPERADMIN' || loggedInUser.userType === 'ADMIN');
@@ -49,7 +54,7 @@ export default function Home() {
                   </div>
                 </div>
                 <button
-                  onClick={() => setLoggedInUser(null)}
+                  onClick={handleLogout}
                   className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                 >
                   Logout
