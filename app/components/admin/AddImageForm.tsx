@@ -19,7 +19,7 @@ export default function AddImageForm({ screens, testLevels, imageLibraries, onAd
   const [file, setFile] = useState<File | null>(null);
   const [screenId, setScreenId] = useState(initialScreenId ? initialScreenId.toString() : "");
   const [imageLibraryId, setImageLibraryId] = useState<number | null>(null);
-  const [useLibraryImage, setUseLibraryImage] = useState(false);
+  const [useLibraryImage, setUseLibraryImage] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -70,19 +70,6 @@ export default function AddImageForm({ screens, testLevels, imageLibraries, onAd
       <h2 className="text-xl font-semibold mb-4">Add Image</h2>
 
       <div className="mb-4">
-        <label className="flex items-center mb-2">
-          <input
-            type="radio"
-            name="imageSource"
-            checked={!useLibraryImage}
-            onChange={() => {
-              setUseLibraryImage(false);
-              setImageLibraryId(null);
-            }}
-            className="mr-2"
-          />
-          Upload New Image
-        </label>
         <label className="flex items-center">
           <input
             type="radio"
@@ -96,6 +83,20 @@ export default function AddImageForm({ screens, testLevels, imageLibraries, onAd
           />
           Choose from Image Library
         </label>
+        <label className="flex items-center mb-2">
+          <input
+            type="radio"
+            name="imageSource"
+            checked={!useLibraryImage}
+            onChange={() => {
+              setUseLibraryImage(false);
+              setImageLibraryId(null);
+            }}
+            className="mr-2"
+          />
+          Upload New Image
+        </label>
+        
       </div>
 
       {!useLibraryImage ? (

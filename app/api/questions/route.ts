@@ -5,10 +5,10 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
-    const { text, screenId, options, answerImageId } = await request.json();
+    const { text, screenId, answerImageId } = await request.json();
 
-    if (!text || typeof text !== 'string' || !screenId || typeof screenId !== 'number' || !options || !Array.isArray(options) || answerImageId === undefined || typeof answerImageId !== 'number') {
-      return NextResponse.json({ error: 'text, screenId, options, and valid answerImageId are required. options must be an array, answerImageId must be a number' }, { status: 400 });
+    if (!text || typeof text !== 'string' || !screenId || typeof screenId !== 'number' || answerImageId === undefined || typeof answerImageId !== 'number') {
+      return NextResponse.json({ error: 'text, screenId, and valid answerImageId are required. answerImageId must be a number' }, { status: 400 });
     }
 
     const question = await prisma.question.create({

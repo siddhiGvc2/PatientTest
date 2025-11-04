@@ -347,8 +347,8 @@ export default function AdminPanel() {
       <div className="flex mb-6 flex-wrap">
         <button onClick={() => setActiveTab('testLevel')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'testLevel' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>TestLevel</button>
         <button onClick={() => setActiveTab('screen')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'screen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Screen</button>
-        <button onClick={() => setActiveTab('images')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'images' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Images</button>
-        <button onClick={() => setActiveTab('question')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'question' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Question</button>
+        {/* <button onClick={() => setActiveTab('images')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'images' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Images</button>
+        <button onClick={() => setActiveTab('question')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'question' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Question</button> */}
         <button onClick={() => setActiveTab('imageLibrary')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'imageLibrary' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Image Library</button>
         <button onClick={() => setActiveTab('selectScreen')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'selectScreen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Select Screen</button>
       </div>
@@ -405,7 +405,7 @@ export default function AdminPanel() {
                       <div key={index} className="border border-gray-300 p-2 rounded">
                         {image ? (
                           <>
-                            <img src={image.url} alt={`Image ${image.id}`} className="w-full h-16 object-cover mb-2" />
+                            <img src={image.url} alt={`Image ${image.id}`} className="w-full h-26 object-content mb-2" />
                             <button onClick={() => handleEditImage(image)} className="text-blue-600 hover:text-blue-800 text-sm">Edit</button>
                           </>
                         ) : (
@@ -413,7 +413,7 @@ export default function AdminPanel() {
                             onClick={() => setShowAddImageForm(true)}
                             className="w-full h-16 bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-500 text-sm rounded cursor-pointer transition-colors"
                           >
-                            Empty Slot
+                            Add Image
                           </button>
                         )}
                       </div>
@@ -443,11 +443,11 @@ export default function AdminPanel() {
                         </tr>
                       </thead>
                       <tbody>
-                        {questions.filter(q => q.screenId === selectedScreen.id).map((question) => (
+                        {questions.filter(q => q.screenId === selectedScreen.id).map((question,i) => (
                           <tr key={question.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-2 border-b">{question.id}</td>
-                            <td className="px-4 py-2 border-b">{question.text}</td>
-                            <td className="px-4 py-2 border-b">
+                            <td className="px-4 py-2 border-b text-center">{i+1}</td>
+                            <td className="px-4 py-2 border-b text-center">{question.text}</td>
+                            <td className="px-4 py-2 border-b text-center">
                               <button onClick={() => handleEditQuestion(question)} className="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
                               <button onClick={() => handleDeleteQuestion(question.id)} className="text-red-600 hover:text-red-800">Delete</button>
                             </td>
@@ -532,7 +532,7 @@ export default function AdminPanel() {
             <h3 className="text-lg font-semibold mb-4">Add Question to Screen {selectedScreen.screenNumber}</h3>
             <AddQuestionForm
               screens={screens}
-              images={images}
+              images={images.filter(img => img.screenId === selectedScreen.id)}
               testLevels={testLevels}
               initialScreenId={selectedScreen.id}
               onAdd={async (question) => {

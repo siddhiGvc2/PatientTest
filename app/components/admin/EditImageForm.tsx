@@ -20,7 +20,7 @@ export default function EditImageForm({ image, screens, testLevels, imageLibrari
   const [file, setFile] = useState<File | null>(null);
   const [screenId, setScreenId] = useState(image.screenId);
   const [imageLibraryId, setImageLibraryId] = useState<number | null>(null);
-  const [useLibraryImage, setUseLibraryImage] = useState(false);
+  const [useLibraryImage, setUseLibraryImage] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
@@ -57,6 +57,19 @@ export default function EditImageForm({ image, screens, testLevels, imageLibrari
       <h2 className="text-xl font-semibold mb-4">Edit Image</h2>
 
       <div className="mb-4">
+          <label className="flex items-center mb-2">
+          <input
+            type="radio"
+            name="editImageSource"
+            checked={useLibraryImage}
+            onChange={() => {
+              setUseLibraryImage(true);
+              setFile(null);
+            }}
+            className="mr-2"
+          />
+          Choose from Image Library
+        </label>
         <label className="flex items-center mb-2">
           <input
             type="radio"
@@ -70,19 +83,7 @@ export default function EditImageForm({ image, screens, testLevels, imageLibrari
           />
           Upload New Image
         </label>
-        <label className="flex items-center mb-2">
-          <input
-            type="radio"
-            name="editImageSource"
-            checked={useLibraryImage}
-            onChange={() => {
-              setUseLibraryImage(true);
-              setFile(null);
-            }}
-            className="mr-2"
-          />
-          Choose from Image Library
-        </label>
+      
       </div>
 
       {!useLibraryImage ? (
