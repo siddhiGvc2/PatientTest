@@ -12,6 +12,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
     const screenIdStr = formData.get('screenId') as string;
+    const imageLibraryIdStr = formData.get('imageLibraryId') as string;
 
     if (!screenIdStr) {
       return NextResponse.json({ error: 'screenId is required' }, { status: 400 });
@@ -25,11 +26,29 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     let cloudinaryUrl: string | undefined;
 
     if (file) {
-      // Convert file to buffer
+      // Upload new file
       const fileBuffer = Buffer.from(await file.arrayBuffer());
-
-      // Upload to Cloudinary
       cloudinaryUrl = await uploadToCloudinary(fileBuffer, 'patient-test-images');
+      const imageLibrary = await prisma.imageLibrary.create({
+        data: {
+          url: cloudinaryUrl
+        },
+      });
+    } else if (imageLibraryIdStr) {
+      // Use existing image from library
+      const imageLibraryId = parseInt(imageLibraryIdStr);
+      if (isNaN(imageLibraryId)) {
+        return NextResponse.json({ error: 'imageLibraryId must be a number' }, { status: 400 });
+      }
+
+      const imageLibrary = await prisma.imageLibrary.findUnique({
+        where: { id: imageLibraryId },
+      });
+
+      if (!imageLibrary) {
+        return NextResponse.json({ error: 'Image library item not found' }, { status: 404 });
+      }
+      cloudinaryUrl = imageLibrary.url;
     }
 
     const updateData: { url?: string; screenId: number } = { screenId };
