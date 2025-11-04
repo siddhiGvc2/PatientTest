@@ -34,6 +34,7 @@ export default function AdminPanel() {
   const [message, setMessage] = useState("");
   const [selectedScreen, setSelectedScreen] = useState<Screen | null>(null);
   const [showAddImageForm, setShowAddImageForm] = useState(false);
+  const [showAddQuestionForm, setShowAddQuestionForm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -422,7 +423,15 @@ export default function AdminPanel() {
               </div>
 
               <div>
-                <h4 className="text-md font-semibold mb-2">Associated Questions:</h4>
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="text-md font-semibold">Associated Questions:</h4>
+                  <button
+                    onClick={() => setShowAddQuestionForm(true)}
+                    className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+                  >
+                    Add Question
+                  </button>
+                </div>
                 {questions.filter(q => q.screenId === selectedScreen.id).length > 0 ? (
                   <div className="overflow-x-auto">
                     <table className="min-w-full bg-white border border-gray-300">
@@ -500,13 +509,39 @@ export default function AdminPanel() {
               screens={screens}
               testLevels={testLevels}
               imageLibraries={imageLibraries}
-              onAdd={(file, screenId, imageLibraryId) => {
-                handleAddImage(file, selectedScreen.id, imageLibraryId);
+              initialScreenId={selectedScreen.id}
+              onAdd={async (file, screenId, imageLibraryId) => {
+                await handleAddImage(file, selectedScreen.id, imageLibraryId);
                 setShowAddImageForm(false);
               }}
             />
             <button
               onClick={() => setShowAddImageForm(false)}
+              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add Question Modal */}
+      {showAddQuestionForm && selectedScreen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">Add Question to Screen {selectedScreen.screenNumber}</h3>
+            <AddQuestionForm
+              screens={screens}
+              images={images}
+              testLevels={testLevels}
+              initialScreenId={selectedScreen.id}
+              onAdd={async (question) => {
+                await handleAddQuestion(question);
+                setShowAddQuestionForm(false);
+              }}
+            />
+            <button
+              onClick={() => setShowAddQuestionForm(false)}
               className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
             >
               Cancel
