@@ -1,28 +1,43 @@
 import { useState } from "react";
 
 interface AddImageLibraryFormProps {
-  onAdd: (file: File) => Promise<void>;
+  onAdd: (files: File[]) => Promise<void>;
 }
 
 export default function AddImageLibraryForm({ onAdd }: AddImageLibraryFormProps) {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
 
   const handleSubmit = async () => {
-    if (!file) return;
-    await onAdd(file);
-    setFile(null);
+    if (files.length === 0) return;
+    await onAdd(files);
+    setFiles([]);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    setFiles(selectedFiles);
   };
 
   return (
     <div className="bg-[var(--card-bg)] p-4 rounded shadow mb-6 border border-[var(--border-color)]">
-      <h2 className="text-xl font-semibold mb-4">Add Image to Library</h2>
+      <h2 className="text-xl font-semibold mb-4">Add Images to Library</h2>
       <input
         type="file"
         accept="image/*"
-        onChange={(e) => setFile(e.target.files?.[0] || null)}
+        multiple
+        onChange={handleFileChange}
         className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
       />
-      <button onClick={handleSubmit} className="w-full bg-[var(--button-bg)] text-white p-2 rounded hover:bg-[var(--button-hover)]">
+      {files.length > 0 && (
+        <div className="mb-2 text-sm text-[var(--foreground)]">
+          {files.length} file{files.length > 1 ? 's' : ''} selected
+        </div>
+      )}
+      <button
+        onClick={handleSubmit}
+        disabled={files.length === 0}
+        className="w-full bg-[var(--button-bg)] text-white p-2 rounded hover:bg-[var(--button-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+      >
         Add to Library
       </button>
     </div>

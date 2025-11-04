@@ -211,23 +211,24 @@ export default function AdminPanel() {
     setEditType(null);
   };
 
-  const handleAddImageLibrary = async (file: File) => {
+  const handleAddImageLibrary = async (files: File[]) => {
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
 
-      const res = await fetch("/api/image-library", {
-        method: "POST",
-        body: formData,
-      });
-      if (res.ok) {
-        setMessage("Image added to library successfully!");
-        fetchData();
-      } else {
-        setMessage("Error adding image to library");
+        const res = await fetch("/api/image-library", {
+          method: "POST",
+          body: formData,
+        });
+        if (!res.ok) {
+          throw new Error(`Failed to upload ${file.name}`);
+        }
       }
+      setMessage(`${files.length} image${files.length > 1 ? 's' : ''} added to library successfully!`);
+      fetchData();
     } catch (error) {
-      setMessage("Error adding image to library");
+      setMessage("Error adding images to library");
     }
   };
 
