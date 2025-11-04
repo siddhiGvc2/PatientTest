@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { TestLevel, Screen, Question, Image as ImageType, NewQuestionState, ImageLibrary } from "./admin/types";
 import AddTestLevelForm from "./admin/AddTestLevelForm";
 import AddScreenForm from "./admin/AddScreenForm";
@@ -33,6 +33,7 @@ export default function AdminPanel() {
 
   const [message, setMessage] = useState("");
   const [selectedScreen, setSelectedScreen] = useState<Screen | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchData();
@@ -393,35 +394,40 @@ export default function AdminPanel() {
               </div>
 
               <div className="mb-6">
+                <h4 className="text-md font-semibold mb-2">Add New Image:</h4>
+                <AddImageForm
+                  screens={screens}
+                  testLevels={testLevels}
+                  imageLibraries={imageLibraries}
+                  onAdd={(file, screenId, imageLibraryId) => handleAddImage(file, selectedScreen.id, imageLibraryId)}
+                />
+              </div>
+
+              <div className="mb-6">
                 <h4 className="text-md font-semibold mb-2">Associated Images:</h4>
-                {images.filter(img => img.screenId === selectedScreen.id).length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white border border-gray-300">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="px-4 py-2 border-b">ID</th>
-                          <th className="px-4 py-2 border-b">Image</th>
-                          <th className="px-4 py-2 border-b">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {images.filter(img => img.screenId === selectedScreen.id).map((image) => (
-                          <tr key={image.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-2 border-b">{image.id}</td>
-                            <td className="px-4 py-2 border-b">
-                              <img src={image.url} alt={`Image ${image.id}`} className="w-16 h-16 object-cover" />
-                            </td>
-                            <td className="px-4 py-2 border-b">
-                              <button onClick={() => handleEditImage(image)} className="text-blue-600 hover:text-blue-800">Edit</button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className="text-gray-500">No images associated with this screen.</p>
-                )}
+                <div className="grid grid-cols-4 gap-4">
+                  {Array.from({ length: 4 }, (_, index) => {
+                    const screenImages = images.filter(img => img.screenId === selectedScreen.id);
+                    const image = screenImages[index];
+                    return (
+                      <div key={index} className="border border-gray-300 p-2 rounded">
+                        {image ? (
+                          <>
+                            <img src={image.url} alt={`Image ${image.id}`} className="w-full h-16 object-cover mb-2" />
+                            <button onClick={() => handleEditImage(image)} className="text-blue-600 hover:text-blue-800 text-sm">Edit</button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-full h-16 bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-500 text-sm rounded cursor-pointer transition-colors"
+                          >
+                            Empty Slot
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               <div>
@@ -494,20 +500,40 @@ export default function AdminPanel() {
         </div>
       )}
 
+      {/* Hidden file input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file && selectedScreen) {
+            handleAddImage(file, selectedScreen.id);
+          }
+          // Reset the input
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+        }}
+      />
+
       {/* Tables */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Existing Data</h2>
+      {activeTab !== 'selectScreen' && (
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Existing Data</h2>
 
-        {activeTab === 'testLevel' && <TestLevelTable testLevels={testLevels} />}
+          {activeTab === 'testLevel' && <TestLevelTable testLevels={testLevels} />}
 
-        {activeTab === 'screen' && <ScreenTable screens={screens} testLevels={testLevels} />}
+          {activeTab === 'screen' && <ScreenTable screens={screens} testLevels={testLevels} />}
 
-        {activeTab === 'question' && <QuestionTable questions={questions} testLevels={testLevels} screens={screens} onEdit={handleEditQuestion} onDelete={handleDeleteQuestion} />}
+          {activeTab === 'question' && <QuestionTable questions={questions} testLevels={testLevels} screens={screens} onEdit={handleEditQuestion} onDelete={handleDeleteQuestion} />}
 
-        {activeTab === 'images' && <ImageTable images={images} testLevels={testLevels} screens={screens} onEdit={handleEditImage} onDelete={handleDeleteImage} />}
+          {activeTab === 'images' && <ImageTable images={images} testLevels={testLevels} screens={screens} onEdit={handleEditImage} onDelete={handleDeleteImage} />}
 
-        {activeTab === 'imageLibrary' && <ImageLibraryTable imageLibraries={imageLibraries} onEdit={handleEditImageLibrary} onDelete={handleDeleteImageLibrary} />}
-      </div>
+          {activeTab === 'imageLibrary' && <ImageLibraryTable imageLibraries={imageLibraries} onEdit={handleEditImageLibrary} onDelete={handleDeleteImageLibrary} />}
+        </div>
+      )}
     </div>
   );
 }
