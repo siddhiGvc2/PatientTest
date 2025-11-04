@@ -95,6 +95,7 @@ model Option {
   userResponses UserResponse[]
 }
 
+
 // User responses per question
 model UserResponse {
   id         Int      @id @default(autoincrement())
@@ -106,4 +107,10 @@ model UserResponse {
   selected   Option   @relation(fields: [selectedId], references: [id])
   isCorrect  Boolean  @default(false)
   createdAt  DateTime @default(now())
+}
+
+// Standalone image library
+model ImageLibrary {
+  id  Int     @id @default(autoincrement())
+  url String
 }
