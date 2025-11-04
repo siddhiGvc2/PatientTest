@@ -5,9 +5,16 @@ interface ImageTableProps {
   testLevels: TestLevel[];
   screens: Screen[];
   onEdit: (image: ImageType) => void;
+  onDelete: (id: number) => void;
 }
 
-export default function ImageTable({ images, testLevels, screens, onEdit }: ImageTableProps) {
+export default function ImageTable({ images, testLevels, screens, onEdit, onDelete }: ImageTableProps) {
+  const handleDelete = (image: ImageType) => {
+    if (window.confirm(`Are you sure you want to delete image ${image.id}?`)) {
+      onDelete(image.id);
+    }
+  };
+
   return (
     <div className="mb-6">
       <h3 className="text-lg font-semibold mb-2">Images</h3>
@@ -31,8 +38,11 @@ export default function ImageTable({ images, testLevels, screens, onEdit }: Imag
                 {screens.find(s => s.id === i.screenId)?.screenNumber} (Level {testLevels.find(tl => tl.id === screens.find(s => s.id === i.screenId)?.testLevelId)?.level})
               </td>
               <td className="border border-[var(--border-color)] p-2 text-center">
-                <button onClick={() => onEdit(i)} className="bg-[var(--success-bg)] text-white px-2 py-1 rounded hover:bg-[var(--success-hover)]">
+                <button onClick={() => onEdit(i)} className="bg-[var(--success-bg)] text-white px-2 py-1 rounded hover:bg-[var(--success-hover)] mr-2">
                   Edit
+                </button>
+                <button onClick={() => handleDelete(i)} className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">
+                  Delete
                 </button>
               </td>
             </tr>

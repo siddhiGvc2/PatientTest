@@ -315,6 +315,25 @@ export default function AdminPanel() {
     }
   };
 
+  const handleDeleteImage = async (imageId: number) => {
+    if (!confirm('Are you sure you want to delete this image? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/images/${imageId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setMessage("Image deleted successfully!");
+        fetchData();
+      } else {
+        setMessage("Error deleting Image");
+      }
+    } catch (error) {
+      setMessage("Error deleting Image");
+    }
+  };
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Admin Panel</h1>
@@ -385,7 +404,7 @@ export default function AdminPanel() {
 
         {activeTab === 'question' && <QuestionTable questions={questions} testLevels={testLevels} screens={screens} onEdit={handleEditQuestion} onDelete={handleDeleteQuestion} />}
 
-        {activeTab === 'images' && <ImageTable images={images} testLevels={testLevels} screens={screens} onEdit={handleEditImage} />}
+        {activeTab === 'images' && <ImageTable images={images} testLevels={testLevels} screens={screens} onEdit={handleEditImage} onDelete={handleDeleteImage} />}
 
         {activeTab === 'imageLibrary' && <ImageLibraryTable imageLibraries={imageLibraries} onEdit={handleEditImageLibrary} onDelete={handleDeleteImageLibrary} />}
       </div>
