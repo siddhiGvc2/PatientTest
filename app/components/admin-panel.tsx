@@ -17,7 +17,7 @@ import ImageTable from "./admin/ImageTable";
 import ImageLibraryTable from "./admin/ImageLibraryTable";
 
 export default function AdminPanel() {
-  const [activeTab, setActiveTab] = useState('testLevel');
+  const [activeTab, setActiveTab] = useState('imageLibrary');
   const [testLevels, setTestLevels] = useState<TestLevel[]>([]);
   const [screens, setScreens] = useState<Screen[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -35,6 +35,8 @@ export default function AdminPanel() {
   const [selectedScreen, setSelectedScreen] = useState<Screen | null>(null);
   const [showAddImageForm, setShowAddImageForm] = useState(false);
   const [showAddQuestionForm, setShowAddQuestionForm] = useState(false);
+  const [showAddTestLevelForm, setShowAddTestLevelForm] = useState(false);
+  const [showAddScreenForm, setShowAddScreenForm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -345,12 +347,12 @@ export default function AdminPanel() {
 
       {/* Tabs */}
       <div className="flex mb-6 flex-wrap">
-        <button onClick={() => setActiveTab('testLevel')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'testLevel' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>TestLevel</button>
-        <button onClick={() => setActiveTab('screen')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'screen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Screen</button>
+        {/* <button onClick={() => setActiveTab('testLevel')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'testLevel' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>TestLevel</button>
+        <button onClick={() => setActiveTab('screen')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'screen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Screen</button> */}
         {/* <button onClick={() => setActiveTab('images')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'images' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Images</button>
         <button onClick={() => setActiveTab('question')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'question' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Question</button> */}
         <button onClick={() => setActiveTab('imageLibrary')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'imageLibrary' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Image Library</button>
-        <button onClick={() => setActiveTab('selectScreen')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'selectScreen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Select Screen</button>
+        <button onClick={() => setActiveTab('selectScreen')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'selectScreen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Settings</button>
       </div>
 
       {/* Add Forms */}
@@ -367,6 +369,20 @@ export default function AdminPanel() {
       {activeTab === 'selectScreen' && (
         <div className="mb-6">
           <label htmlFor="screenSelect" className="block text-sm font-medium mb-2">Choose a Screen:</label>
+          <div className="flex gap-4 mb-4">
+            <button
+              onClick={() => setShowAddTestLevelForm(true)}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              Add Test Level
+            </button>
+            <button
+              onClick={() => setShowAddScreenForm(true)}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Add Screen
+            </button>
+          </div>
           <select
             id="screenSelect"
             value={selectedScreen?.id || ''}
@@ -550,6 +566,49 @@ export default function AdminPanel() {
         </div>
       )}
 
+      {/* Add Test Level Modal */}
+      {showAddTestLevelForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">Add Test Level</h3>
+            <AddTestLevelForm
+              onAdd={async (level) => {
+                await handleAddTestLevel(level);
+                setShowAddTestLevelForm(false);
+              }}
+            />
+            <button
+              onClick={() => setShowAddTestLevelForm(false)}
+              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add Screen Modal */}
+      {showAddScreenForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">Add Screen</h3>
+            <AddScreenForm
+              testLevels={testLevels}
+              onAdd={async (screenNumber, testLevelId) => {
+                await handleAddScreen(screenNumber, testLevelId);
+                setShowAddScreenForm(false);
+              }}
+            />
+            <button
+              onClick={() => setShowAddScreenForm(false)}
+              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Hidden file input */}
       <input
         type="file"
@@ -581,7 +640,7 @@ export default function AdminPanel() {
 
           {activeTab === 'images' && <ImageTable images={images} testLevels={testLevels} screens={screens} onEdit={handleEditImage} onDelete={handleDeleteImage} />}
 
-          {activeTab === 'imageLibrary' && <ImageLibraryTable imageLibraries={imageLibraries} onEdit={handleEditImageLibrary} onDelete={handleDeleteImageLibrary} />}
+          {activeTab === 'imageLibrary' && <ImageLibraryTable imageLibraries={imageLibraries} onDelete={handleDeleteImageLibrary} />}
         </div>
       )}
     </div>
