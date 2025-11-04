@@ -33,6 +33,7 @@ export default function AdminPanel() {
 
   const [message, setMessage] = useState("");
   const [selectedScreen, setSelectedScreen] = useState<Screen | null>(null);
+  const [showAddImageForm, setShowAddImageForm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -394,16 +395,6 @@ export default function AdminPanel() {
               </div>
 
               <div className="mb-6">
-                <h4 className="text-md font-semibold mb-2">Add New Image:</h4>
-                <AddImageForm
-                  screens={screens}
-                  testLevels={testLevels}
-                  imageLibraries={imageLibraries}
-                  onAdd={(file, screenId, imageLibraryId) => handleAddImage(file, selectedScreen.id, imageLibraryId)}
-                />
-              </div>
-
-              <div className="mb-6">
                 <h4 className="text-md font-semibold mb-2">Associated Images:</h4>
                 <div className="grid grid-cols-4 gap-4">
                   {Array.from({ length: 4 }, (_, index) => {
@@ -418,7 +409,7 @@ export default function AdminPanel() {
                           </>
                         ) : (
                           <button
-                            onClick={() => fileInputRef.current?.click()}
+                            onClick={() => setShowAddImageForm(true)}
                             className="w-full h-16 bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-500 text-sm rounded cursor-pointer transition-colors"
                           >
                             Empty Slot
@@ -496,6 +487,30 @@ export default function AdminPanel() {
                 onCancel={handleCancelEditImageLibrary}
               />
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Add Image Modal */}
+      {showAddImageForm && selectedScreen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">Add Image to Screen {selectedScreen.screenNumber}</h3>
+            <AddImageForm
+              screens={screens}
+              testLevels={testLevels}
+              imageLibraries={imageLibraries}
+              onAdd={(file, screenId, imageLibraryId) => {
+                handleAddImage(file, selectedScreen.id, imageLibraryId);
+                setShowAddImageForm(false);
+              }}
+            />
+            <button
+              onClick={() => setShowAddImageForm(false)}
+              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
