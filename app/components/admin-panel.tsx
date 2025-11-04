@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { TestLevel, Screen, Question, Image as ImageType, NewQuestionState, ImageLibrary } from "./admin/types";
 import AddTestLevelForm from "./admin/AddTestLevelForm";
 import AddScreenForm from "./admin/AddScreenForm";
@@ -17,7 +17,7 @@ import ImageTable from "./admin/ImageTable";
 import ImageLibraryTable from "./admin/ImageLibraryTable";
 
 export default function AdminPanel() {
-  const [activeTab, setActiveTab] = useState('testLevel');
+  const [activeTab, setActiveTab] = useState('imageLibrary');
   const [testLevels, setTestLevels] = useState<TestLevel[]>([]);
   const [screens, setScreens] = useState<Screen[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -32,6 +32,12 @@ export default function AdminPanel() {
   const [editType, setEditType] = useState<'question' | 'image' | 'imageLibrary' | null>(null);
 
   const [message, setMessage] = useState("");
+  const [selectedScreen, setSelectedScreen] = useState<Screen | null>(null);
+  const [showAddImageForm, setShowAddImageForm] = useState(false);
+  const [showAddQuestionForm, setShowAddQuestionForm] = useState(false);
+  const [showAddTestLevelForm, setShowAddTestLevelForm] = useState(false);
+  const [showAddScreenForm, setShowAddScreenForm] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchData();
@@ -341,11 +347,12 @@ export default function AdminPanel() {
 
       {/* Tabs */}
       <div className="flex mb-6 flex-wrap">
-        <button onClick={() => setActiveTab('testLevel')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'testLevel' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>TestLevel</button>
-        <button onClick={() => setActiveTab('screen')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'screen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Screen</button>
-        <button onClick={() => setActiveTab('images')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'images' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Images</button>
-        <button onClick={() => setActiveTab('question')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'question' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Question</button>
+        {/* <button onClick={() => setActiveTab('testLevel')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'testLevel' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>TestLevel</button>
+        <button onClick={() => setActiveTab('screen')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'screen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Screen</button> */}
+        {/* <button onClick={() => setActiveTab('images')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'images' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Images</button>
+        <button onClick={() => setActiveTab('question')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'question' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Question</button> */}
         <button onClick={() => setActiveTab('imageLibrary')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'imageLibrary' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Image Library</button>
+        <button onClick={() => setActiveTab('selectScreen')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'selectScreen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Settings</button>
       </div>
 
       {/* Add Forms */}
@@ -358,6 +365,121 @@ export default function AdminPanel() {
       {activeTab === 'images' && <AddImageForm screens={screens} testLevels={testLevels} imageLibraries={imageLibraries} onAdd={handleAddImage} />}
 
       {activeTab === 'imageLibrary' && <AddImageLibraryForm onAdd={handleAddImageLibrary} />}
+
+      {activeTab === 'selectScreen' && (
+        <div className="mb-6">
+          <label htmlFor="screenSelect" className="block text-sm font-medium mb-2">Choose a Screen:</label>
+          <div className="flex gap-4 mb-4">
+            <button
+              onClick={() => setShowAddTestLevelForm(true)}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              Add Test Level
+            </button>
+            <button
+              onClick={() => setShowAddScreenForm(true)}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Add Screen
+            </button>
+          </div>
+          <select
+            id="screenSelect"
+            value={selectedScreen?.id || ''}
+            onChange={(e) => {
+              const screenId = parseInt(e.target.value);
+              const screen = screens.find(s => s.id === screenId) || null;
+              setSelectedScreen(screen);
+            }}
+            className="border border-gray-300 rounded px-3 py-2 w-full"
+          >
+            <option value="">Select a screen</option>
+            {screens.map((screen) => {
+              const testLevel = testLevels.find(tl => tl.id === screen.testLevelId);
+              return (
+                <option key={screen.id} value={screen.id}>
+                  Screen {screen.screenNumber} - Test Level {testLevel?.level || 'Unknown'}
+                </option>
+              );
+            })}
+          </select>
+          {selectedScreen && (
+            <div className="mt-4">
+              <div className="p-4 bg-gray-100 rounded mb-4">
+                <h3 className="text-lg font-semibold">Selected Screen Details:</h3>
+                <p><strong>Screen Number:</strong> {selectedScreen.screenNumber}</p>
+                <p><strong>Test Level:</strong> {testLevels.find(tl => tl.id === selectedScreen.testLevelId)?.level || 'Unknown'}</p>
+              </div>
+
+              <div className="mb-6">
+                <h4 className="text-md font-semibold mb-2">Associated Images:</h4>
+                <div className="grid grid-cols-4 gap-4">
+                  {Array.from({ length: 4 }, (_, index) => {
+                    const screenImages = images.filter(img => img.screenId === selectedScreen.id);
+                    const image = screenImages[index];
+                    return (
+                      <div key={index} className="border border-gray-300 p-2 rounded">
+                        {image ? (
+                          <>
+                            <img src={image.url} alt={`Image ${image.id}`} className="w-full h-26 object-content mb-2" />
+                            <button onClick={() => handleEditImage(image)} className="text-blue-600 hover:text-blue-800 text-sm">Edit</button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setShowAddImageForm(true)}
+                            className="w-full h-16 bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-500 text-sm rounded cursor-pointer transition-colors"
+                          >
+                            Add Image
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="text-md font-semibold">Associated Questions:</h4>
+                  <button
+                    onClick={() => setShowAddQuestionForm(true)}
+                    className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+                  >
+                    Add Question
+                  </button>
+                </div>
+                {questions.filter(q => q.screenId === selectedScreen.id).length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full bg-white border border-gray-300">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          <th className="px-4 py-2 border-b">ID</th>
+                          <th className="px-4 py-2 border-b">Text</th>
+                          <th className="px-4 py-2 border-b">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {questions.filter(q => q.screenId === selectedScreen.id).map((question,i) => (
+                          <tr key={question.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-2 border-b text-center">{i+1}</td>
+                            <td className="px-4 py-2 border-b text-center">{question.text}</td>
+                            <td className="px-4 py-2 border-b text-center">
+                              <button onClick={() => handleEditQuestion(question)} className="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
+                              <button onClick={() => handleDeleteQuestion(question.id)} className="text-red-600 hover:text-red-800">Delete</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-gray-500">No questions associated with this screen.</p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Edit Modal */}
       {showEditModal && (
@@ -394,20 +516,133 @@ export default function AdminPanel() {
         </div>
       )}
 
+      {/* Add Image Modal */}
+      {showAddImageForm && selectedScreen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">Add Image to Screen {selectedScreen.screenNumber}</h3>
+            <AddImageForm
+              screens={screens}
+              testLevels={testLevels}
+              imageLibraries={imageLibraries}
+              initialScreenId={selectedScreen.id}
+              onAdd={async (file, screenId, imageLibraryId) => {
+                await handleAddImage(file, selectedScreen.id, imageLibraryId);
+                setShowAddImageForm(false);
+              }}
+            />
+            <button
+              onClick={() => setShowAddImageForm(false)}
+              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add Question Modal */}
+      {showAddQuestionForm && selectedScreen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">Add Question to Screen {selectedScreen.screenNumber}</h3>
+            <AddQuestionForm
+              screens={screens}
+              images={images.filter(img => img.screenId === selectedScreen.id)}
+              testLevels={testLevels}
+              initialScreenId={selectedScreen.id}
+              onAdd={async (question) => {
+                await handleAddQuestion(question);
+                setShowAddQuestionForm(false);
+              }}
+            />
+            <button
+              onClick={() => setShowAddQuestionForm(false)}
+              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add Test Level Modal */}
+      {showAddTestLevelForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">Add Test Level</h3>
+            <AddTestLevelForm
+              onAdd={async (level) => {
+                await handleAddTestLevel(level);
+                setShowAddTestLevelForm(false);
+              }}
+            />
+            <button
+              onClick={() => setShowAddTestLevelForm(false)}
+              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add Screen Modal */}
+      {showAddScreenForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">Add Screen</h3>
+            <AddScreenForm
+              testLevels={testLevels}
+              onAdd={async (screenNumber, testLevelId) => {
+                await handleAddScreen(screenNumber, testLevelId);
+                setShowAddScreenForm(false);
+              }}
+            />
+            <button
+              onClick={() => setShowAddScreenForm(false)}
+              className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden file input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file && selectedScreen) {
+            handleAddImage(file, selectedScreen.id);
+          }
+          // Reset the input
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+        }}
+      />
+
       {/* Tables */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Existing Data</h2>
+      {activeTab !== 'selectScreen' && (
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Existing Data</h2>
 
-        {activeTab === 'testLevel' && <TestLevelTable testLevels={testLevels} />}
+          {activeTab === 'testLevel' && <TestLevelTable testLevels={testLevels} />}
 
-        {activeTab === 'screen' && <ScreenTable screens={screens} testLevels={testLevels} />}
+          {activeTab === 'screen' && <ScreenTable screens={screens} testLevels={testLevels} />}
 
-        {activeTab === 'question' && <QuestionTable questions={questions} testLevels={testLevels} screens={screens} onEdit={handleEditQuestion} onDelete={handleDeleteQuestion} />}
+          {activeTab === 'question' && <QuestionTable questions={questions} testLevels={testLevels} screens={screens} onEdit={handleEditQuestion} onDelete={handleDeleteQuestion} />}
 
-        {activeTab === 'images' && <ImageTable images={images} testLevels={testLevels} screens={screens} onEdit={handleEditImage} onDelete={handleDeleteImage} />}
+          {activeTab === 'images' && <ImageTable images={images} testLevels={testLevels} screens={screens} onEdit={handleEditImage} onDelete={handleDeleteImage} />}
 
-        {activeTab === 'imageLibrary' && <ImageLibraryTable imageLibraries={imageLibraries} onEdit={handleEditImageLibrary} onDelete={handleDeleteImageLibrary} />}
-      </div>
+          {activeTab === 'imageLibrary' && <ImageLibraryTable imageLibraries={imageLibraries} onDelete={handleDeleteImageLibrary} />}
+        </div>
+      )}
     </div>
   );
 }

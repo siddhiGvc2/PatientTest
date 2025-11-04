@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Select, { SingleValue } from 'react-select';
 import { Screen, TestLevel, ImageLibrary } from "./types";
 
@@ -12,14 +12,21 @@ interface AddImageFormProps {
   testLevels: TestLevel[];
   imageLibraries: ImageLibrary[];
   onAdd: (file: File | null, screenId: number, imageLibraryId?: number) => Promise<void>;
+  initialScreenId?: number;
 }
 
-export default function AddImageForm({ screens, testLevels, imageLibraries, onAdd }: AddImageFormProps) {
+export default function AddImageForm({ screens, testLevels, imageLibraries, onAdd, initialScreenId }: AddImageFormProps) {
   const [file, setFile] = useState<File | null>(null);
-  const [screenId, setScreenId] = useState("");
+  const [screenId, setScreenId] = useState(initialScreenId ? initialScreenId.toString() : "");
   const [imageLibraryId, setImageLibraryId] = useState<number | null>(null);
-  const [useLibraryImage, setUseLibraryImage] = useState(false);
+  const [useLibraryImage, setUseLibraryImage] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialScreenId) {
+      setScreenId(initialScreenId.toString());
+    }
+  }, [initialScreenId]);
 
   const handleSubmit = async () => {
     if (!screenId) return;
@@ -63,19 +70,6 @@ export default function AddImageForm({ screens, testLevels, imageLibraries, onAd
       <h2 className="text-xl font-semibold mb-4">Add Image</h2>
 
       <div className="mb-4">
-        <label className="flex items-center mb-2">
-          <input
-            type="radio"
-            name="imageSource"
-            checked={!useLibraryImage}
-            onChange={() => {
-              setUseLibraryImage(false);
-              setImageLibraryId(null);
-            }}
-            className="mr-2"
-          />
-          Upload New Image
-        </label>
         <label className="flex items-center">
           <input
             type="radio"
@@ -89,6 +83,20 @@ export default function AddImageForm({ screens, testLevels, imageLibraries, onAd
           />
           Choose from Image Library
         </label>
+        <label className="flex items-center mb-2">
+          <input
+            type="radio"
+            name="imageSource"
+            checked={!useLibraryImage}
+            onChange={() => {
+              setUseLibraryImage(false);
+              setImageLibraryId(null);
+            }}
+            className="mr-2"
+          />
+          Upload New Image
+        </label>
+        
       </div>
 
       {!useLibraryImage ? (
@@ -133,16 +141,25 @@ export default function AddImageForm({ screens, testLevels, imageLibraries, onAd
         </div>
       )}
 
-      <select
-        value={screenId}
-        onChange={(e) => setScreenId(e.target.value)}
-        className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
-      >
-        <option value="">Select Screen</option>
-        {screens.map(s => (
-          <option key={s.id} value={s.id}>Screen {s.screenNumber} (Level {testLevels.find(tl => tl.id === s.testLevelId)?.level})</option>
-        ))}
-      </select>
+      {initialScreenId ? (
+        <div className="mb-2">
+          <label className="block mb-2 font-medium">Screen:</label>
+          <div className="p-2 bg-gray-100 rounded">
+            Screen {screens.find(s => s.id === initialScreenId)?.screenNumber} (Level {testLevels.find(tl => tl.id === screens.find(s => s.id === initialScreenId)?.testLevelId)?.level})
+          </div>
+        </div>
+      ) : (
+        <select
+          value={screenId}
+          onChange={(e) => setScreenId(e.target.value)}
+          className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
+        >
+          <option value="">Select Screen</option>
+          {screens.map(s => (
+            <option key={s.id} value={s.id}>Screen {s.screenNumber} (Level {testLevels.find(tl => tl.id === s.testLevelId)?.level})</option>
+          ))}
+        </select>
+      )}
       <button
         onClick={handleSubmit}
         disabled={!screenId || (!useLibraryImage && !file) || (useLibraryImage && !imageLibraryId) || isLoading}
