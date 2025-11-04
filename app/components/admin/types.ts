@@ -33,3 +33,8 @@ export interface NewQuestionState {
   screenId: string;
   answerImageId: string | number | '';
 }
+
+export interface ImageLibrary {
+  id: number;
+  url: string;
+}

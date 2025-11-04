@@ -1,51 +1,47 @@
 import { useState } from "react";
-import { TestLevel } from "./types";
 
-interface AddScreenFormProps {
-  testLevels: TestLevel[];
-  onAdd: (screenNumber: number, testLevelId: number) => Promise<void>;
+interface AddImageLibraryFormProps {
+  onAdd: (files: File[]) => Promise<void>;
 }
 
-export default function AddScreenForm({ testLevels, onAdd }: AddScreenFormProps) {
-  const [screenNumber, setScreenNumber] = useState("");
-  const [testLevelId, setTestLevelId] = useState("");
+export default function AddImageLibraryForm({ onAdd }: AddImageLibraryFormProps) {
+  const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!screenNumber || !testLevelId) return;
+    if (files.length === 0) return;
     setIsLoading(true);
     try {
-      await onAdd(parseInt(screenNumber), parseInt(testLevelId));
-      setScreenNumber("");
-      setTestLevelId("");
+      await onAdd(files);
+      setFiles([]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    setFiles(selectedFiles);
+  };
+
   return (
     <div className="bg-[var(--card-bg)] p-4 rounded shadow mb-6 border border-[var(--border-color)]">
-      <h2 className="text-xl font-semibold mb-4">Add Screen</h2>
+      <h2 className="text-xl font-semibold mb-4">Add Images to Library</h2>
       <input
-        type="number"
-        placeholder="Screen Number"
-        value={screenNumber}
-        onChange={(e) => setScreenNumber(e.target.value)}
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleFileChange}
         className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
       />
-      <select
-        value={testLevelId}
-        onChange={(e) => setTestLevelId(e.target.value)}
-        className="w-full p-2 border border-[var(--border-color)] rounded mb-2 bg-[var(--card-bg)] text-[var(--foreground)]"
-      >
-        <option value="">Select TestLevel</option>
-        {testLevels.map(tl => (
-          <option key={tl.id} value={tl.id}>{tl.level}</option>
-        ))}
-      </select>
+      {files.length > 0 && (
+        <div className="mb-2 text-sm text-[var(--foreground)]">
+          {files.length} file{files.length > 1 ? 's' : ''} selected
+        </div>
+      )}
       <button
         onClick={handleSubmit}
-        disabled={isLoading}
+        disabled={files.length === 0 || isLoading}
         className="w-full bg-[var(--button-bg)] text-white p-2 rounded hover:bg-[var(--button-hover)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
       >
         {isLoading ? (
@@ -57,7 +53,7 @@ export default function AddScreenForm({ testLevels, onAdd }: AddScreenFormProps)
             Adding...
           </>
         ) : (
-          "Add Screen"
+          "Add to Library"
         )}
       </button>
     </div>

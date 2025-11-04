@@ -1,17 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { TestLevel, Screen, Question, Image as ImageType, NewQuestionState } from "./admin/types";
+import { TestLevel, Screen, Question, Image as ImageType, NewQuestionState, ImageLibrary } from "./admin/types";
 import AddTestLevelForm from "./admin/AddTestLevelForm";
 import AddScreenForm from "./admin/AddScreenForm";
 import AddQuestionForm from "./admin/AddQuestionForm";
 import AddImageForm from "./admin/AddImageForm";
+import AddImageLibraryForm from "./admin/AddImageLibraryForm";
 import EditQuestionForm from "./admin/EditQuestionForm";
 import EditImageForm from "./admin/EditImageForm";
+import EditImageLibraryForm from "./admin/EditImageLibraryForm";
 import TestLevelTable from "./admin/TestLevelTable";
 import ScreenTable from "./admin/ScreenTable";
 import QuestionTable from "./admin/QuestionTable";
 import ImageTable from "./admin/ImageTable";
+import ImageLibraryTable from "./admin/ImageLibraryTable";
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState('testLevel');
@@ -19,12 +22,14 @@ export default function AdminPanel() {
   const [screens, setScreens] = useState<Screen[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [images, setImages] = useState<ImageType[]>([]);
+  const [imageLibraries, setImageLibraries] = useState<ImageLibrary[]>([]);
 
   // Edit states
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [editingImage, setEditingImage] = useState<ImageType | null>(null);
+  const [editingImageLibrary, setEditingImageLibrary] = useState<ImageLibrary | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editType, setEditType] = useState<'question' | 'image' | null>(null);
+  const [editType, setEditType] = useState<'question' | 'image' | 'imageLibrary' | null>(null);
 
   const [message, setMessage] = useState("");
 
@@ -34,17 +39,19 @@ export default function AdminPanel() {
 
   const fetchData = async () => {
     try {
-      const [tlRes, sRes, qRes, iRes] = await Promise.all([
+      const [tlRes, sRes, qRes, iRes, ilRes] = await Promise.all([
         fetch("/api/test-level"),
         fetch("/api/screens"),
         fetch("/api/questions"),
         fetch("/api/images"),
+        fetch("/api/image-library"),
       ]);
 
       if (tlRes.ok) setTestLevels(await tlRes.json());
       if (sRes.ok) setScreens(await sRes.json());
       if (qRes.ok) setQuestions(await qRes.json());
       if (iRes.ok) setImages(await iRes.json());
+      if (ilRes.ok) setImageLibraries(await ilRes.json());
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -108,10 +115,15 @@ export default function AdminPanel() {
     }
   };
 
-  const handleAddImage = async (file: File, screenId: number) => {
+  const handleAddImage = async (file: File | null, screenId: number, imageLibraryId?: number) => {
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      if (file) {
+        formData.append('file', file);
+      }
+      if (imageLibraryId) {
+        formData.append('imageLibraryId', imageLibraryId.toString());
+      }
       formData.append('screenId', screenId.toString());
 
       const res = await fetch("/api/images", {
@@ -172,12 +184,15 @@ export default function AdminPanel() {
     setShowEditModal(true);
   };
 
-  const handleUpdateImage = async (image: ImageType, file?: File) => {
+  const handleUpdateImage = async (image: ImageType, file?: File, imageLibraryId?: number) => {
     try {
       const formData = new FormData();
       formData.append('screenId', image.screenId.toString());
       if (file) {
         formData.append('file', file);
+      }
+      if (imageLibraryId) {
+        formData.append('imageLibraryId', imageLibraryId.toString());
       }
 
       const res = await fetch(`/api/images/${image.id}`, {
@@ -204,6 +219,83 @@ export default function AdminPanel() {
     setEditType(null);
   };
 
+  const handleAddImageLibrary = async (files: File[]) => {
+    try {
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const res = await fetch("/api/image-library", {
+          method: "POST",
+          body: formData,
+        });
+        if (!res.ok) {
+          throw new Error(`Failed to upload ${file.name}`);
+        }
+      }
+      setMessage(`${files.length} image${files.length > 1 ? 's' : ''} added to library successfully!`);
+      fetchData();
+    } catch (error) {
+      setMessage("Error adding images to library");
+    }
+  };
+
+  const handleEditImageLibrary = (imageLibrary: ImageLibrary) => {
+    setEditingImageLibrary(imageLibrary);
+    setEditType('imageLibrary');
+    setShowEditModal(true);
+  };
+
+  const handleUpdateImageLibrary = async (imageLibrary: ImageLibrary, file?: File) => {
+    try {
+      const formData = new FormData();
+      if (file) {
+        formData.append('file', file);
+      }
+
+      const res = await fetch(`/api/image-library/${imageLibrary.id}`, {
+        method: "PUT",
+        body: formData,
+      });
+      if (res.ok) {
+        setMessage("Image library item updated successfully!");
+        setEditingImageLibrary(null);
+        setShowEditModal(false);
+        setEditType(null);
+        fetchData();
+      } else {
+        setMessage("Error updating image library item");
+      }
+    } catch (error) {
+      setMessage("Error updating image library item");
+    }
+  };
+
+  const handleCancelEditImageLibrary = () => {
+    setEditingImageLibrary(null);
+    setShowEditModal(false);
+    setEditType(null);
+  };
+
+  const handleDeleteImageLibrary = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this image from library? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/image-library/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setMessage("Image deleted from library successfully!");
+        fetchData();
+      } else {
+        setMessage("Error deleting image from library");
+      }
+    } catch (error) {
+      setMessage("Error deleting image from library");
+    }
+  };
+
   const handleDeleteQuestion = async (questionId: number) => {
     if (!confirm('Are you sure you want to delete this question? This action cannot be undone.')) {
       return;
@@ -223,17 +315,37 @@ export default function AdminPanel() {
     }
   };
 
+  const handleDeleteImage = async (imageId: number) => {
+    if (!confirm('Are you sure you want to delete this image? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/images/${imageId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setMessage("Image deleted successfully!");
+        fetchData();
+      } else {
+        setMessage("Error deleting Image");
+      }
+    } catch (error) {
+      setMessage("Error deleting Image");
+    }
+  };
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Admin Panel</h1>
       {message && <p className="mb-4 text-green-600">{message}</p>}
 
       {/* Tabs */}
-      <div className="flex mb-6">
-        <button onClick={() => setActiveTab('testLevel')} className={`px-4 py-2 mr-2 rounded ${activeTab === 'testLevel' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>TestLevel</button>
-        <button onClick={() => setActiveTab('screen')} className={`px-4 py-2 mr-2 rounded ${activeTab === 'screen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Screen</button>
-        <button onClick={() => setActiveTab('images')} className={`px-4 py-2 mr-2 rounded ${activeTab === 'images' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Images</button>
-        <button onClick={() => setActiveTab('question')} className={`px-4 py-2 rounded ${activeTab === 'question' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Question</button>
+      <div className="flex mb-6 flex-wrap">
+        <button onClick={() => setActiveTab('testLevel')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'testLevel' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>TestLevel</button>
+        <button onClick={() => setActiveTab('screen')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'screen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Screen</button>
+        <button onClick={() => setActiveTab('images')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'images' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Images</button>
+        <button onClick={() => setActiveTab('question')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'question' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Question</button>
+        <button onClick={() => setActiveTab('imageLibrary')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'imageLibrary' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Image Library</button>
       </div>
 
       {/* Add Forms */}
@@ -243,7 +355,9 @@ export default function AdminPanel() {
 
       {activeTab === 'question' && <AddQuestionForm screens={screens} images={images} testLevels={testLevels} onAdd={handleAddQuestion} />}
 
-      {activeTab === 'images' && <AddImageForm screens={screens} testLevels={testLevels} onAdd={handleAddImage} />}
+      {activeTab === 'images' && <AddImageForm screens={screens} testLevels={testLevels} imageLibraries={imageLibraries} onAdd={handleAddImage} />}
+
+      {activeTab === 'imageLibrary' && <AddImageLibraryForm onAdd={handleAddImageLibrary} />}
 
       {/* Edit Modal */}
       {showEditModal && (
@@ -264,8 +378,16 @@ export default function AdminPanel() {
                 image={editingImage}
                 screens={screens}
                 testLevels={testLevels}
+                imageLibraries={imageLibraries}
                 onUpdate={handleUpdateImage}
                 onCancel={handleCancelEditImage}
+              />
+            )}
+            {editType === 'imageLibrary' && editingImageLibrary && (
+              <EditImageLibraryForm
+                imageLibrary={editingImageLibrary}
+                onUpdate={handleUpdateImageLibrary}
+                onCancel={handleCancelEditImageLibrary}
               />
             )}
           </div>
@@ -282,7 +404,9 @@ export default function AdminPanel() {
 
         {activeTab === 'question' && <QuestionTable questions={questions} testLevels={testLevels} screens={screens} onEdit={handleEditQuestion} onDelete={handleDeleteQuestion} />}
 
-        {activeTab === 'images' && <ImageTable images={images} testLevels={testLevels} screens={screens} onEdit={handleEditImage} />}
+        {activeTab === 'images' && <ImageTable images={images} testLevels={testLevels} screens={screens} onEdit={handleEditImage} onDelete={handleDeleteImage} />}
+
+        {activeTab === 'imageLibrary' && <ImageLibraryTable imageLibraries={imageLibraries} onEdit={handleEditImageLibrary} onDelete={handleDeleteImageLibrary} />}
       </div>
     </div>
   );

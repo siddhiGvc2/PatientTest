@@ -11,16 +11,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
-    const screenIdStr = formData.get('screenId') as string;
-
-    if (!screenIdStr) {
-      return NextResponse.json({ error: 'screenId is required' }, { status: 400 });
-    }
-
-    const screenId = parseInt(screenIdStr);
-    if (isNaN(screenId)) {
-      return NextResponse.json({ error: 'screenId must be a number' }, { status: 400 });
-    }
 
     let cloudinaryUrl: string | undefined;
 
@@ -29,22 +19,22 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       const fileBuffer = Buffer.from(await file.arrayBuffer());
 
       // Upload to Cloudinary
-      cloudinaryUrl = await uploadToCloudinary(fileBuffer, 'patient-test-images');
+      cloudinaryUrl = await uploadToCloudinary(fileBuffer, 'image-library');
     }
 
-    const updateData: { url?: string; screenId: number } = { screenId };
+    const updateData: { url?: string } = {};
     if (cloudinaryUrl) {
       updateData.url = cloudinaryUrl;
     }
 
-    const updatedImage = await prisma.image.update({
+    const updatedImageLibrary = await prisma.imageLibrary.update({
       where: { id: idNum },
       data: updateData,
     });
 
-    return NextResponse.json(updatedImage);
+    return NextResponse.json(updatedImageLibrary);
   } catch (error) {
-    console.error('Error updating image:', error);
+    console.error('Error updating image library item:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -54,17 +44,13 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const { id } = await params;
     const idNum = parseInt(id);
 
-    if (isNaN(idNum)) {
-      return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
-    }
-
-    await prisma.image.delete({
+    await prisma.imageLibrary.delete({
       where: { id: idNum },
     });
 
-    return NextResponse.json({ message: 'Image deleted successfully' });
+    return NextResponse.json({ message: 'Image library item deleted successfully' });
   } catch (error) {
-    console.error('Error deleting image:', error);
+    console.error('Error deleting image library item:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

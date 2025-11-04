@@ -18,7 +18,7 @@ export async function GET(
     const option = await prisma.option.findUnique({
       where: { id: optionId },
       include: {
-        questions: true,
+        
         userResponses: true,
       },
     });
