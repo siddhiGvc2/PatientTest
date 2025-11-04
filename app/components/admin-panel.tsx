@@ -32,6 +32,7 @@ export default function AdminPanel() {
   const [editType, setEditType] = useState<'question' | 'image' | 'imageLibrary' | null>(null);
 
   const [message, setMessage] = useState("");
+  const [selectedScreen, setSelectedScreen] = useState<Screen | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -346,6 +347,7 @@ export default function AdminPanel() {
         <button onClick={() => setActiveTab('images')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'images' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Images</button>
         <button onClick={() => setActiveTab('question')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'question' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Question</button>
         <button onClick={() => setActiveTab('imageLibrary')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'imageLibrary' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Image Library</button>
+        <button onClick={() => setActiveTab('selectScreen')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'selectScreen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Select Screen</button>
       </div>
 
       {/* Add Forms */}
@@ -358,6 +360,104 @@ export default function AdminPanel() {
       {activeTab === 'images' && <AddImageForm screens={screens} testLevels={testLevels} imageLibraries={imageLibraries} onAdd={handleAddImage} />}
 
       {activeTab === 'imageLibrary' && <AddImageLibraryForm onAdd={handleAddImageLibrary} />}
+
+      {activeTab === 'selectScreen' && (
+        <div className="mb-6">
+          <label htmlFor="screenSelect" className="block text-sm font-medium mb-2">Choose a Screen:</label>
+          <select
+            id="screenSelect"
+            value={selectedScreen?.id || ''}
+            onChange={(e) => {
+              const screenId = parseInt(e.target.value);
+              const screen = screens.find(s => s.id === screenId) || null;
+              setSelectedScreen(screen);
+            }}
+            className="border border-gray-300 rounded px-3 py-2 w-full"
+          >
+            <option value="">Select a screen</option>
+            {screens.map((screen) => {
+              const testLevel = testLevels.find(tl => tl.id === screen.testLevelId);
+              return (
+                <option key={screen.id} value={screen.id}>
+                  Screen {screen.screenNumber} - Test Level {testLevel?.level || 'Unknown'}
+                </option>
+              );
+            })}
+          </select>
+          {selectedScreen && (
+            <div className="mt-4">
+              <div className="p-4 bg-gray-100 rounded mb-4">
+                <h3 className="text-lg font-semibold">Selected Screen Details:</h3>
+                <p><strong>Screen Number:</strong> {selectedScreen.screenNumber}</p>
+                <p><strong>Test Level:</strong> {testLevels.find(tl => tl.id === selectedScreen.testLevelId)?.level || 'Unknown'}</p>
+              </div>
+
+              <div className="mb-6">
+                <h4 className="text-md font-semibold mb-2">Associated Images:</h4>
+                {images.filter(img => img.screenId === selectedScreen.id).length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full bg-white border border-gray-300">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          <th className="px-4 py-2 border-b">ID</th>
+                          <th className="px-4 py-2 border-b">Image</th>
+                          <th className="px-4 py-2 border-b">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {images.filter(img => img.screenId === selectedScreen.id).map((image) => (
+                          <tr key={image.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-2 border-b">{image.id}</td>
+                            <td className="px-4 py-2 border-b">
+                              <img src={image.url} alt={`Image ${image.id}`} className="w-16 h-16 object-cover" />
+                            </td>
+                            <td className="px-4 py-2 border-b">
+                              <button onClick={() => handleEditImage(image)} className="text-blue-600 hover:text-blue-800">Edit</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-gray-500">No images associated with this screen.</p>
+                )}
+              </div>
+
+              <div>
+                <h4 className="text-md font-semibold mb-2">Associated Questions:</h4>
+                {questions.filter(q => q.screenId === selectedScreen.id).length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full bg-white border border-gray-300">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          <th className="px-4 py-2 border-b">ID</th>
+                          <th className="px-4 py-2 border-b">Text</th>
+                          <th className="px-4 py-2 border-b">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {questions.filter(q => q.screenId === selectedScreen.id).map((question) => (
+                          <tr key={question.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-2 border-b">{question.id}</td>
+                            <td className="px-4 py-2 border-b">{question.text}</td>
+                            <td className="px-4 py-2 border-b">
+                              <button onClick={() => handleEditQuestion(question)} className="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
+                              <button onClick={() => handleDeleteQuestion(question.id)} className="text-red-600 hover:text-red-800">Delete</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-gray-500">No questions associated with this screen.</p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Edit Modal */}
       {showEditModal && (
