@@ -42,6 +42,11 @@ export async function POST(request: NextRequest) {
       // Upload new file
       const fileBuffer = Buffer.from(await file.arrayBuffer());
       cloudinaryUrl = await uploadToCloudinary(fileBuffer, 'patient-test-images');
+       const image = await prisma.imageLibrary.create({
+          data: {
+            url: cloudinaryUrl
+          },
+        });
     } else if (imageLibraryIdStr) {
       // Use existing image from library
       const imageLibraryId = parseInt(imageLibraryIdStr);
@@ -53,11 +58,13 @@ export async function POST(request: NextRequest) {
         where: { id: imageLibraryId },
       });
 
+      
+
       if (!imageLibrary) {
         return NextResponse.json({ error: 'Image library item not found' }, { status: 404 });
       }
-
-      cloudinaryUrl = imageLibrary.url;
+     cloudinaryUrl = imageLibrary.url;
+      
     } else {
       return NextResponse.json({ error: 'Either file or imageLibraryId is required' }, { status: 400 });
     }
@@ -69,6 +76,9 @@ export async function POST(request: NextRequest) {
         screenId,
       },
     });
+   
+
+     
 
     return NextResponse.json(image, { status: 201 });
   } catch (error) {
