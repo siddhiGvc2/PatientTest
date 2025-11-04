@@ -25,9 +25,10 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const screenIdStr = formData.get('screenId') as string;
+    const imageLibraryIdStr = formData.get('imageLibraryId') as string;
 
-    if (!file || !screenIdStr) {
-      return NextResponse.json({ error: 'file and screenId are required' }, { status: 400 });
+    if (!screenIdStr) {
+      return NextResponse.json({ error: 'screenId is required' }, { status: 400 });
     }
 
     const screenId = parseInt(screenIdStr);
@@ -35,11 +36,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'screenId must be a number' }, { status: 400 });
     }
 
-    // Convert file to buffer
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    let cloudinaryUrl: string;
 
-    // Upload to Cloudinary
-    const cloudinaryUrl = await uploadToCloudinary(fileBuffer, 'patient-test-images');
+    if (file) {
+      // Upload new file
+      const fileBuffer = Buffer.from(await file.arrayBuffer());
+      cloudinaryUrl = await uploadToCloudinary(fileBuffer, 'patient-test-images');
+    } else if (imageLibraryIdStr) {
+      // Use existing image from library
+      const imageLibraryId = parseInt(imageLibraryIdStr);
+      if (isNaN(imageLibraryId)) {
+        return NextResponse.json({ error: 'imageLibraryId must be a number' }, { status: 400 });
+      }
+
+      const imageLibrary = await prisma.imageLibrary.findUnique({
+        where: { id: imageLibraryId },
+      });
+
+      if (!imageLibrary) {
+        return NextResponse.json({ error: 'Image library item not found' }, { status: 404 });
+      }
+
+      cloudinaryUrl = imageLibrary.url;
+    } else {
+      return NextResponse.json({ error: 'Either file or imageLibraryId is required' }, { status: 400 });
+    }
 
     // Save to database
     const image = await prisma.image.create({

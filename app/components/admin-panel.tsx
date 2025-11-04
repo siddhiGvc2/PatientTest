@@ -115,10 +115,15 @@ export default function AdminPanel() {
     }
   };
 
-  const handleAddImage = async (file: File, screenId: number) => {
+  const handleAddImage = async (file: File | null, screenId: number, imageLibraryId?: number) => {
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      if (file) {
+        formData.append('file', file);
+      }
+      if (imageLibraryId) {
+        formData.append('imageLibraryId', imageLibraryId.toString());
+      }
       formData.append('screenId', screenId.toString());
 
       const res = await fetch("/api/images", {
@@ -328,7 +333,7 @@ export default function AdminPanel() {
 
       {activeTab === 'question' && <AddQuestionForm screens={screens} images={images} testLevels={testLevels} onAdd={handleAddQuestion} />}
 
-      {activeTab === 'images' && <AddImageForm screens={screens} testLevels={testLevels} onAdd={handleAddImage} />}
+      {activeTab === 'images' && <AddImageForm screens={screens} testLevels={testLevels} imageLibraries={imageLibraries} onAdd={handleAddImage} />}
 
       {activeTab === 'imageLibrary' && <AddImageLibraryForm onAdd={handleAddImageLibrary} />}
 

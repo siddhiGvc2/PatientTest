@@ -9,5 +9,5 @@
 - [x] Create app/components/admin/EditImageLibraryForm.tsx
 - [x] Create app/components/admin/ImageLibraryTable.tsx
 - [x] Push database changes
-- [x] Generate Prisma client (completed despite permission error)
+- [x] Generate Prisma client
 - [ ] Test the new schema and API
