@@ -184,12 +184,15 @@ export default function AdminPanel() {
     setShowEditModal(true);
   };
 
-  const handleUpdateImage = async (image: ImageType, file?: File) => {
+  const handleUpdateImage = async (image: ImageType, file?: File, imageLibraryId?: number) => {
     try {
       const formData = new FormData();
       formData.append('screenId', image.screenId.toString());
       if (file) {
         formData.append('file', file);
+      }
+      if (imageLibraryId) {
+        formData.append('imageLibraryId', imageLibraryId.toString());
       }
 
       const res = await fetch(`/api/images/${image.id}`, {
@@ -356,6 +359,7 @@ export default function AdminPanel() {
                 image={editingImage}
                 screens={screens}
                 testLevels={testLevels}
+                imageLibraries={imageLibraries}
                 onUpdate={handleUpdateImage}
                 onCancel={handleCancelEditImage}
               />
