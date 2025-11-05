@@ -1,14 +1,15 @@
-# TODO
+# TODO: Replace hardcoded "Patient" and "Patients" with NEXT_PUBLIC_PATIENT env var
 
-## Completed Tasks
-- [x] Add a new tab "Select Screen" to the admin panel
-- [x] Add state for selectedScreen
-- [x] Add tab button for "Select Screen"
-- [x] Implement dropdown to choose from available screens
-- [x] Display selected screen details (screen number and test level)
-- [x] Show associated images for the selected screen in a table with edit/delete actions
-- [x] Show associated questions for the selected screen in a table with edit/delete actions
+- [x] Add patientTerm constant to app/components/patient-list.tsx
+- [x] Replace UI strings in app/components/patient-list.tsx
+- [x] Add patientTerm constant to app/page.tsx
+- [x] Replace "Patients" in app/page.tsx
 
-## Pending Tasks
-- [ ] Test the new tab functionality (dropdown populates, selection displays details, images and questions tables show correctly)
-- [ ] Verify no linting errors or runtime issues
+# TODO: Replace hardcoded "User" and "Users" with NEXT_PUBLIC_USER env var
+
+- [x] Add userTerm constant to app/components/user-management.tsx
+- [x] Replace UI strings in app/components/user-management.tsx (including all "User" words)
+- [x] Replace "User Management" in app/page.tsx
+- [x] Replace "User" in toggle button options in app/components/user-management.tsx
+- [x] Replace "Admin" with NEXT_PUBLIC_ADMIN env var in app/components/user-management.tsx
+- [x] Replace USER/ADMIN in Type column display with env variables in app/components/user-management.tsx

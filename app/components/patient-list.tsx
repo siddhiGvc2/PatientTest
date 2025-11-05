@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+const patientTerm = process.env.NEXT_PUBLIC_PATIENT || 'Patient';
+
 interface Patient {
   id: number;
   name: string;
@@ -126,7 +128,7 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
   };
 
   const handleDeletePatient = async (patientId: number) => {
-    if (!confirm('Are you sure you want to delete this patient?')) return;
+    if (!confirm(`Are you sure you want to delete this ${patientTerm.toLowerCase()}?`)) return;
     try {
       const res = await fetch(`/api/patients/${patientId}?userId=${selectedUserId}&currentUserId=${currentUser.id}`, {
         method: 'DELETE',
@@ -143,7 +145,7 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
   };
 
   if (loading) {
-    return <div className="text-center">Loading patients...</div>;
+    return <div className="text-center">Loading {patientTerm.toLowerCase()}s...</div>;
   }
 
   if (error) {
@@ -153,14 +155,14 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
   return (
     <div className="w-full p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Patient List</h2>
+        <h2 className="text-2xl font-bold">{patientTerm}s List</h2>
         <div className="flex items-center space-x-4">
           
             <button
               onClick={() => setShowForm(true)}
               className="bg-[var(--button-bg)] text-white px-4 py-2 rounded hover:bg-[var(--button-hover)]"
             >
-              Add Patient
+              Add {patientTerm}
             </button>
         
         </div>
@@ -168,7 +170,7 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
 
       {showForm && (
         <div className="max-w-4xl mx-auto bg-[var(--card-bg)] p-6 rounded-lg shadow-md mb-6 border border-[var(--border-color)]">
-          <h3 className="text-lg font-semibold mb-4">{editingPatient ? 'Edit Patient' : 'Add New Patient'}</h3>
+          <h3 className="text-lg font-semibold mb-4">{editingPatient ? `Edit ${patientTerm}` : `Add New ${patientTerm}`}</h3>
           <form onSubmit={handleAddPatient}>
             <div className="mb-4">
               <label className="block text-[var(--foreground)]">Name</label>
@@ -246,7 +248,7 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
             </div>
             <div className="flex space-x-2">
               <button type="submit" className="bg-[var(--success-bg)] text-white px-4 py-2 rounded hover:bg-[var(--success-hover)]">
-                {editingPatient ? 'Update Patient' : 'Add Patient'}
+                {editingPatient ? `Update ${patientTerm}` : `Add ${patientTerm}`}
               </button>
               <button
                 type="button"
@@ -265,7 +267,7 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
       )}
 
       {patients.length === 0 ? (
-        <p>No patients found.</p>
+        <p>No {patientTerm.toLowerCase()}s found.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-[var(--card-bg)] border border-[var(--border-color)]">
