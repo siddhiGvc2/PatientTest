@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+const userTerm = process.env.NEXT_PUBLIC_USER || 'User';
+
 interface AuthorizedUser {
   id: number;
   email: string;
@@ -70,7 +72,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
   };
 
   const handleDeleteUser = async (userId: number) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+    if (!confirm(`Are you sure you want to delete this ${userTerm.toLowerCase()}?`)) return;
     try {
       const res = await fetch(`/api/user/${userId}`, {
         method: 'DELETE',
@@ -120,7 +122,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
   };
 
   if (loading) {
-    return <div className="text-center">Loading users...</div>;
+    return <div className="text-center">Loading {userTerm.toLowerCase()}s...</div>;
   }
 
   if (error) {
@@ -131,24 +133,24 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
   const canManageUsers = currentUser.userType === 'SUPERADMIN' || currentUser.userType === 'ADMIN';
 
   if (!canManageUsers) {
-    return <div className="text-center">You do not have permission to manage users.</div>;
+    return <div className="text-center">You do not have permission to manage {userTerm.toLowerCase()}s.</div>;
   }
 
   return (
     <div className="w-full p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">User Management</h2>
+        <h2 className="text-2xl font-bold">{userTerm} Management</h2>
         <button
           onClick={() => setShowForm(true)}
           className="bg-[var(--button-bg)] text-white px-4 py-2 rounded hover:bg-[var(--button-hover)]"
         >
-          Add User
+          Add {userTerm}
         </button>
       </div>
 
       {showForm && (
         <div className="max-w-md mx-auto bg-[var(--card-bg)] p-6 rounded-lg shadow-md mb-6 border border-[var(--border-color)]">
-          <h3 className="text-lg font-semibold mb-4">Add New User</h3>
+          <h3 className="text-lg font-semibold mb-4">Add New {userTerm}</h3>
           <form onSubmit={handleAddUser}>
             <div className="mb-4">
               <label className="block text-[var(--foreground)]">Email</label>
@@ -167,14 +169,14 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                 className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
               >
-                <option value="USER">User</option>
-                {currentUser.userType === 'SUPERADMIN' && <option value="ADMIN">Admin</option>}
+                          <option value="USER">{userTerm}</option>
+                          {currentUser.userType === 'SUPERADMIN' && <option value="ADMIN">Admin</option>}
                 {currentUser.userType === 'SUPERADMIN' && <option value="SUPERADMIN">Superadmin</option>}
               </select>
             </div>
             <div className="flex space-x-2">
               <button type="submit" className="bg-[var(--success-bg)] text-white px-4 py-2 rounded hover:bg-[var(--success-hover)]">
-                Add User
+                Add {userTerm}
               </button>
               <button
                 type="button"
@@ -192,7 +194,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
       )}
 
       {authorizedUsers.length === 0 ? (
-        <p>No authorized users found.</p>
+        <p>No authorized {userTerm.toLowerCase()}s found.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-[var(--card-bg)] border border-[var(--border-color)]">
@@ -219,7 +221,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
                           onChange={(e) => handleTypeChange(user.id, user.email, e.target.value)}
                           className="p-1 border border-[var(--border-color)] rounded text-sm bg-[var(--card-bg)] text-[var(--foreground)]"
                         >
-                          <option value="USER">User</option>
+                          <option value="USER">{userTerm}</option>
                           {currentUser.userType === 'SUPERADMIN' && <option value="ADMIN">Admin</option>}
                         </select>
                       )}
