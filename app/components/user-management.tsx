@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 const userTerm = process.env.NEXT_PUBLIC_USER || 'User';
+const adminTerm = process.env.NEXT_PUBLIC_ADMIN || 'Admin';
 
 interface AuthorizedUser {
   id: number;
@@ -170,7 +171,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
                 className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
               >
                           <option value="USER">{userTerm}</option>
-                          {currentUser.userType === 'SUPERADMIN' && <option value="ADMIN">Admin</option>}
+                          {currentUser.userType === 'SUPERADMIN' && <option value="ADMIN">{adminTerm}</option>}
                 {currentUser.userType === 'SUPERADMIN' && <option value="SUPERADMIN">Superadmin</option>}
               </select>
             </div>
@@ -222,7 +223,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
                           className="p-1 border border-[var(--border-color)] rounded text-sm bg-[var(--card-bg)] text-[var(--foreground)]"
                         >
                           <option value="USER">{userTerm}</option>
-                          {currentUser.userType === 'SUPERADMIN' && <option value="ADMIN">Admin</option>}
+                          {currentUser.userType === 'SUPERADMIN' && <option value="ADMIN">{adminTerm}</option>}
                         </select>
                       )}
                       {/* Only allow deletion if user is not a superadmin or if current user is superadmin */}

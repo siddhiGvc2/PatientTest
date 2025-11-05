@@ -11,3 +11,4 @@
 - [x] Replace UI strings in app/components/user-management.tsx (including all "User" words)
 - [x] Replace "User Management" in app/page.tsx
 - [x] Replace "User" in toggle button options in app/components/user-management.tsx
+- [x] Replace "Admin" with NEXT_PUBLIC_ADMIN env var in app/components/user-management.tsx
