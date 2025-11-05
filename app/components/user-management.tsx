@@ -212,7 +212,9 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
                 <tr key={user.id} className="hover:bg-[var(--secondary-bg)]">
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{user.id}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{user.email}</td>
-                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{user.type}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">
+                    {user.type === 'USER' ? userTerm : user.type === 'ADMIN' ? adminTerm : user.type}
+                  </td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] ">
                     <div className="flex space-x-2">
                       {/* Toggle type if not SUPERADMIN */}
