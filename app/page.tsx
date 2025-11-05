@@ -14,6 +14,7 @@ export default function Home() {
   const { loggedInUser, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<'patients' | 'users' | 'test'>('patients');
   const [testEnded, setTestEnded] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<any>(null);
 
   const showHeader = activeTab !== 'test' || testEnded;
 
@@ -80,12 +81,12 @@ export default function Home() {
                       {process.env.NEXT_PUBLIC_USER || 'User'} Management
                     </button>
                   )}
-                  <button
+                  {/* <button
                     onClick={() => {setActiveTab('test');setTestEnded(false)}}
                     className={`px-4 py-2 rounded ${activeTab === 'test' ? 'bg-[var(--button-bg)] text-white hover:bg-[var(--button-hover)]' : 'bg-[var(--card-bg)] hover:bg-[var(--secondary-bg)]'}`}
                   >
                     Test Level
-                  </button>
+                  </button> */}
                   {canManageUsers && (
                     <a
                       href="/admin"
@@ -99,11 +100,11 @@ export default function Home() {
             </>
           )}
 
-          {activeTab === 'patients' && <PatientList userId={loggedInUser.id} currentUser={loggedInUser} />}
+          {activeTab === 'patients' && <PatientList userId={loggedInUser.id} currentUser={loggedInUser} onStartTest={(patient) => {setSelectedPatient(patient); setActiveTab('test');setTestEnded(false)}} />}
           {activeTab === 'users' && canManageUsers && <UserManagement currentUser={loggedInUser} />}
           {activeTab === 'test' && (
             <div className="min-h-screen bg-[var(--background)]">
-              <TestLevel onTestEnd={handleTestEnd} onExit={handleExitTest} onRetake={handleRetakeTest} />
+              <TestLevel onTestEnd={handleTestEnd} onExit={handleExitTest} onRetake={handleRetakeTest} selectedPatient={selectedPatient} />
             </div>
           )}
         </div>

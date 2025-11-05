@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+const patientTerm = process.env.NEXT_PUBLIC_PATIENT || 'Patient';
+
 interface Option {
   id: number;
   text: string;
@@ -37,9 +39,10 @@ interface TestLevelProps {
   onTestEnd?: () => void;
   onExit?: () => void;
   onRetake?: () => void;
+  selectedPatient?: any;
 }
 
-export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProps) {
+export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient }: TestLevelProps) {
   const [testLevel, setTestLevel] = useState<TestLevel | null>(null);
   const [allOptions, setAllOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
@@ -195,6 +198,11 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
 
   return (
     <div className="w-full p-6">
+      {selectedPatient && (
+        <div className="mb-4 p-4 bg-blue-100 border border-blue-300 rounded-lg">
+          <h3 className="text-lg font-semibold text-blue-800">{patientTerm}: {selectedPatient.name}</h3>
+        </div>
+      )}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Test Level {testLevel.level}</h2>
         <button

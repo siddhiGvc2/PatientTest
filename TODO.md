@@ -14,3 +14,16 @@
 - [x] Replace "Admin" with NEXT_PUBLIC_ADMIN env var in app/components/user-management.tsx
 - [x] Replace USER/ADMIN in Type column display with env variables in app/components/user-management.tsx
 - [x] Replace user type in navbar display in app/page.tsx
+
+# TODO: Add Start Test button for each patient in Patient List
+
+- [x] Add onStartTest prop to PatientListProps in app/components/patient-list.tsx
+- [x] Add Start Test button in Actions column for each patient
+- [x] Update app/page.tsx to handle start test action
+
+# TODO: Display patient name at top when starting test
+
+- [x] Add selectedPatient state in app/page.tsx
+- [x] Update onStartTest to set selectedPatient
+- [x] Pass selectedPatient to TestLevel component
+- [x] Update TestLevel to display patient name at top

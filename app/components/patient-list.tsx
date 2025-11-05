@@ -24,6 +24,7 @@ interface Patient {
 interface PatientListProps {
   userId: number;
   currentUser: any;
+  onStartTest?: (patient: Patient) => void;
 }
 
 interface User {
@@ -33,7 +34,7 @@ interface User {
   userType: string;
 }
 
-export default function PatientList({ userId, currentUser }: PatientListProps) {
+export default function PatientList({ userId, currentUser, onStartTest }: PatientListProps) {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -300,6 +301,12 @@ export default function PatientList({ userId, currentUser }: PatientListProps) {
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.phoneNumber || '-'}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{patient.score}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center justify-center align-center">
+                    <button
+                      onClick={() => onStartTest && onStartTest(patient)}
+                      className="bg-[var(--success-bg)] text-white px-2 py-1 rounded mr-2 hover:bg-[var(--success-hover)]"
+                    >
+                      Start Test
+                    </button>
                     <button
                       onClick={() => handleEditPatient(patient)}
                       className="bg-[var(--button-bg)] text-white px-2 py-1 rounded mr-2 hover:bg-[var(--button-hover)]"
