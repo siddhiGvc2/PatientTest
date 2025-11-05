@@ -7,6 +7,9 @@ import UserManagement from "./components/user-management";
 import TestLevel from "./components/test-level";
 import { useAuth } from "./contexts/AuthContext";
 
+const userTerm = process.env.NEXT_PUBLIC_USER || 'User';
+const adminTerm = process.env.NEXT_PUBLIC_ADMIN || 'Admin';
+
 export default function Home() {
   const { loggedInUser, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<'patients' | 'users' | 'test'>('patients');
@@ -50,7 +53,7 @@ export default function Home() {
                   <img src={loggedInUser.picture} alt={loggedInUser.name} className="w-10 h-10 rounded-full" />
                   <div>
                     <h2 className="text-lg font-semibold">{loggedInUser.name}</h2>
-                    <p className="text-[var(--secondary-text)]">{loggedInUser.email} ({loggedInUser.userType})</p>
+                    <p className="text-[var(--secondary-text)]">{loggedInUser.email} ({loggedInUser.userType === 'USER' ? userTerm : loggedInUser.userType === 'ADMIN' ? adminTerm : loggedInUser.userType})</p>
                   </div>
                 </div>
                 <button
