@@ -67,7 +67,7 @@ export default function Home() {
                     onClick={() => setActiveTab('patients')}
                     className={`px-4 py-2 rounded ${activeTab === 'patients' ? 'bg-[var(--button-bg)] text-white hover:bg-[var(--button-hover)]' : 'bg-[var(--card-bg)] hover:bg-[var(--secondary-bg)]'}`}
                   >
-                    Patients
+                    {process.env.NEXT_PUBLIC_PATIENT || 'Patient'}s
                   </button>
                   {canManageUsers && (
                     <button
