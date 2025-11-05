@@ -69,11 +69,12 @@ model Screen {
 
 // Images for each screen
 model Image {
-  id       Int        @id @default(autoincrement())
-  url      String
-  screenId Int
-  screen   Screen     @relation(fields: [screenId], references: [id])
-  Question Question[]
+  id              Int            @id @default(autoincrement())
+  url             String
+  screenId        Int
+  screen          Screen         @relation(fields: [screenId], references: [id])
+  Question        Question[]
+  userResponses   UserResponse[]
 }
 
 model Question {
@@ -88,25 +89,26 @@ model Question {
 }
 
 model Option {
-  id            Int            @id @default(autoincrement())
-  text          String
-  questionId    Int
-  question      Question       @relation(fields: [questionId], references: [id])
-  userResponses UserResponse[]
+  id         Int      @id @default(autoincrement())
+  text       String
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [id])
 }
 
 
 // User responses per question
 model UserResponse {
-  id         Int      @id @default(autoincrement())
-  patientId  Int
-  questionId Int
-  selectedId Int
-  patient    Patient  @relation(fields: [patientId], references: [id])
-  question   Question @relation(fields: [questionId], references: [id])
-  selected   Option   @relation(fields: [selectedId], references: [id])
-  isCorrect  Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id              Int      @id @default(autoincrement())
+  patientId       Int
+  questionId      Int
+  selectedImageId Int
+  patient         Patient  @relation(fields: [patientId], references: [id])
+  question        Question @relation(fields: [questionId], references: [id])
+  selectedImage   Image    @relation(fields: [selectedImageId], references: [id])
+  isCorrect       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  @@unique([patientId, questionId])
 }
 
 // Standalone image library

@@ -18,8 +18,27 @@ export default function Home() {
 
   const showHeader = activeTab !== 'test' || testEnded;
 
-  const handleTestEnd = () => {
+  const handleTestEnd = async () => {
     setTestEnded(true);
+    // Calculate and save the patient's score when test ends
+    if (selectedPatient) {
+      try {
+        const res = await fetch(`/api/patients/${selectedPatient.id}/score`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            patientId: selectedPatient.id,
+          }),
+        });
+        if (!res.ok) {
+          console.error('Failed to save score');
+        }
+      } catch (error) {
+        console.error('Error saving score:', error);
+      }
+    }
   };
 
   const handleExitTest = () => {
