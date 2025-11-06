@@ -127,7 +127,7 @@ export default function Home() {
               <TestLevel onTestEnd={handleTestEnd} onExit={handleExitTest} onRetake={handleRetakeTest} selectedPatient={selectedPatient} />
             </div>
           )}
-          {activeTab === 'report' && <Report selectedPatient={selectedPatient} onBack={() => setActiveTab('patients')} />}
+          {activeTab === 'report' && <Report selectedPatient={selectedPatient} currentUserId={loggedInUser.id} onBack={() => setActiveTab('patients')} />}
         </div>
       )}
     </div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 interface Patient {
   id: number;
   name: string;
@@ -17,12 +19,48 @@ interface Patient {
   };
 }
 
+interface ScoreReport {
+  id: number;
+  patientId: number;
+  score: number;
+  dateTime: string;
+}
+
 interface ReportProps {
   selectedPatient: Patient | null;
+  currentUserId: number;
   onBack: () => void;
 }
 
-export default function Report({ selectedPatient, onBack }: ReportProps) {
+export default function Report({ selectedPatient, currentUserId, onBack }: ReportProps) {
+  const [scoreReports, setScoreReports] = useState<ScoreReport[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (selectedPatient) {
+      fetchScoreReports();
+    }
+  }, [selectedPatient, currentUserId]);
+
+  const fetchScoreReports = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/score-reports?patientId=${selectedPatient!.id}&currentUserId=${currentUserId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setScoreReports(data.scoreReports);
+      } else {
+        setError('Failed to fetch score reports');
+      }
+    } catch (err) {
+      setError('Error fetching score reports');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!selectedPatient) {
     return <div className="text-center">No patient selected for report.</div>;
   }
@@ -38,7 +76,7 @@ export default function Report({ selectedPatient, onBack }: ReportProps) {
           Back to Patients
         </button>
       </div>
-      <div className="bg-[var(--card-bg)] p-6 rounded-lg shadow-md border border-[var(--border-color)]">
+      <div className="bg-[var(--card-bg)] p-6 rounded-lg shadow-md border border-[var(--border-color)] mb-6">
         <h3 className="text-lg font-semibold mb-4">Patient Details</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -78,6 +116,34 @@ export default function Report({ selectedPatient, onBack }: ReportProps) {
             <p className="text-[var(--foreground)]">{selectedPatient.user.name}</p>
           </div>
         </div>
+      </div>
+      <div className="bg-[var(--card-bg)] p-6 rounded-lg shadow-md border border-[var(--border-color)]">
+        <h3 className="text-lg font-semibold mb-4">Score Reports</h3>
+        {loading && <div className="text-center">Loading score reports...</div>}
+        {error && <div className="text-center text-red-500">{error}</div>}
+        {!loading && !error && scoreReports.length === 0 && <div className="text-center">No score reports found for this patient.</div>}
+        {!loading && !error && scoreReports.length > 0 && (
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-[var(--card-bg)] border border-[var(--border-color)]">
+              <thead>
+                <tr className="bg-[var(--secondary-bg)]">
+                  <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">ID</th>
+                  <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Score</th>
+                  <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Date & Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scoreReports.map((report, i) => (
+                  <tr key={report.id} className="hover:bg-[var(--secondary-bg)]">
+                    <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{i + 1}</td>
+                    <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{report.score}</td>
+                    <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{new Date(report.dateTime).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
