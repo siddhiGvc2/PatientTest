@@ -1,8 +1,13 @@
-- [x] Create app/api/responses/route.ts for POST endpoint to save UserResponse using upsert
-- [x] Modify app/components/test-level.tsx to call the API when an image is selected, passing patientId, questionId, selectedImageId
-- [x] Ensure isCorrect is calculated in the API by comparing selectedImageId with question.answerImageId
-- [x] Add error handling and loading state for saving responses
-- [x] Test the functionality by running the test and checking DB
-- [x] Calculate and save patient score in Patient table when test completes
-- [x] Update PatientListProps interface to include onReport?: (patient: Patient) => void;
-- [x] Add Report button in the Actions column of the PatientList table
+# TODO: Add Search Functionality to Patient List Table
+
+## Steps to Complete:
+- [x] Add searchTerm state variable to manage the search input
+- [x] Add a search input field above the patient table for user input
+- [x] Implement filtering logic to filter patients by name, unique ID, city, or created by user name (case insensitive)
+- [x] Update the table rendering to display only filtered patients
+- [ ] Test the search functionality to ensure it works correctly
+
+## Notes:
+- Search will be case insensitive and filter across multiple fields: name, uniqueId, city, user.name
+- The search input should be placed above the table for easy access
+- Ensure the filtering does not affect the original patients array, only the displayed list
