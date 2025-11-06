@@ -393,22 +393,23 @@ export default function AdminPanel() {
             }}
             className="border border-gray-300 rounded px-3 py-2 w-full"
           >
-            <option value="">Select a screen</option>
+            <option className="bg-[var(--card-bg)]" value="">Select a screen</option>
             {screens.map((screen) => {
               const testLevel = testLevels.find(tl => tl.id === screen.testLevelId);
               return (
-                <option key={screen.id} value={screen.id}>
-                  Screen {screen.screenNumber} - Test Level {testLevel?.level || 'Unknown'}
+                <option className="bg-[var(--card-bg)]" key={screen.id} value={screen.id}>
+                   Test Level {testLevel?.level || 'Unknown'}-Screen {screen.screenNumber}
                 </option>
               );
             })}
           </select>
           {selectedScreen && (
             <div className="mt-4">
-              <div className="p-4 bg-gray-100 rounded mb-4">
+              <div className="p-4 bg-[var(--card-bg)] rounded mb-4">
                 <h3 className="text-lg font-semibold">Selected Screen Details:</h3>
-                <p><strong>Screen Number:</strong> {selectedScreen.screenNumber}</p>
                 <p><strong>Test Level:</strong> {testLevels.find(tl => tl.id === selectedScreen.testLevelId)?.level || 'Unknown'}</p>
+                <p><strong>Screen Number:</strong> {selectedScreen.screenNumber}</p>
+                
               </div>
 
               <div className="mb-6">
@@ -452,7 +453,7 @@ export default function AdminPanel() {
                   <div className="overflow-x-auto">
                     <table className="min-w-full bg-white border border-gray-300">
                       <thead>
-                        <tr className="bg-gray-50">
+                        <tr className="bg-[var(--card-bg)]">
                           <th className="px-4 py-2 border-b">ID</th>
                           <th className="px-4 py-2 border-b">Text</th>
                           <th className="px-4 py-2 border-b">Actions</th>
@@ -460,7 +461,7 @@ export default function AdminPanel() {
                       </thead>
                       <tbody>
                         {questions.filter(q => q.screenId === selectedScreen.id).map((question,i) => (
-                          <tr key={question.id} className="hover:bg-gray-50">
+                          <tr key={question.id} className="hover:bg-gray-50 bg-[var(--card-bg)]">
                             <td className="px-4 py-2 border-b text-center">{i+1}</td>
                             <td className="px-4 py-2 border-b text-center">{question.text}</td>
                             <td className="px-4 py-2 border-b text-center">
