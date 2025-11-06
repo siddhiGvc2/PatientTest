@@ -25,6 +25,7 @@ interface PatientListProps {
   userId: number;
   currentUser: any;
   onStartTest?: (patient: Patient) => void;
+  onReport?: (patient: Patient) => void;
 }
 
 interface User {
@@ -34,7 +35,7 @@ interface User {
   userType: string;
 }
 
-export default function PatientList({ userId, currentUser, onStartTest }: PatientListProps) {
+export default function PatientList({ userId, currentUser, onStartTest, onReport }: PatientListProps) {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -297,12 +298,18 @@ export default function PatientList({ userId, currentUser, onStartTest }: Patien
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.phoneNumber || '-'}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{patient.score}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center justify-center align-center">
-                   
+
                     <button
                       onClick={() => handleEditPatient(patient)}
                       className="bg-[var(--button-bg)] text-white px-2 py-1 rounded mr-2 hover:bg-[var(--button-hover)]"
                     >
                       Edit
+                    </button>
+                    <button
+                      onClick={() => onReport && onReport(patient)}
+                      className="bg-[var(--secondary-bg)] text-[var(--foreground)] px-2 py-1 rounded mr-2 hover:bg-[var(--border-color)]"
+                    >
+                      Report
                     </button>
                     <button
                       onClick={() => handleDeletePatient(patient.id)}

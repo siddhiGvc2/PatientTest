@@ -29,6 +29,14 @@ export async function PUT(request: NextRequest) {
       data: { score },
     });
 
+    // Save score-report
+    await prisma.scoreReport.create({
+      data: {
+        patientId: patientIdInt,
+        score,
+      },
+    });
+
     return NextResponse.json({ patient: updatedPatient, score }, { status: 200 });
   } catch (error) {
     console.error('Error calculating and saving score:', error);
