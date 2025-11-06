@@ -271,10 +271,9 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Created By</th>
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Age</th>
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">City</th>
-                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Father Name</th>
-                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Mother Name</th>
-                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Unique ID</th>
-                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Phone Number</th>
+              
+                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Unique ID</th>
+               
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Score</th>
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Actions</th>
               </tr>
@@ -292,25 +291,25 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.user.name}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] ">{patient.age || '-'}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.city || '-'}</td>
-                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.fatherName || '-'}</td>
-                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.motherName || '-'}</td>
+                  {/* <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.fatherName || '-'}</td> */}
+                  {/* <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.motherName || '-'}</td> */}
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.uniqueId || '-'}</td>
-                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.phoneNumber || '-'}</td>
+                  {/* <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.phoneNumber || '-'}</td> */}
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{patient.score}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center justify-center align-center">
-
+                      <button
+                      onClick={() => onReport && onReport(patient)}
+                      className="bg-[var(--secondary-bg)] text-[var(--foreground)] px-2 py-1 rounded mr-2 hover:bg-[var(--border-color)]"
+                    >
+                      Report
+                    </button>
                     <button
                       onClick={() => handleEditPatient(patient)}
                       className="bg-[var(--button-bg)] text-white px-2 py-1 rounded mr-2 hover:bg-[var(--button-hover)]"
                     >
                       Edit
                     </button>
-                    <button
-                      onClick={() => onReport && onReport(patient)}
-                      className="bg-[var(--secondary-bg)] text-[var(--foreground)] px-2 py-1 rounded mr-2 hover:bg-[var(--border-color)]"
-                    >
-                      Report
-                    </button>
+                   
                     <button
                       onClick={() => handleDeletePatient(patient.id)}
                       className="bg-[var(--danger-bg)] text-white px-2 py-1 rounded hover:bg-[var(--danger-hover)]"
