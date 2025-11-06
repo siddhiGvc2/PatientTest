@@ -1,16 +1,6 @@
-# TODO: Replace hardcoded "Patient" and "Patients" with NEXT_PUBLIC_PATIENT env var
-
-- [x] Add patientTerm constant to app/components/patient-list.tsx
-- [x] Replace UI strings in app/components/patient-list.tsx
-- [x] Add patientTerm constant to app/page.tsx
-- [x] Replace "Patients" in app/page.tsx
-
-# TODO: Replace hardcoded "User" and "Users" with NEXT_PUBLIC_USER env var
-
-- [x] Add userTerm constant to app/components/user-management.tsx
-- [x] Replace UI strings in app/components/user-management.tsx (including all "User" words)
-- [x] Replace "User Management" in app/page.tsx
-- [x] Replace "User" in toggle button options in app/components/user-management.tsx
-- [x] Replace "Admin" with NEXT_PUBLIC_ADMIN env var in app/components/user-management.tsx
-- [x] Replace USER/ADMIN in Type column display with env variables in app/components/user-management.tsx
-- [x] Replace user type in navbar display in app/page.tsx
+- [x] Create app/api/responses/route.ts for POST endpoint to save UserResponse using upsert
+- [x] Modify app/components/test-level.tsx to call the API when an image is selected, passing patientId, questionId, selectedImageId
+- [x] Ensure isCorrect is calculated in the API by comparing selectedImageId with question.answerImageId
+- [x] Add error handling and loading state for saving responses
+- [x] Test the functionality by running the test and checking DB
+- [x] Calculate and save patient score in Patient table when test completes

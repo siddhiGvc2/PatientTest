@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+const patientTerm = process.env.NEXT_PUBLIC_PATIENT || 'Patient';
+
 interface Option {
   id: number;
   text: string;
@@ -37,9 +39,10 @@ interface TestLevelProps {
   onTestEnd?: () => void;
   onExit?: () => void;
   onRetake?: () => void;
+  selectedPatient?: any;
 }
 
-export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProps) {
+export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient }: TestLevelProps) {
   const [testLevel, setTestLevel] = useState<TestLevel | null>(null);
   const [allOptions, setAllOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,14 +52,43 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
   const [currentScreenIndex, setCurrentScreenIndex] = useState(0);
   const [currentQuestionIndexInScreen, setCurrentQuestionIndexInScreen] = useState(0);
   const [testEnded,setTestEnded]=useState(false);
+  const [saving, setSaving] = useState(false);
 
   const speakText = (text: string) => {
+   
     if ('speechSynthesis' in window) {
+      
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'hi-IN'; // Set language to Hindi (India)
       window.speechSynthesis.speak(utterance);
+       console.log("speakText called");
     } else {
       alert('Text-to-speech is not supported in this browser.');
+    }
+  };
+
+  const saveResponse = async (questionId: number, selectedImageId: number) => {
+    if (!selectedPatient) return;
+    setSaving(true);
+    try {
+      const res = await fetch('/api/responses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          patientId: selectedPatient.id,
+          questionId,
+          selectedImageId,
+        }),
+      });
+      if (!res.ok) {
+        console.error('Failed to save response');
+      }
+    } catch (error) {
+      console.error('Error saving response:', error);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -195,6 +227,11 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
 
   return (
     <div className="w-full p-6">
+      {selectedPatient && (
+        <div className="mb-4 p-4 bg-blue-100 border border-blue-300 rounded-lg">
+          <h3 className="text-lg font-semibold text-blue-800">{patientTerm}: {selectedPatient.name}</h3>
+        </div>
+      )}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Test Level {testLevel.level}</h2>
         <button
@@ -221,27 +258,30 @@ export default function TestLevel({ onTestEnd, onExit, onRetake }: TestLevelProp
              🔊
            </button>
          </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
           {currentScreen.images.map((image, index) => {
             const labels = ['A', 'B', 'C', 'D'];
 
             return (
               <div
                 key={image.id}
-                onClick={() => setSelectedOptions(prev => ({ ...prev, [currentQuestion.id]: image.id }))} // select option on image click
+                onClick={() => {
+                  setSelectedOptions(prev => ({ ...prev, [currentQuestion.id]: image.id }));
+                  saveResponse(currentQuestion.id, image.id);
+                }} // select option on image click and save response
                 className={`bg-white p-4 rounded-lg shadow-md relative cursor-pointer  transition-all ${
                   selectedOptions[currentQuestion.id] === image.id
                     ? 'ring-4 ring-blue-400'
                     : 'hover:shadow-lg'
                 }`}
               >
-                <div className="absolute top-2 left-2 bg-black text-white px-2 py-1 rounded text-sm font-bold">
+                {/* <div className="absolute top-2 left-2 bg-black text-white px-2 py-1 rounded text-sm font-bold">
                   {labels[index] || ''}
-                </div>
+                </div> */}
                 <img
                   src={image.url}
                   alt={`Image ${image.id}`}
-                  className="w-full h-80 object-cover rounded-md"
+                  className="w-full h-38 md:h-83 lg:h-84 object-cover rounded-md"
                 />
               </div>
             );
