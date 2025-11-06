@@ -46,6 +46,7 @@ model Patient {
   userId      Int
   user        PatientTestUser @relation(fields: [userId], references: [id])
   responses   UserResponse[]
+  scoreReports ScoreReport[]
 }
 
 // Test Levels
@@ -115,4 +116,12 @@ model UserResponse {
 model ImageLibrary {
   id  Int     @id @default(autoincrement())
   url String
+}
+
+model ScoreReport {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  score     Int
+  dateTime  DateTime @default(now())
+  patient   Patient  @relation(fields: [patientId], references: [id])
 }

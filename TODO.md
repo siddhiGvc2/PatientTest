@@ -4,3 +4,5 @@
 - [x] Add error handling and loading state for saving responses
 - [x] Test the functionality by running the test and checking DB
 - [x] Calculate and save patient score in Patient table when test completes
+- [x] Update PatientListProps interface to include onReport?: (patient: Patient) => void;
+- [x] Add Report button in the Actions column of the PatientList table

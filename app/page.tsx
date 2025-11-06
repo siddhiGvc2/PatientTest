@@ -5,6 +5,7 @@ import LoginPage from "./components/login";
 import PatientList from "./components/patient-list";
 import UserManagement from "./components/user-management";
 import TestLevel from "./components/test-level";
+import Report from "./components/report";
 import { useAuth } from "./contexts/AuthContext";
 
 const userTerm = process.env.NEXT_PUBLIC_USER || 'User';
@@ -12,7 +13,7 @@ const adminTerm = process.env.NEXT_PUBLIC_ADMIN || 'Admin';
 
 export default function Home() {
   const { loggedInUser, login, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'patients' | 'users' | 'test'>('patients');
+  const [activeTab, setActiveTab] = useState<'patients' | 'users' | 'test' | 'report'>('patients');
   const [testEnded, setTestEnded] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
 
@@ -119,13 +120,14 @@ export default function Home() {
             </>
           )}
 
-          {activeTab === 'patients' && <PatientList userId={loggedInUser.id} currentUser={loggedInUser} onStartTest={(patient) => {setSelectedPatient(patient); setActiveTab('test');setTestEnded(false)}} />}
+          {activeTab === 'patients' && <PatientList userId={loggedInUser.id} currentUser={loggedInUser} onStartTest={(patient) => {setSelectedPatient(patient); setActiveTab('test');setTestEnded(false)}} onReport={(patient) => {setSelectedPatient(patient); setActiveTab('report');}} />}
           {activeTab === 'users' && canManageUsers && <UserManagement currentUser={loggedInUser} />}
           {activeTab === 'test' && (
             <div className="min-h-screen bg-[var(--background)]">
               <TestLevel onTestEnd={handleTestEnd} onExit={handleExitTest} onRetake={handleRetakeTest} selectedPatient={selectedPatient} />
             </div>
           )}
+          {activeTab === 'report' && <Report selectedPatient={selectedPatient} onBack={() => setActiveTab('patients')} />}
         </div>
       )}
     </div>
