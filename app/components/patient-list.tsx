@@ -44,6 +44,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
   const [formData, setFormData] = useState({ name: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
   const [selectedUserId, setSelectedUserId] = useState<number>(userId);
   const [users, setUsers] = useState<User[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const fetchUsers = async () => {
     try {
@@ -145,6 +146,13 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
       setError('Error deleting patient');
     }
   };
+
+  const filteredPatients = patients.filter(patient =>
+    patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (patient.uniqueId && patient.uniqueId.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (patient.city && patient.city.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    patient.user.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) {
     return <div className="text-center">Loading {patientTerm.toLowerCase()}s...</div>;
@@ -259,7 +267,17 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
         </div>
       )}
 
-      {patients.length === 0 ? (
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by name, unique ID, city, or created by..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+        />
+      </div>
+
+      {filteredPatients.length === 0 ? (
         <p>No {patientTerm.toLowerCase()}s found.</p>
       ) : (
         <div className="overflow-x-auto">
@@ -271,15 +289,15 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Created By</th>
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Age</th>
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">City</th>
-              
+
                  <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Unique ID</th>
-               
+
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Score</th>
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {patients.map((patient,i) => (
+              {filteredPatients.map((patient,i) => (
                 <tr key={patient.id} className="hover:bg-[var(--secondary-bg)]">
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{i+1}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] ">{patient.name}  <button
