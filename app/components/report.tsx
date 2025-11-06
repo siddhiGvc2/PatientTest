@@ -126,23 +126,23 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
       </div>
       <div className="bg-[var(--card-bg)] p-6 rounded-lg shadow-md border border-[var(--border-color)]">
         <h3 className="text-lg font-semibold mb-4">Score Reports</h3>
-        <div className="flex gap-4 mb-4">
-          <div>
+        <div className="flex flex-col sm:flex-row gap-4 mb-4">
+          <div className="flex-1">
             <label className="block text-[var(--foreground)] font-medium mb-1">Start Date</label>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="px-3 py-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+              className="w-full px-3 py-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
             />
           </div>
-          <div>
+          <div className="flex-1">
             <label className="block text-[var(--foreground)] font-medium mb-1">End Date</label>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="px-3 py-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+              className="w-full px-3 py-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
             />
           </div>
         </div>
