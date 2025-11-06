@@ -282,7 +282,12 @@ export default function PatientList({ userId, currentUser, onStartTest }: Patien
               {patients.map((patient,i) => (
                 <tr key={patient.id} className="hover:bg-[var(--secondary-bg)]">
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{i+1}</td>
-                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] ">{patient.name}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] ">{patient.name}  <button
+                      onClick={() => onStartTest && onStartTest(patient)}
+                      className="bg-[var(--success-bg)] text-white px-2 py-1 rounded mr-2 hover:bg-[var(--success-hover)]"
+                    >
+                      Start Test
+                    </button></td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.user.name}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] ">{patient.age || '-'}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.city || '-'}</td>
@@ -292,12 +297,7 @@ export default function PatientList({ userId, currentUser, onStartTest }: Patien
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.phoneNumber || '-'}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{patient.score}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center justify-center align-center">
-                    <button
-                      onClick={() => onStartTest && onStartTest(patient)}
-                      className="bg-[var(--success-bg)] text-white px-2 py-1 rounded mr-2 hover:bg-[var(--success-hover)]"
-                    >
-                      Start Test
-                    </button>
+                   
                     <button
                       onClick={() => handleEditPatient(patient)}
                       className="bg-[var(--button-bg)] text-white px-2 py-1 rounded mr-2 hover:bg-[var(--button-hover)]"
