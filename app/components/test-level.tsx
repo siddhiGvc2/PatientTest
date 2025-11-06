@@ -269,7 +269,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
                   setSelectedOptions(prev => ({ ...prev, [currentQuestion.id]: image.id }));
                   saveResponse(currentQuestion.id, image.id);
                 }} // select option on image click and save response
-                className={`bg-white p-4 rounded-lg shadow-md relative cursor-pointer  transition-all ${
+                className={`bg-white p-2 md:p-4 lg:p-4 rounded-lg shadow-md relative cursor-pointer  transition-all ${
                   selectedOptions[currentQuestion.id] === image.id
                     ? 'ring-4 ring-blue-400'
                     : 'hover:shadow-lg'
