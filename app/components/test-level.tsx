@@ -258,7 +258,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
              🔊
            </button>
          </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
           {currentScreen.images.map((image, index) => {
             const labels = ['A', 'B', 'C', 'D'];
 
@@ -275,13 +275,13 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
                     : 'hover:shadow-lg'
                 }`}
               >
-                <div className="absolute top-2 left-2 bg-black text-white px-2 py-1 rounded text-sm font-bold">
+                {/* <div className="absolute top-2 left-2 bg-black text-white px-2 py-1 rounded text-sm font-bold">
                   {labels[index] || ''}
-                </div>
+                </div> */}
                 <img
                   src={image.url}
                   alt={`Image ${image.id}`}
-                  className="w-full h-80 object-cover rounded-md"
+                  className="w-full h-38 md:h-83 lg:h-84 object-cover rounded-md"
                 />
               </div>
             );

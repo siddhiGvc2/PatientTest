@@ -238,15 +238,6 @@ export default function PatientList({ userId, currentUser, onStartTest }: Patien
                 className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-[var(--foreground)]">Score</label>
-              <input
-                type="number"
-                value={formData.score}
-                onChange={(e) => setFormData({ ...formData, score: parseInt(e.target.value) || 0 })}
-                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
-              />
-            </div>
             <div className="flex space-x-2">
               <button type="submit" className="bg-[var(--success-bg)] text-white px-4 py-2 rounded hover:bg-[var(--success-hover)]">
                 {editingPatient ? `Update ${patientTerm}` : `Add ${patientTerm}`}
