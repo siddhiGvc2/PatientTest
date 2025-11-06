@@ -64,9 +64,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'You do not have permission to view score reports for this patient' }, { status: 403 });
     }
 
-    // Get all score reports for the patient
+    // Build where clause for date filtering
+    const whereClause: any = { patientId: patientIdInt };
+    if (searchParams.get('startDate')) {
+      whereClause.dateTime = { ...whereClause.dateTime, gte: new Date(searchParams.get('startDate')!) };
+    }
+    if (searchParams.get('endDate')) {
+      whereClause.dateTime = { ...whereClause.dateTime, lte: new Date(searchParams.get('endDate')!) };
+    }
+
+    // Get filtered score reports for the patient
     const scoreReports = await prisma.scoreReport.findMany({
-      where: { patientId: patientIdInt },
+      where: whereClause,
       orderBy: { dateTime: 'desc' },
     });
 
