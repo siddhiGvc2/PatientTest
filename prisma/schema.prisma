@@ -119,9 +119,10 @@ model ImageLibrary {
 }
 
 model ScoreReport {
-  id        Int      @id @default(autoincrement())
-  patientId Int
-  score     Int
-  dateTime  DateTime @default(now())
-  patient   Patient  @relation(fields: [patientId], references: [id])
+  id             Int      @id @default(autoincrement())
+  patientId      Int
+  score          Int
+  dateTime       DateTime @default(now())
+  detailedReport Json?
+  patient        Patient  @relation(fields: [patientId], references: [id])
 }

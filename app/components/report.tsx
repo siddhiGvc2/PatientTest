@@ -26,6 +26,13 @@ interface ScoreReport {
   patientId: number;
   score: number;
   dateTime: string;
+  detailedReport: any[] | null;
+}
+
+interface Question {
+  id: number;
+  text: string;
+  options: { id: number; text: string }[];
 }
 
 interface ReportProps {
@@ -40,12 +47,31 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<ScoreReport | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
+
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
 
   useEffect(() => {
     if (selectedPatient) {
       fetchScoreReports();
     }
   }, [selectedPatient, currentUserId, startDate, endDate]);
+
+  const fetchQuestions = async () => {
+    try {
+      const res = await fetch('/api/questions');
+      if (res.ok) {
+        const data = await res.json();
+        setQuestions(data);
+      }
+    } catch (err) {
+      console.error('Error fetching questions:', err);
+    }
+  };
 
   const fetchScoreReports = async () => {
     setLoading(true);
@@ -66,6 +92,16 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleViewDetailedReport = (report: ScoreReport) => {
+    setSelectedReport(report);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedReport(null);
   };
 
   if (!selectedPatient) {
@@ -157,6 +193,7 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
                   <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">ID</th>
                   <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Score</th>
                   <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Date & Time</th>
+                  <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -165,6 +202,14 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
                     <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{i + 1}</td>
                     <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{report.score}</td>
                     <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{new Date(report.dateTime).toLocaleString()}</td>
+                    <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">
+                      <button
+                        onClick={() => handleViewDetailedReport(report)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      >
+                        View Detailed Report
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -172,6 +217,76 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
           </div>
         )}
       </div>
+
+      {showModal && selectedReport && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[var(--card-bg)] p-6 rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Detailed Report</h3>
+              <button
+                onClick={closeModal}
+                className="text-[var(--foreground)] hover:text-red-500 text-xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="mb-4">
+              <p className="text-[var(--foreground)]"><strong>Score:</strong> {selectedReport.score}</p>
+              <p className="text-[var(--foreground)]"><strong>Date & Time:</strong> {new Date(selectedReport.dateTime).toLocaleString()}</p>
+            </div>
+            {selectedReport.detailedReport && selectedReport.detailedReport.length > 0 ? (
+              <div>
+                <h4 className="text-md font-semibold mb-2">Question Details:</h4>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full bg-[var(--card-bg)] border border-[var(--border-color)]">
+                    <thead>
+                      <tr className="bg-[var(--secondary-bg)]">
+                        <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Question</th>
+                        <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Correct</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedReport.detailedReport.map((item: any, index: number) => (
+                        <tr key={index} className="hover:bg-[var(--secondary-bg)]">
+                          <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-left">
+                            <div className="mb-2">
+                              <strong>Question {item.questionId}:</strong> {questions.find(q => q.id === item.questionId)?.text || 'N/A'}
+                            </div>
+                            {(() => {
+                              const question = questions.find(q => q.id === item.questionId);
+                              return question?.options && question.options.length > 0 ? (
+                                <div className="text-sm text-gray-600">
+                                  <strong>Options:</strong>
+                                  <ul className="list-disc list-inside mt-1">
+                                    {question.options.map((opt: any) => (
+                                      <li key={opt.id} className={opt.id === item.option?.id ? 'font-semibold text-blue-600' : ''}>
+                                        {opt.text}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              ) : null;
+                            })()}
+                          </td>
+                          <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">
+                            {item.isCorrect ? (
+                              <span className="text-green-500 font-semibold">✓ Correct</span>
+                            ) : (
+                              <span className="text-red-500 font-semibold">✗ Incorrect</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <p className="text-[var(--foreground)]">No detailed report available.</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

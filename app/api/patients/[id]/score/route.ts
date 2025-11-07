@@ -3,7 +3,10 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function PUT(request: NextRequest) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { patientId } = await request.json();
 
@@ -16,12 +19,28 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'patientId must be a valid integer' }, { status: 400 });
     }
 
-    // Calculate the score based on correct responses
-    const responses = await prisma.userResponse.findMany({
-      where: { patientId: patientIdInt, isCorrect: true },
+    // Fetch all responses for the patient
+    const allResponses = await prisma.userResponse.findMany({
+      where: { patientId: patientIdInt },
+      select: {
+        id: true,
+        questionId: true,
+        isCorrect: true,
+        question: {
+          select: {
+            text: true,
+            options: {
+              select: { id: true, text: true }
+            }
+          }
+        },
+       
+      },
     });
 
-    const score = responses.length;
+    // Calculate the score based on correct responses
+    const correctResponses = allResponses.filter(response => response.isCorrect);
+    const score = correctResponses.length;
 
     // Update the patient's score
     const updatedPatient = await prisma.patient.update({
@@ -29,11 +48,12 @@ export async function PUT(request: NextRequest) {
       data: { score },
     });
 
-    // Save score-report
+    // Save score-report with detailedReport
     await prisma.scoreReport.create({
       data: {
         patientId: patientIdInt,
         score,
+        detailedReport: allResponses,
       },
     });
 
