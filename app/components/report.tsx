@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import TestLevel from "./test-level";
 
 const patientTerm = process.env.NEXT_PUBLIC_PATIENT || 'Patient';
 
@@ -32,7 +33,20 @@ interface ScoreReport {
 interface Question {
   id: number;
   text: string;
+  screenId:number;
   options: { id: number; text: string }[];
+}
+
+
+interface Screen {
+  id: number;
+  screenNumber: number;
+  testLevelId:number;
+}
+
+interface TestLevel {
+  id: number;
+  level:number;
 }
 
 interface ReportProps {
@@ -50,9 +64,15 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
   const [showModal, setShowModal] = useState(false);
   const [selectedReport, setSelectedReport] = useState<ScoreReport | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [screens, setScreens] = useState<Screen[]>([]);
+  const [testLevels, setTestLevels] = useState<TestLevel[]>([]);
+
+
 
   useEffect(() => {
     fetchQuestions();
+    fetchScreens();
+    fetchTestLevels();
   }, []);
 
   useEffect(() => {
@@ -67,6 +87,30 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
       if (res.ok) {
         const data = await res.json();
         setQuestions(data);
+      }
+    } catch (err) {
+      console.error('Error fetching questions:', err);
+    }
+  };
+
+  const fetchScreens = async () => {
+    try {
+      const res = await fetch('/api/screens');
+      if (res.ok) {
+        const data = await res.json();
+        setScreens(data);
+      }
+    } catch (err) {
+      console.error('Error fetching questions:', err);
+    }
+  };
+
+  const fetchTestLevels = async () => {
+    try {
+      const res = await fetch('/api/test-level');
+      if (res.ok) {
+        const data = await res.json();
+        setTestLevels(data);
       }
     } catch (err) {
       console.error('Error fetching questions:', err);
@@ -250,7 +294,21 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
                         <tr key={index} className="hover:bg-[var(--secondary-bg)]">
                           <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-left">
                             <div className="mb-2">
-                              <strong>Question {item.questionId}:</strong> {questions.find(q => q.id === item.questionId)?.text || 'N/A'}
+                              {(() => {
+                                const question = questions.find(q => q.id === item.questionId);
+                                const screen = screens.find(s => s.id === question?.screenId);
+                                const testLevel = testLevels.find(t => t.id === screen?.id);
+
+                                return (
+                                  <>
+                                    <strong>
+                                      Test Level {testLevel?.level || 'N/A'} Screen {screen?.screenNumber || 'N/A'}:
+                                    </strong>{' '}
+                                    {question?.text || 'N/A'}
+                                  </>
+                                );
+                              })()}
+
                             </div>
                             {(() => {
                               const question = questions.find(q => q.id === item.questionId);
