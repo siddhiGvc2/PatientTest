@@ -116,9 +116,21 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
       if (res.ok) {
         const data = await res.json();
         console.log(data);
-        setTestLevel(data);
-        setCurrentScreenIndex(0);
-        setCurrentQuestionIndexInScreen(0);
+        // Check if the level has screens with questions
+        const hasValidScreens = data.screens && data.screens.some((screen: Screen) => screen.questions && screen.questions.length > 0);
+        if (hasValidScreens) {
+          setTestLevel(data);
+          setCurrentScreenIndex(0);
+          setCurrentQuestionIndexInScreen(0);
+        } else {
+          // No valid screens, try next level
+          if (level < 10) { // Assume max 10 levels to prevent infinite loop
+            setCurrentLevel(level + 1);
+          } else {
+            setTestEnded(true);
+            onTestEnd?.();
+          }
+        }
       } else {
         setTestEnded(true);
          onTestEnd?.();
