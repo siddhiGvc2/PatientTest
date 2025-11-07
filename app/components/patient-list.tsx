@@ -42,6 +42,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [formData, setFormData] = useState({ name: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
+  const [generatedUniqueId, setGeneratedUniqueId] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<number>(userId);
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -85,6 +86,40 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
     }
   }, [currentUser, selectedUserId]);
 
+  useEffect(() => {
+    if (showForm && !editingPatient) {
+      generateUniqueId();
+    }
+  }, [showForm, editingPatient]);
+
+  const generateUniqueId = async () => {
+    let uniqueId;
+    let isUnique = false;
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    while (!isUnique && attempts < maxAttempts) {
+      uniqueId = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit number
+      try {
+        const res = await fetch(`/api/patients/check-unique-id?uniqueId=${uniqueId}`);
+        if (res.ok) {
+          const data = await res.json();
+          isUnique = data.isUnique;
+        }
+      } catch (err) {
+        console.error('Error checking unique ID:', err);
+      }
+      attempts++;
+    }
+
+    if (isUnique) {
+      setGeneratedUniqueId(uniqueId);
+      setFormData({ ...formData, uniqueId });
+    } else {
+      setError('Failed to generate a unique ID. Please try again.');
+    }
+  };
+
   const handleAddPatient = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -104,6 +139,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
 
         if (res.ok) {
           setFormData({ name: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
+          setGeneratedUniqueId('');
           setShowForm(false);
           setEditingPatient(null);
           fetchPatients(); // Refresh the list
@@ -236,6 +272,8 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                 value={formData.uniqueId}
                 onChange={(e) => setFormData({ ...formData, uniqueId: e.target.value })}
                 className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                readOnly={!editingPatient}
+                placeholder={editingPatient ? '' : 'Auto-generated on form open'}
               />
             </div>
             <div className="mb-4">

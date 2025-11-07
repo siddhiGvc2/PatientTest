@@ -54,6 +54,22 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
   const [testEnded,setTestEnded]=useState(false);
   const [saving, setSaving] = useState(false);
 
+  const advanceToNextValidScreen = () => {
+    if (!testLevel) return;
+    let nextScreenIndex = currentScreenIndex;
+    while (nextScreenIndex < testLevel.screens.length) {
+      if (testLevel.screens[nextScreenIndex].questions && testLevel.screens[nextScreenIndex].questions.length > 0) {
+        setCurrentScreenIndex(nextScreenIndex);
+        setCurrentQuestionIndexInScreen(0);
+        return;
+      }
+      nextScreenIndex++;
+    }
+    // No valid screen found, end test
+    setTestEnded(true);
+    onTestEnd?.();
+  };
+
   const speakText = (text: string) => {
    
     if ('speechSynthesis' in window) {
@@ -100,9 +116,21 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
       if (res.ok) {
         const data = await res.json();
         console.log(data);
-        setTestLevel(data);
-        setCurrentScreenIndex(0);
-        setCurrentQuestionIndexInScreen(0);
+        // Check if the level has screens with questions
+        const hasValidScreens = data.screens && data.screens.some((screen: Screen) => screen.questions && screen.questions.length > 0);
+        if (hasValidScreens) {
+          setTestLevel(data);
+          setCurrentScreenIndex(0);
+          setCurrentQuestionIndexInScreen(0);
+        } else {
+          // No valid screens, try next level
+          if (level < 10) { // Assume max 10 levels to prevent infinite loop
+            setCurrentLevel(level + 1);
+          } else {
+            setTestEnded(true);
+            onTestEnd?.();
+          }
+        }
       } else {
         setTestEnded(true);
          onTestEnd?.();
@@ -138,6 +166,8 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
     if (testLevel && currentScreenIndex >= testLevel.screens.length) {
       setTestEnded(true);
        onTestEnd?.();
+    } else if (testLevel && testLevel.screens[currentScreenIndex] && (!testLevel.screens[currentScreenIndex].questions || testLevel.screens[currentScreenIndex].questions.length === 0)) {
+      advanceToNextValidScreen();
     }
   }, [testLevel, currentScreenIndex]);
 
@@ -156,8 +186,17 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
           if (currentQuestionIndexInScreen < currentScreen.questions.length - 1) {
             setCurrentQuestionIndexInScreen(currentQuestionIndexInScreen + 1);
           } else if (currentScreenIndex < testLevel.screens.length - 1) {
-            setCurrentScreenIndex(currentScreenIndex + 1);
-            setCurrentQuestionIndexInScreen(0);
+            let nextIndex = currentScreenIndex + 1;
+            while (nextIndex < testLevel.screens.length && (!testLevel.screens[nextIndex].questions || testLevel.screens[nextIndex].questions.length === 0)) {
+              nextIndex++;
+            }
+            if (nextIndex < testLevel.screens.length) {
+              setCurrentScreenIndex(nextIndex);
+              setCurrentQuestionIndexInScreen(0);
+            } else {
+              setCurrentLevel(currentLevel + 1);
+              setSelectedOptions({});
+            }
           } else {
             setCurrentLevel(currentLevel + 1);
             setSelectedOptions({});
@@ -352,8 +391,17 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
         {isAnswered && currentQuestionIndexInScreen === currentScreen.questions.length - 1 && currentScreenIndex < testLevel.screens.length - 1 && (
           <button
             onClick={() => {
-              setCurrentScreenIndex(currentScreenIndex + 1);
-              setCurrentQuestionIndexInScreen(0);
+              let nextIndex = currentScreenIndex + 1;
+              while (nextIndex < testLevel.screens.length && (!testLevel.screens[nextIndex].questions || testLevel.screens[nextIndex].questions.length === 0)) {
+                nextIndex++;
+              }
+              if (nextIndex < testLevel.screens.length) {
+                setCurrentScreenIndex(nextIndex);
+                setCurrentQuestionIndexInScreen(0);
+              } else {
+                setCurrentLevel(currentLevel + 1);
+                setSelectedOptions({});
+              }
             }}
             className="px-6 py-3 mr-4 bg-green-500 text-white rounded hover:bg-green-600"
           >
