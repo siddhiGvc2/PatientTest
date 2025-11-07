@@ -342,6 +342,26 @@ export default function AdminPanel() {
     }
   };
 
+  const handleDeleteScreen = async (screenId: number) => {
+    if (!confirm('Are you sure you want to delete this screen? This action cannot be undone and will also delete all associated questions and images.')) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/screens/${screenId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setMessage("Screen deleted successfully!");
+        setSelectedScreen(null);
+        fetchData();
+      } else {
+        setMessage("Error deleting Screen");
+      }
+    } catch (error) {
+      setMessage("Error deleting Screen");
+    }
+  };
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
      
@@ -420,7 +440,12 @@ export default function AdminPanel() {
                 <h3 className="text-lg font-semibold">Selected Screen Details:</h3>
                 <p><strong>Test Level:</strong> {testLevels.find(tl => tl.id === selectedScreen.testLevelId)?.level || 'Unknown'}</p>
                 <p><strong>Screen Number:</strong> {selectedScreen.screenNumber}</p>
-                
+                <button
+                  onClick={() => handleDeleteScreen(selectedScreen.id)}
+                  className="mt-2 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
+                >
+                  Delete Screen
+                </button>
               </div>
 
               <div className="mb-6">
