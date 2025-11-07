@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from 'next/navigation';
 import { TestLevel, Screen, Question, Image as ImageType, NewQuestionState, ImageLibrary } from "./admin/types";
 import AddTestLevelForm from "./admin/AddTestLevelForm";
 import AddScreenForm from "./admin/AddScreenForm";
@@ -17,6 +18,7 @@ import ImageTable from "./admin/ImageTable";
 import ImageLibraryTable from "./admin/ImageLibraryTable";
 
 export default function AdminPanel() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('imageLibrary');
   const [testLevels, setTestLevels] = useState<TestLevel[]>([]);
   const [screens, setScreens] = useState<Screen[]>([]);
@@ -342,7 +344,16 @@ export default function AdminPanel() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
+     
+     <div className="flex justify-between">
       <h1 className="text-3xl font-bold mb-6">Admin Panel</h1>
+        <button
+        onClick={() => router.push('/')}
+        className="mb-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+      >
+        Back to Home
+      </button>
+      </div>
       {message && <p className="mb-4 text-green-600">{message}</p>}
 
       {/* Tabs */}
