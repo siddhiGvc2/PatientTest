@@ -207,6 +207,26 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
     }
   }, [selectedOptions, currentScreenIndex, currentQuestionIndexInScreen, testLevel]);
 
+  useEffect(() => {
+    try {
+      document.documentElement.requestFullscreen();
+    } catch (error) {
+      console.error('Failed to enter fullscreen:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (testEnded) {
+      try {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        }
+      } catch (error) {
+        console.error('Failed to exit fullscreen:', error);
+      }
+    }
+  }, [testEnded]);
+
   if (loading) {
     return <div className="text-center">Loading test level...</div>;
   }
