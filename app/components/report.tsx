@@ -302,7 +302,7 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
                                 return (
                                   <>
                                     <strong>
-                                      Test Level {testLevel?.level || 'N/A'} Screen {screen?.screenNumber || 'N/A'}:
+                                      Test Level {screen?.testLevelId || 'N/A'} Screen {screen?.screenNumber || 'N/A'}:
                                     </strong>{' '}
                                     {question?.text || 'N/A'}
                                   </>

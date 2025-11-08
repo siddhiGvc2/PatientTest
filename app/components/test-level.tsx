@@ -320,7 +320,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
                 <img
                   src={image.url}
                   alt={`Image ${image.id}`}
-                  className="w-full h-38 md:h-83 lg:h-84 object-cover rounded-md"
+                  className="w-full h-38 md:h-77 lg:h-84 object-cover rounded-md"
                 />
               </div>
             );
