@@ -77,6 +77,13 @@ export async function GET(request: NextRequest) {
     const scoreReports = await prisma.scoreReport.findMany({
       where: whereClause,
       orderBy: { dateTime: 'desc' },
+      select: {
+        id: true,
+        patientId: true,
+        score: true,
+        dateTime: true,
+        detailedReport: true,
+      },
     });
 
     return NextResponse.json({ scoreReports }, { status: 200 });

@@ -38,10 +38,13 @@ export async function GET(
     });
 
     if (!testLevel) {
-      return NextResponse.json(
-        { error: 'Test level not found' },
-        { status: 404 }
-      );
+      // Return a default test level structure if not found
+      const defaultTestLevel = {
+        id: null,
+        level,
+        screens: [],
+      };
+      return NextResponse.json(defaultTestLevel);
     }
 
     return NextResponse.json(testLevel);

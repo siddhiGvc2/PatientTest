@@ -93,7 +93,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
   }, [showForm, editingPatient]);
 
   const generateUniqueId = async () => {
-    let uniqueId;
+    let uniqueId: string = '';
     let isUnique = false;
     let attempts = 0;
     const maxAttempts = 10;

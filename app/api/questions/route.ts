@@ -32,6 +32,12 @@ export async function GET() {
       include: {
         screen: true,
         responses: true,
+        options: {
+          select: {
+            id: true,
+            text: true,
+          },
+        },
       },
     });
 
