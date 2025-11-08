@@ -17,10 +17,6 @@ export async function GET(
 
     const option = await prisma.option.findUnique({
       where: { id: optionId },
-      include: {
-        
-        userResponses: true,
-      },
     });
 
     if (!option) {
