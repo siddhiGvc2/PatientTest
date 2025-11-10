@@ -1,7 +1,6 @@
-# TODO: Add View Detailed Report Button to Score Report Table
+# TODO: Modify upload-split-image API to save questions as text
 
-- [x] Update app/api/score-reports/route.ts to include detailedReport in the query
-- [x] Update ScoreReport interface in app/components/report.tsx to include detailedReport
-- [x] Add "Actions" column with "View Detailed Report" button to the table
-- [x] Add modal state and component to display detailed report
-- [x] Test the UI functionality
+- [x] Modify app/api/upload-split-image/route.ts to save extracted question texts as Question records in the database, associated with the screenId.
+- [x] Ensure only questions (type: 'question') are saved as text, not images.
+- [x] Save the 4 images accurately to the database.
+- [ ] Test the endpoint to verify questions are saved correctly and no errors occur.
