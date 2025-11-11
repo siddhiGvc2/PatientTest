@@ -34,6 +34,11 @@ interface TestLevel {
   level: number;
   screens: Screen[];
 }
+interface TestLevels{
+  id: number;
+  level: number;
+  
+}
 
 interface TestLevelProps {
   onTestEnd?: () => void;
@@ -43,6 +48,7 @@ interface TestLevelProps {
 }
 
 export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient }: TestLevelProps) {
+  const [AllTestLevel, setAllTestLevels] = useState<TestLevels[]>([]);
   const [testLevel, setTestLevel] = useState<TestLevel | null>(null);
   const [allOptions, setAllOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +59,23 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
   const [currentQuestionIndexInScreen, setCurrentQuestionIndexInScreen] = useState(0);
   const [testEnded,setTestEnded]=useState(false);
   const [saving, setSaving] = useState(false);
+
+
+  const fetchAllTestLevels = async () => {
+    try {
+      const res = await fetch('/api/test-level');
+      if (res.ok) {
+        const data = await res.json();
+        setAllTestLevels(data);
+      }
+    } catch (err) {
+      console.error('Error fetching questions:', err);
+    }
+  };
+
+  useEffect(()=>{
+    fetchAllTestLevels();
+  },[])
 
   const advanceToNextValidScreen = () => {
     if (!testLevel) return;
@@ -124,7 +147,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
           setCurrentQuestionIndexInScreen(0);
         } else {
           // No valid screens, try next level
-          if (level < 10) { // Assume max 10 levels to prevent infinite loop
+          if (level < AllTestLevel.length-1) { // Assume max 10 levels to prevent infinite loop
             setCurrentLevel(level + 1);
           } else {
             setTestEnded(true);

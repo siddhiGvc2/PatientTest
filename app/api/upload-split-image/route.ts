@@ -166,6 +166,12 @@ async function processImageUrl(imageUrl: string ,screenId:string) {
             screenId:parseInt(screenId),
           },
         });
+
+         const imageLibrary = await prisma.imageLibrary.create({
+          data: {
+            url: up.secure_url,
+          },
+        });
    
       } catch (err) {
         console.error(`❌ Error cropping/uploading part ${part.position}:`, err);
@@ -272,6 +278,8 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json({ error: 'Either file or imageUrl must be provided' }, { status: 400 });
     }
+
+    console.log("Cloudinary Url",cloudinaryUrl);
 
     const result = await processImageUrl(cloudinaryUrl,screenId);
 
