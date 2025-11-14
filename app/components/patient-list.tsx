@@ -324,7 +324,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
               <tr className="bg-[var(--secondary-bg)]">
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">ID</th>
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Name</th>
-                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Created By</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Accessor Name</th>
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Age</th>
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">City</th>
 
