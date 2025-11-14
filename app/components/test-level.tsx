@@ -34,6 +34,11 @@ interface TestLevel {
   level: number;
   screens: Screen[];
 }
+interface TestLevels{
+  id: number;
+  level: number;
+  
+}
 
 interface TestLevelProps {
   onTestEnd?: () => void;
@@ -43,6 +48,7 @@ interface TestLevelProps {
 }
 
 export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient }: TestLevelProps) {
+  const [AllTestLevel, setAllTestLevels] = useState<TestLevels[]>([]);
   const [testLevel, setTestLevel] = useState<TestLevel | null>(null);
   const [allOptions, setAllOptions] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +59,25 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
   const [currentQuestionIndexInScreen, setCurrentQuestionIndexInScreen] = useState(0);
   const [testEnded,setTestEnded]=useState(false);
   const [saving, setSaving] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+
+  const fetchAllTestLevels = async () => {
+    try {
+      const res = await fetch('/api/test-level');
+      if (res.ok) {
+        const data = await res.json();
+        setAllTestLevels(data);
+      }
+    } catch (err) {
+      console.error('Error fetching questions:', err);
+    }
+  };
+
+  useEffect(()=>{
+    fetchAllTestLevels();
+    setMounted(true);
+  },[])
 
   const advanceToNextValidScreen = () => {
     if (!testLevel) return;
@@ -71,13 +96,11 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
   };
 
   const speakText = (text: string) => {
-   
-    if ('speechSynthesis' in window) {
-      
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'hi-IN'; // Set language to Hindi (India)
       window.speechSynthesis.speak(utterance);
-       console.log("speakText called");
+      console.log("speakText called");
     } else {
       alert('Text-to-speech is not supported in this browser.');
     }
@@ -124,7 +147,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
           setCurrentQuestionIndexInScreen(0);
         } else {
           // No valid screens, try next level
-          if (level < 10) { // Assume max 10 levels to prevent infinite loop
+          if (level < AllTestLevel.length-1) { // Assume max 10 levels to prevent infinite loop
             setCurrentLevel(level + 1);
           } else {
             setTestEnded(true);
@@ -171,11 +194,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
     }
   }, [testLevel, currentScreenIndex]);
 
-  useEffect(() => {
-    if (testLevel && testLevel.screens[currentScreenIndex] && testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen]) {
-      speakText(testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen].text);
-    }
-  }, [currentScreenIndex, currentQuestionIndexInScreen, testLevel]);
+
 
   useEffect(() => {
     if (testLevel && testLevel.screens[currentScreenIndex] && testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen]) {
@@ -214,6 +233,12 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
       console.error('Failed to enter fullscreen:', error);
     }
   }, []);
+
+  useEffect(() => {
+    if (mounted && testLevel && testLevel.screens[currentScreenIndex] && testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen]) {
+      speakText(testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen].text);
+    }
+  }, [currentScreenIndex, currentQuestionIndexInScreen, testLevel, mounted]);
 
   useEffect(() => {
     if (testEnded) {

@@ -386,6 +386,8 @@ export default function AdminPanel() {
         <button onClick={() => setActiveTab('selectScreen')} className={`px-4 py-2 mr-2 mb-2 rounded ${activeTab === 'selectScreen' ? 'bg-[var(--button-bg)] text-white' : 'bg-[var(--secondary-bg)] text-[var(--foreground)]'}`}>Settings</button>
       </div>
 
+     
+
       {/* Add Forms */}
       {activeTab === 'testLevel' && <AddTestLevelForm onAdd={handleAddTestLevel} />}
 
@@ -449,7 +451,15 @@ export default function AdminPanel() {
               </div>
 
               <div className="mb-6">
-                <h4 className="text-md font-semibold mb-2">Associated Images:</h4>
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="text-md font-semibold">Associated Images:</h4>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-3 py-1 bg-purple-500 text-white text-sm rounded hover:bg-purple-600"
+                  >
+                    Upload Split Image
+                  </button>
+                </div>
                 <div className="grid grid-cols-4 gap-4">
                   {Array.from({ length: 4 }, (_, index) => {
                     const screenImages = images.filter(img => img.screenId === selectedScreen.id);
@@ -652,10 +662,27 @@ export default function AdminPanel() {
         ref={fileInputRef}
         style={{ display: 'none' }}
         accept="image/*"
-        onChange={(e) => {
+        onChange={async (e) => {
           const file = e.target.files?.[0];
           if (file && selectedScreen) {
-            handleAddImage(file, selectedScreen.id);
+            try {
+              const formData = new FormData();
+              formData.append('file', file);
+              formData.append('screenId', selectedScreen.id.toString());
+
+              const res = await fetch("/api/upload-split-image", {
+                method: "POST",
+                body: formData,
+              });
+              if (res.ok) {
+                setMessage("Split image uploaded successfully!");
+                fetchData();
+              } else {
+                setMessage("Error uploading split image");
+              }
+            } catch (error) {
+              setMessage("Error uploading split image");
+            }
           }
           // Reset the input
           if (fileInputRef.current) {
