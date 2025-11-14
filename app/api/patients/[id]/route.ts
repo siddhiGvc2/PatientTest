@@ -11,7 +11,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Invalid patient ID' }, { status: 400 });
     }
 
-    const { userId, currentUserId, name, age, city, fatherName, motherName, uniqueId, phoneNumber, score } = await request.json();
+    const { userId, currentUserId, name, dateOfBirth, relation, address, aadiId, keyWorkerName, caregiverName, phoneNumber, score } = await request.json();
 
     if (!currentUserId) {
       return NextResponse.json({ error: 'currentUserId is required' }, { status: 400 });
@@ -34,7 +34,20 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     // Check if patient exists
     const existingPatient = await prisma.patient.findUnique({
       where: { id: patientId },
-      include: { user: true },
+      select: {
+        id: true,
+        name: true,
+        dateOfBirth: true,
+        relation: true,
+        address: true,
+        aadiId: true,
+        keyWorkerName: true,
+        caregiverName: true,
+        phoneNumber: true,
+        score: true,
+        userId: true,
+        user: true,
+      },
     });
 
     if (!existingPatient) {
@@ -96,14 +109,14 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'You do not have permission to update this patient' }, { status: 403 });
     }
 
-    // Check if uniqueId is being updated and already exists for another patient
-    if (uniqueId !== undefined && uniqueId !== existingPatient.uniqueId) {
-      if (uniqueId) {
-        const existingUniqueIdPatient = await prisma.patient.findUnique({
-          where: { uniqueId },
+    // Check if aadiId is being updated and already exists for another patient
+    if (aadiId !== undefined && aadiId !== existingPatient.aadiId) {
+      if (aadiId) {
+        const existingAadiIdPatient = await prisma.patient.findUnique({
+          where: { aadiId },
         });
-        if (existingUniqueIdPatient && existingUniqueIdPatient.id !== patientId) {
-          return NextResponse.json({ error: 'Unique ID already exists' }, { status: 400 });
+        if (existingAadiIdPatient && existingAadiIdPatient.id !== patientId) {
+          return NextResponse.json({ error: 'AADI ID already exists' }, { status: 400 });
         }
       }
     }
@@ -113,11 +126,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       where: { id: patientId },
       data: {
         name: name !== undefined ? name : existingPatient.name,
-        age: age !== undefined ? (age ? parseInt(age, 10) : null) : existingPatient.age,
-        city: city !== undefined ? city : existingPatient.city,
-        fatherName: fatherName !== undefined ? fatherName : existingPatient.fatherName,
-        motherName: motherName !== undefined ? motherName : existingPatient.motherName,
-        uniqueId: uniqueId !== undefined ? uniqueId : existingPatient.uniqueId,
+        dateOfBirth: dateOfBirth !== undefined ? (dateOfBirth ? new Date(dateOfBirth) : null) : existingPatient.dateOfBirth,
+        relation: relation !== undefined ? relation : existingPatient.relation,
+        address: address !== undefined ? address : existingPatient.address,
+        aadiId: aadiId !== undefined ? aadiId : existingPatient.aadiId,
+        keyWorkerName: keyWorkerName !== undefined ? keyWorkerName : existingPatient.keyWorkerName,
+        caregiverName: caregiverName !== undefined ? caregiverName : existingPatient.caregiverName,
         phoneNumber: phoneNumber !== undefined ? phoneNumber : existingPatient.phoneNumber,
         score: score !== undefined ? score : existingPatient.score,
       },

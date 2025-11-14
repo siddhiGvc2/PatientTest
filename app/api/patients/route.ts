@@ -35,11 +35,12 @@ export async function GET(request: NextRequest) {
         select: {
           id: true,
           name: true,
-          age: true,
-          city: true,
-          fatherName: true,
-          motherName: true,
-          uniqueId: true,
+          dateOfBirth: true,
+          relation: true,
+          address: true,
+          aadiId: true,
+          keyWorkerName: true,
+          caregiverName: true,
           phoneNumber: true,
           score: true,
           user: {
@@ -76,11 +77,12 @@ export async function GET(request: NextRequest) {
         select: {
           id: true,
           name: true,
-          age: true,
-          city: true,
-          fatherName: true,
-          motherName: true,
-          uniqueId: true,
+          dateOfBirth: true,
+          relation: true,
+          address: true,
+          aadiId: true,
+          keyWorkerName: true,
+          caregiverName: true,
           phoneNumber: true,
           score: true,
           user: {
@@ -132,11 +134,11 @@ export async function GET(request: NextRequest) {
         select: {
           id: true,
           name: true,
-          age: true,
-          city: true,
-          fatherName: true,
-          motherName: true,
-          uniqueId: true,
+          dateOfBirth: true,
+          relation: true,
+          address: true,
+          aadiId: true,
+          keyWorkerName: true,
           phoneNumber: true,
           score: true,
           user: {
@@ -149,7 +151,13 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ patients }, { status: 200 });
+    // Calculate age for each patient
+    const patientsWithAge = patients.map(patient => ({
+      ...patient,
+      age: patient.dateOfBirth ? Math.floor((new Date().getTime() - new Date(patient.dateOfBirth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
+    }));
+
+    return NextResponse.json({ patients: patientsWithAge }, { status: 200 });
   } catch (error) {
     console.error('Error fetching patients:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -158,7 +166,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId, currentUserId, name, age, city, fatherName, motherName, uniqueId, phoneNumber, score } = await request.json();
+    const { userId, currentUserId, name, dateOfBirth, relation, address, aadiId, keyWorkerName, caregiverName, phoneNumber, score } = await request.json();
     console.log(userId,currentUserId,name);
     if (!userId || !currentUserId || !name) {
       return NextResponse.json({ error: 'userId, currentUserId, and name are required' }, { status: 400 });
@@ -225,13 +233,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Patient test user not found' }, { status: 404 });
     }
 
-    // Check if uniqueId is provided and already exists
-    if (uniqueId) {
+    // Check if aadiId is provided and already exists
+    if (aadiId) {
       const existingPatient = await prisma.patient.findUnique({
-        where: { uniqueId },
+        where: { aadiId },
       });
       if (existingPatient) {
-        return NextResponse.json({ error: 'Unique ID already exists' }, { status: 400 });
+        return NextResponse.json({ error: 'AADI ID already exists' }, { status: 400 });
       }
     }
 
@@ -240,11 +248,12 @@ export async function POST(request: NextRequest) {
       data: {
         userId: patientTestUser.id,
         name,
-        age: age ? parseInt(age, 10) : null,
-        city: city || null,
-        fatherName: fatherName || null,
-        motherName: motherName || null,
-        uniqueId: uniqueId || null,
+        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+        relation: relation || 'OTHER',
+        address: address || null,
+        aadiId: aadiId || null,
+        keyWorkerName: keyWorkerName || null,
+        caregiverName: caregiverName || null,
         phoneNumber: phoneNumber || null,
         score: score || 0,
       },

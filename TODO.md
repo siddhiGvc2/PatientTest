@@ -1,6 +1,8 @@
-# TODO: Modify upload-split-image API to save questions as text
-
-- [x] Modify app/api/upload-split-image/route.ts to save extracted question texts as Question records in the database, associated with the screenId.
-- [x] Ensure only questions (type: 'question') are saved as text, not images.
-- [x] Save the 4 images accurately to the database.
-- [ ] Test the endpoint to verify questions are saved correctly and no errors occur.
+- [ ] Update Prisma schema: Change age to dateOfBirth (DateTime?)
+- [ ] Run prisma generate and db push
+- [ ] Update API GET: Compute age from dateOfBirth
+- [ ] Update API POST: Accept dateOfBirth instead of age
+- [ ] Update frontend form: Replace age input with dateOfBirth date input, add calculated age display
+- [ ] Update edit functionality: Populate dateOfBirth
+- [ ] Update table display: Show calculated age
+- [ ] Test the changes

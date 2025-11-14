@@ -7,12 +7,13 @@ const patientTerm = process.env.NEXT_PUBLIC_PATIENT || 'Patient';
 interface Patient {
   id: number;
   name: string;
-  age: number | null;
-  city: string | null;
-  fatherName: string | null;
-  motherName: string | null;
-  uniqueId: string | null;
   phoneNumber: string | null;
+  dateOfBirth: string | null;
+  relation: string;
+  address: string | null;
+  aadiId: string | null;
+  keyWorkerName: string | null;
+  caregiverName: string | null;
   score: number;
   user: {
     email: string;
@@ -41,11 +42,19 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
-  const [formData, setFormData] = useState({ name: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
+  const [formData, setFormData] = useState({ name: '', phoneNumber: '', dateOfBirth: '', relation: 'OTHER', address: '', aadiId: '', keyWorkerName: '', caregiverName: '', score: 0 });
   const [generatedUniqueId, setGeneratedUniqueId] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<number>(userId);
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
+
+  const calculateAge = (dateOfBirth: string) => {
+    if (!dateOfBirth) return '';
+    const birthDate = new Date(dateOfBirth);
+    if (isNaN(birthDate.getTime())) return '';
+    const age = Math.floor((new Date().getTime() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+    return age.toString();
+  };
 
   const fetchUsers = async () => {
     try {
@@ -88,35 +97,35 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
 
   useEffect(() => {
     if (showForm && !editingPatient) {
-      generateUniqueId();
+      generateAadiId();
     }
   }, [showForm, editingPatient]);
 
-  const generateUniqueId = async () => {
-    let uniqueId: string = '';
+  const generateAadiId = async () => {
+    let aadiId: string = '';
     let isUnique = false;
     let attempts = 0;
     const maxAttempts = 10;
 
     while (!isUnique && attempts < maxAttempts) {
-      uniqueId = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit number
+      aadiId = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit number
       try {
-        const res = await fetch(`/api/patients/check-unique-id?uniqueId=${uniqueId}`);
+        const res = await fetch(`/api/patients/check-unique-id?aadiId=${aadiId}`);
         if (res.ok) {
           const data = await res.json();
           isUnique = data.isUnique;
         }
       } catch (err) {
-        console.error('Error checking unique ID:', err);
+        console.error('Error checking AADI ID:', err);
       }
       attempts++;
     }
 
     if (isUnique) {
-      setGeneratedUniqueId(uniqueId);
-      setFormData({ ...formData, uniqueId });
+      setGeneratedUniqueId(aadiId);
+      setFormData({ ...formData, aadiId });
     } else {
-      setError('Failed to generate a unique ID. Please try again.');
+      setError('Failed to generate a unique AADI ID. Please try again.');
     }
   };
 
@@ -137,15 +146,15 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
         }),
       });
 
-        if (res.ok) {
-          setFormData({ name: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
-          setGeneratedUniqueId('');
-          setShowForm(false);
-          setEditingPatient(null);
-          fetchPatients(); // Refresh the list
-        } else {
-          setError(editingPatient ? 'Failed to update patient' : 'Failed to add patient');
-        }
+      if (res.ok) {
+        setFormData({ name: '', phoneNumber: '', dateOfBirth: '', relation: 'OTHER', address: '', aadiId: '', keyWorkerName: '', caregiverName: '', score: 0 });
+        setGeneratedUniqueId('');
+        setShowForm(false);
+        setEditingPatient(null);
+        fetchPatients(); // Refresh the list
+      } else {
+        setError(editingPatient ? 'Failed to update patient' : 'Failed to add patient');
+      }
     } catch (err) {
       setError(editingPatient ? 'Error updating patient' : 'Error adding patient');
     }
@@ -155,12 +164,13 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
     setEditingPatient(patient);
     setFormData({
       name: patient.name,
-      age: patient.age?.toString() || '',
-      city: patient.city || '',
-      fatherName: patient.fatherName || '',
-      motherName: patient.motherName || '',
-      uniqueId: patient.uniqueId || '',
+      dateOfBirth: patient.dateOfBirth || '',
+      relation: patient.relation || 'OTHER',
+      address: patient.address || '',
+      aadiId: patient.aadiId || '',
       phoneNumber: patient.phoneNumber || '',
+      keyWorkerName: patient.keyWorkerName || '',
+      caregiverName: patient.caregiverName || '',
       score: patient.score,
     });
     setShowForm(true);
@@ -185,8 +195,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
 
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (patient.uniqueId && patient.uniqueId.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (patient.city && patient.city.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (patient.aadiId && patient.aadiId.toLowerCase().includes(searchTerm.toLowerCase())) ||
     patient.user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -203,14 +212,14 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">{patientTerm}s List</h2>
         <div className="flex items-center space-x-4">
-          
+
             <button
               onClick={() => setShowForm(true)}
               className="bg-[var(--button-bg)] text-white px-4 py-2 rounded hover:bg-[var(--button-hover)]"
             >
               Add {patientTerm}
             </button>
-        
+
         </div>
       </div>
 
@@ -218,72 +227,106 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
         <div className="max-w-4xl mx-auto bg-[var(--card-bg)] p-6 rounded-lg shadow-md mb-6 border border-[var(--border-color)]">
           <h3 className="text-lg font-semibold mb-4">{editingPatient ? `Edit ${patientTerm}` : `Add New ${patientTerm}`}</h3>
           <form onSubmit={handleAddPatient}>
-            <div className="mb-4">
-              <label className="block text-[var(--foreground)]">Name</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
-                required
-              />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="mb-4">
+                <label className="block text-[var(--foreground)]">Name</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                  required
+                />
+              </div>
 
-            <div className="mb-4">
-              <label className="block text-[var(--foreground)]">Age</label>
-              <input
-                type="number"
-                value={formData.age}
-                onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-[var(--foreground)]">City</label>
-              <input
-                type="text"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-[var(--foreground)]">Father Name</label>
-              <input
-                type="text"
-                value={formData.fatherName}
-                onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
-                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-[var(--foreground)]">Mother Name</label>
-              <input
-                type="text"
-                value={formData.motherName}
-                onChange={(e) => setFormData({ ...formData, motherName: e.target.value })}
-                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-[var(--foreground)]">Unique ID</label>
-              <input
-                type="text"
-                value={formData.uniqueId}
-                onChange={(e) => setFormData({ ...formData, uniqueId: e.target.value })}
-                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
-                readOnly={!editingPatient}
-                placeholder={editingPatient ? '' : 'Auto-generated on form open'}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-[var(--foreground)]">Phone Number</label>
-              <input
-                type="tel"
-                value={formData.phoneNumber}
-                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
-              />
+              <div className="mb-4">
+                <label className="block text-[var(--foreground)]">Phone Number</label>
+                <input
+                  type="tel"
+                  value={formData.phoneNumber}
+                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-[var(--foreground)]">Date of Birth</label>
+                <input
+                  type="date"
+                  value={formData.dateOfBirth}
+                  onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-[var(--foreground)]">Age</label>
+                <input
+                  type="number"
+                  value={calculateAge(formData.dateOfBirth)}
+                  readOnly
+                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                  placeholder="Calculated from date of birth"
+                />
+              </div>
+               <div className="mb-4">
+                <label className="block text-[var(--foreground)]">Caregiver Name</label>
+                <input
+                  type="text"
+                  value={formData.caregiverName}
+                  onChange={(e) => setFormData({ ...formData, caregiverName: e.target.value })}
+                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-[var(--foreground)]">Relation</label>
+                <select
+                  value={formData.relation}
+                  onChange={(e) => setFormData({ ...formData, relation: e.target.value })}
+                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                >
+                  <option value="MOTHER">Mother</option>
+                  <option value="FATHER">Father</option>
+                  <option value="GRANDMOTHER">Grandmother</option>
+                  <option value="GRANDFATHER">Grandfather</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-[var(--foreground)]">Complete Address</label>
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-[var(--foreground)]">AADI ID</label>
+                <input
+                  type="text"
+                  value={formData.aadiId}
+                  onChange={(e) => setFormData({ ...formData, aadiId: e.target.value })}
+                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                  readOnly={!editingPatient}
+                  placeholder={editingPatient ? '' : 'Auto-generated on form open'}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-[var(--foreground)]">Key Worker Name</label>
+                <input
+                  type="text"
+                  value={formData.keyWorkerName}
+                  onChange={(e) => setFormData({ ...formData, keyWorkerName: e.target.value })}
+                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                />
+              </div>
+
+             
             </div>
             <div className="flex space-x-2">
               <button type="submit" className="bg-[var(--success-bg)] text-white px-4 py-2 rounded hover:bg-[var(--success-hover)]">
@@ -294,7 +337,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                 onClick={() => {
                   setShowForm(false);
                   setEditingPatient(null);
-                  setFormData({ name: '', age: '', city: '', fatherName: '', motherName: '', uniqueId: '', phoneNumber: '', score: 0 });
+                  setFormData({ name: '', phoneNumber: '', dateOfBirth: '', relation: 'OTHER', address: '', aadiId: '', keyWorkerName: '', caregiverName: '', score: 0 });
                 }}
                 className="bg-[var(--secondary-bg)] text-[var(--foreground)] px-4 py-2 rounded hover:bg-[var(--border-color)]"
               >
@@ -345,11 +388,11 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                       Start Test
                     </button></td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.user.name}</td>
-                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] ">{patient.age || '-'}</td>
-                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.city || '-'}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] ">{patient.dateOfBirth || '-'}</td>
+                  {/* <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.city || '-'}</td> */}
                   {/* <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.fatherName || '-'}</td> */}
                   {/* <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.motherName || '-'}</td> */}
-                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.uniqueId || '-'}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.aadiId || '-'}</td>
                   {/* <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.phoneNumber || '-'}</td> */}
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center">{patient.score}</td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] text-center justify-center align-center">
@@ -365,7 +408,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                     >
                       Edit
                     </button>
-                   
+
                     <button
                       onClick={() => handleDeletePatient(patient.id)}
                       className="bg-[var(--danger-bg)] text-white px-2 py-1 rounded hover:bg-[var(--danger-hover)]"
