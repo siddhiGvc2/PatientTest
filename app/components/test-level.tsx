@@ -59,6 +59,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
   const [currentQuestionIndexInScreen, setCurrentQuestionIndexInScreen] = useState(0);
   const [testEnded,setTestEnded]=useState(false);
   const [saving, setSaving] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
 
   const fetchAllTestLevels = async () => {
@@ -75,6 +76,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
 
   useEffect(()=>{
     fetchAllTestLevels();
+    setMounted(true);
   },[])
 
   const advanceToNextValidScreen = () => {
@@ -94,13 +96,11 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
   };
 
   const speakText = (text: string) => {
-   
-    if ('speechSynthesis' in window) {
-      
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'hi-IN'; // Set language to Hindi (India)
       window.speechSynthesis.speak(utterance);
-       console.log("speakText called");
+      console.log("speakText called");
     } else {
       alert('Text-to-speech is not supported in this browser.');
     }
@@ -194,11 +194,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
     }
   }, [testLevel, currentScreenIndex]);
 
-  useEffect(() => {
-    if (testLevel && testLevel.screens[currentScreenIndex] && testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen]) {
-      speakText(testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen].text);
-    }
-  }, [currentScreenIndex, currentQuestionIndexInScreen, testLevel]);
+
 
   useEffect(() => {
     if (testLevel && testLevel.screens[currentScreenIndex] && testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen]) {
@@ -237,6 +233,12 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
       console.error('Failed to enter fullscreen:', error);
     }
   }, []);
+
+  useEffect(() => {
+    if (mounted && testLevel && testLevel.screens[currentScreenIndex] && testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen]) {
+      speakText(testLevel.screens[currentScreenIndex].questions[currentQuestionIndexInScreen].text);
+    }
+  }, [currentScreenIndex, currentQuestionIndexInScreen, testLevel, mounted]);
 
   useEffect(() => {
     if (testEnded) {
