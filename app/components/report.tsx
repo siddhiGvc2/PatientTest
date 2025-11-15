@@ -181,6 +181,14 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
             <p className="text-[var(--foreground)]">{selectedPatient.name}</p>
           </div>
           <div>
+            <label className="block text-[var(--foreground)] font-medium">Key Worker</label>
+            <p className="text-[var(--foreground)]">{selectedPatient.keyWorkerName}</p>
+          </div>
+          <div>
+            <label className="block text-[var(--foreground)] font-medium">Date Of Birth</label>
+            <p className="text-[var(--foreground)]">{selectedPatient.dateOfBirth}</p>
+          </div>
+          <div>
             <label className="block text-[var(--foreground)] font-medium">Age</label>
             <p className="text-[var(--foreground)]">{calculateAge(selectedPatient.dateOfBirth)}</p>
           </div>
@@ -193,9 +201,17 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
             <label className="block text-[var(--foreground)] font-medium">Aadi ID</label>
             <p className="text-[var(--foreground)]">{selectedPatient.aadiId || '-'}</p>
           </div>
+           <div>
+            <label className="block text-[var(--foreground)] font-medium">Care Giver Name</label>
+            <p className="text-[var(--foreground)]">{selectedPatient.caregiverName || '-'}</p>
+          </div>
           <div>
             <label className="block text-[var(--foreground)] font-medium">Phone Number</label>
             <p className="text-[var(--foreground)]">{selectedPatient.phoneNumber || '-'}</p>
+          </div>
+           <div>
+            <label className="block text-[var(--foreground)] font-medium">Relation</label>
+            <p className="text-[var(--foreground)]">{selectedPatient.relation|| '-'}</p>
           </div>
           <div>
             <label className="block text-[var(--foreground)] font-medium">Score</label>
