@@ -8,12 +8,14 @@ const patientTerm = process.env.NEXT_PUBLIC_PATIENT || 'Patient';
 interface Patient {
   id: number;
   name: string;
-  age: number | null;
-  city: string | null;
-  fatherName: string | null;
-  motherName: string | null;
-  uniqueId: string | null;
   phoneNumber: string | null;
+  dateOfBirth: string | null;
+  relation: string;
+  remark: string | null;
+  address: string | null;
+  aadiId: string | null;
+  keyWorkerName: string | null;
+  caregiverName: string | null;
   score: number;
   user: {
     email: string;
@@ -66,6 +68,15 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
   const [questions, setQuestions] = useState<Question[]>([]);
   const [screens, setScreens] = useState<Screen[]>([]);
   const [testLevels, setTestLevels] = useState<TestLevel[]>([]);
+
+
+  const calculateAge = (dateOfBirth: string | null) => {
+    if (!dateOfBirth) return '';
+    const birthDate = new Date(dateOfBirth);
+    if (isNaN(birthDate.getTime())) return '';
+    const age = Math.floor((new Date().getTime() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+    return age.toString();
+  };
 
 
 
@@ -171,28 +182,41 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
             <p className="text-[var(--foreground)]">{selectedPatient.name}</p>
           </div>
           <div>
+            <label className="block text-[var(--foreground)] font-medium">Key Worker</label>
+            <p className="text-[var(--foreground)]">{selectedPatient.keyWorkerName}</p>
+          </div>
+          <div>
+            <label className="block text-[var(--foreground)] font-medium">Date Of Birth</label>
+            <p className="text-[var(--foreground)]">{selectedPatient.dateOfBirth}</p>
+          </div>
+          <div>
             <label className="block text-[var(--foreground)] font-medium">Age</label>
-            <p className="text-[var(--foreground)]">{selectedPatient.age || '-'}</p>
+            <p className="text-[var(--foreground)]">{calculateAge(selectedPatient.dateOfBirth)}</p>
           </div>
           <div>
-            <label className="block text-[var(--foreground)] font-medium">City</label>
-            <p className="text-[var(--foreground)]">{selectedPatient.city || '-'}</p>
+            <label className="block text-[var(--foreground)] font-medium">Address</label>
+            <p className="text-[var(--foreground)]">{selectedPatient.address || '-'}</p>
           </div>
+          
           <div>
-            <label className="block text-[var(--foreground)] font-medium">Father Name</label>
-            <p className="text-[var(--foreground)]">{selectedPatient.fatherName || '-'}</p>
+            <label className="block text-[var(--foreground)] font-medium">Aadi ID</label>
+            <p className="text-[var(--foreground)]">{selectedPatient.aadiId || '-'}</p>
           </div>
-          <div>
-            <label className="block text-[var(--foreground)] font-medium">Mother Name</label>
-            <p className="text-[var(--foreground)]">{selectedPatient.motherName || '-'}</p>
-          </div>
-          <div>
-            <label className="block text-[var(--foreground)] font-medium">Unique ID</label>
-            <p className="text-[var(--foreground)]">{selectedPatient.uniqueId || '-'}</p>
+           <div>
+            <label className="block text-[var(--foreground)] font-medium">Care Giver Name</label>
+            <p className="text-[var(--foreground)]">{selectedPatient.caregiverName || '-'}</p>
           </div>
           <div>
             <label className="block text-[var(--foreground)] font-medium">Phone Number</label>
             <p className="text-[var(--foreground)]">{selectedPatient.phoneNumber || '-'}</p>
+          </div>
+           <div>
+            <label className="block text-[var(--foreground)] font-medium">Relation</label>
+            <p className="text-[var(--foreground)]">{selectedPatient.relation|| '-'}</p>
+          </div>
+           <div>
+            <label className="block text-[var(--foreground)] font-medium">Relation Remark</label>
+            <p className="text-[var(--foreground)]">{selectedPatient.remark|| '-'}</p>
           </div>
           <div>
             <label className="block text-[var(--foreground)] font-medium">Score</label>
