@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
           name: true,
           dateOfBirth: true,
           relation: true,
+          remark: true,
           address: true,
           aadiId: true,
           keyWorkerName: true,
@@ -79,6 +80,7 @@ export async function GET(request: NextRequest) {
           name: true,
           dateOfBirth: true,
           relation: true,
+          remark: true,
           address: true,
           aadiId: true,
           keyWorkerName: true,
@@ -136,6 +138,7 @@ export async function GET(request: NextRequest) {
           name: true,
           dateOfBirth: true,
           relation: true,
+          remark: true,
           address: true,
           aadiId: true,
           keyWorkerName: true,
@@ -166,7 +169,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId, currentUserId, name, dateOfBirth, relation, address, aadiId, keyWorkerName, caregiverName, phoneNumber, score } = await request.json();
+    const { userId, currentUserId, name, dateOfBirth, relation, remark, address, aadiId, keyWorkerName, caregiverName, phoneNumber, score } = await request.json();
     console.log(userId,currentUserId,name);
     if (!userId || !currentUserId || !name) {
       return NextResponse.json({ error: 'userId, currentUserId, and name are required' }, { status: 400 });
@@ -250,6 +253,7 @@ export async function POST(request: NextRequest) {
         name,
         dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
         relation: relation || 'OTHER',
+        remark: remark || null,
         address: address || null,
         aadiId: aadiId || null,
         keyWorkerName: keyWorkerName || null,
