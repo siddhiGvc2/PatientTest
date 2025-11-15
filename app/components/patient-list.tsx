@@ -48,7 +48,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
-  const calculateAge = (dateOfBirth: string) => {
+  const calculateAge = (dateOfBirth: string | null) => {
     if (!dateOfBirth) return '';
     const birthDate = new Date(dateOfBirth);
     if (isNaN(birthDate.getTime())) return '';
@@ -95,11 +95,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
     }
   }, [currentUser, selectedUserId]);
 
-  useEffect(() => {
-    if (showForm && !editingPatient) {
-      generateAadiId();
-    }
-  }, [showForm, editingPatient]);
+  
 
   const generateAadiId = async () => {
     let aadiId: string = '';
@@ -238,17 +234,26 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                   required
                 />
               </div>
-
-              <div className="mb-4">
-                <label className="block text-[var(--foreground)]">Phone Number</label>
+               <div className="mb-4">
+                <label className="block text-[var(--foreground)]">Key Worker Name</label>
                 <input
-                  type="tel"
-                  value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  type="text"
+                  value={formData.keyWorkerName}
+                  onChange={(e) => setFormData({ ...formData, keyWorkerName: e.target.value })}
+                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-[var(--foreground)]">Complete Address</label>
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
                 />
               </div>
 
+             
               <div className="mb-4">
                 <label className="block text-[var(--foreground)]">Date of Birth</label>
                 <input
@@ -278,6 +283,16 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                   className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
                 />
               </div>
+               <div className="mb-4">
+                <label className="block text-[var(--foreground)]">Phone Number</label>
+                <input
+                  type="tel"
+                  value={formData.phoneNumber}
+                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                />
+              </div>
+
 
               <div className="mb-4">
                 <label className="block text-[var(--foreground)]">Relation</label>
@@ -294,15 +309,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                 </select>
               </div>
 
-              <div className="mb-4">
-                <label className="block text-[var(--foreground)]">Complete Address</label>
-                <input
-                  type="text"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
-                />
-              </div>
+              
 
               <div className="mb-4">
                 <label className="block text-[var(--foreground)]">AADI ID</label>
@@ -311,20 +318,12 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                   value={formData.aadiId}
                   onChange={(e) => setFormData({ ...formData, aadiId: e.target.value })}
                   className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
-                  readOnly={!editingPatient}
-                  placeholder={editingPatient ? '' : 'Auto-generated on form open'}
+
+                  placeholder="Enter Your ID"
                 />
               </div>
 
-              <div className="mb-4">
-                <label className="block text-[var(--foreground)]">Key Worker Name</label>
-                <input
-                  type="text"
-                  value={formData.keyWorkerName}
-                  onChange={(e) => setFormData({ ...formData, keyWorkerName: e.target.value })}
-                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
-                />
-              </div>
+             
 
              
             </div>
@@ -368,10 +367,11 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">ID</th>
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Name</th>
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Accessor Name</th>
+                 {/* <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Date Of Birth</th> */}
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Age</th>
-                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">City</th>
+                <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Address</th>
 
-                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Unique ID</th>
+                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Aadi ID</th>
 
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Score</th>
                 <th className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">Actions</th>
@@ -388,8 +388,9 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                       Start Test
                     </button></td>
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.user.name}</td>
-                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] ">{patient.dateOfBirth || '-'}</td>
-                  {/* <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.city || '-'}</td> */}
+                   {/* <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] ">{patient.dateOfBirth}</td> */}
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)] ">{calculateAge(patient.dateOfBirth)}</td>
+                  <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.address || '-'}</td>
                   {/* <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.fatherName || '-'}</td> */}
                   {/* <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.motherName || '-'}</td> */}
                   <td className="py-2 px-4 border-b border-[var(--border-color)] text-[var(--foreground)]">{patient.aadiId || '-'}</td>
