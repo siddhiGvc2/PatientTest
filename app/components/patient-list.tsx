@@ -350,7 +350,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Search by name, unique ID, city, or created by..."
+          placeholder="Search by name,aadi id ,accessor..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"

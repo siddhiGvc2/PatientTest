@@ -239,6 +239,15 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return NextResponse.json({ error: 'You do not have permission to delete this patient' }, { status: 403 });
     }
 
+    // Delete related records first to avoid foreign key constraint violations
+    await prisma.userResponse.deleteMany({
+      where: { patientId },
+    });
+
+    await prisma.scoreReport.deleteMany({
+      where: { patientId },
+    });
+
     // Delete patient
     await prisma.patient.delete({
       where: { id: patientId },
