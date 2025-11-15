@@ -10,6 +10,7 @@ interface Patient {
   phoneNumber: string | null;
   dateOfBirth: string | null;
   relation: string;
+  remark: string | null;
   address: string | null;
   aadiId: string | null;
   keyWorkerName: string | null;
@@ -42,7 +43,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
-  const [formData, setFormData] = useState({ name: '', phoneNumber: '', dateOfBirth: '', relation: 'OTHER', address: '', aadiId: '', keyWorkerName: '', caregiverName: '', score: 0 });
+  const [formData, setFormData] = useState({ name: '', phoneNumber: '', dateOfBirth: '', relation: 'OTHER', remark: '', address: '', aadiId: '', keyWorkerName: '', caregiverName: '', score: 0 });
   const [generatedUniqueId, setGeneratedUniqueId] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<number>(userId);
   const [users, setUsers] = useState<User[]>([]);
@@ -143,7 +144,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
       });
 
       if (res.ok) {
-        setFormData({ name: '', phoneNumber: '', dateOfBirth: '', relation: 'OTHER', address: '', aadiId: '', keyWorkerName: '', caregiverName: '', score: 0 });
+        setFormData({ name: '', phoneNumber: '', dateOfBirth: '', relation: 'OTHER', remark: '', address: '', aadiId: '', keyWorkerName: '', caregiverName: '', score: 0 });
         setGeneratedUniqueId('');
         setShowForm(false);
         setEditingPatient(null);
@@ -162,6 +163,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
       name: patient.name,
       dateOfBirth: patient.dateOfBirth || '',
       relation: patient.relation || 'OTHER',
+      remark: patient.remark || '',
       address: patient.address || '',
       aadiId: patient.aadiId || '',
       phoneNumber: patient.phoneNumber || '',
@@ -295,7 +297,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
 
 
               <div className="mb-4">
-                <label className="block text-[var(--foreground)]">Relation</label>
+                <label className="block text-[var(--foreground)]">Relation With Care Giver</label>
                 <select
                   value={formData.relation}
                   onChange={(e) => setFormData({ ...formData, relation: e.target.value })}
@@ -312,6 +314,16 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
               
 
               <div className="mb-4">
+                <label className="block text-[var(--foreground)]">Relation Remark</label>
+                <textarea
+                  value={formData.remark}
+                  onChange={(e) => setFormData({ ...formData, remark: e.target.value })}
+                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                  placeholder="Enter remark"
+                />
+              </div>
+
+              <div className="mb-4">
                 <label className="block text-[var(--foreground)]">AADI ID</label>
                 <input
                   type="text"
@@ -326,6 +338,8 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
              
 
              
+
+             
             </div>
             <div className="flex space-x-2">
               <button type="submit" className="bg-[var(--success-bg)] text-white px-4 py-2 rounded hover:bg-[var(--success-hover)]">
@@ -336,7 +350,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                 onClick={() => {
                   setShowForm(false);
                   setEditingPatient(null);
-                  setFormData({ name: '', phoneNumber: '', dateOfBirth: '', relation: 'OTHER', address: '', aadiId: '', keyWorkerName: '', caregiverName: '', score: 0 });
+                  setFormData({ name: '', phoneNumber: '', dateOfBirth: '', relation: 'OTHER', remark: '', address: '', aadiId: '', keyWorkerName: '', caregiverName: '', score: 0 });
                 }}
                 className="bg-[var(--secondary-bg)] text-[var(--foreground)] px-4 py-2 rounded hover:bg-[var(--border-color)]"
               >

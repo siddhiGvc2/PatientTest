@@ -47,6 +47,7 @@ model Patient {
   phoneNumber    String?
   dateOfBirth    DateTime?
   relation       Relation        @default(OTHER)
+  remark         String?
   address        String?
   aadiId         String?         @unique
   keyWorkerName  String?

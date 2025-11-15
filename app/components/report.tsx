@@ -11,6 +11,7 @@ interface Patient {
   phoneNumber: string | null;
   dateOfBirth: string | null;
   relation: string;
+  remark: string | null;
   address: string | null;
   aadiId: string | null;
   keyWorkerName: string | null;
@@ -212,6 +213,10 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
            <div>
             <label className="block text-[var(--foreground)] font-medium">Relation</label>
             <p className="text-[var(--foreground)]">{selectedPatient.relation|| '-'}</p>
+          </div>
+           <div>
+            <label className="block text-[var(--foreground)] font-medium">Relation Remark</label>
+            <p className="text-[var(--foreground)]">{selectedPatient.remark|| '-'}</p>
           </div>
           <div>
             <label className="block text-[var(--foreground)] font-medium">Score</label>
