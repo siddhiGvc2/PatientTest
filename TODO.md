@@ -1,8 +1,4 @@
-- [ ] Update Prisma schema: Change age to dateOfBirth (DateTime?)
-- [ ] Run prisma generate and db push
-- [ ] Update API GET: Compute age from dateOfBirth
-- [ ] Update API POST: Accept dateOfBirth instead of age
-- [ ] Update frontend form: Replace age input with dateOfBirth date input, add calculated age display
-- [ ] Update edit functionality: Populate dateOfBirth
-- [ ] Update table display: Show calculated age
-- [ ] Test the changes
+- [x] Define a function to retrieve level names from environment variables based on level number
+- [x] Update the h2 element in test-level.tsx to display the level name instead of "Test Level"
+- [x] Update the detailed report in report.tsx to display level names instead of "Test Level"
+- [x] Verify the changes work correctly

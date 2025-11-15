@@ -5,6 +5,23 @@ import TestLevel from "./test-level";
 
 const patientTerm = process.env.NEXT_PUBLIC_PATIENT || 'Patient';
 
+const getLevelName = (level: number): string => {
+  switch (level) {
+    case 1:
+      return process.env.NEXT_PUBLIC_Level1 || 'One Word Level Pictures';
+    case 2:
+      return process.env.NEXT_PUBLIC_Level2 || 'One Word Action Pictures';
+    case 3:
+      return process.env.NEXT_PUBLIC_Level3 || 'Two Word Level';
+    case 4:
+      return process.env.NEXT_PUBLIC_Level4 || 'Three Word Level';
+    case 5:
+      return process.env.NEXT_PUBLIC_Level5 || 'Four Word Level';
+    default:
+      return `Level ${level}`;
+  }
+};
+
 interface Patient {
   id: number;
   name: string;
@@ -326,7 +343,7 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
                                 return (
                                   <>
                                     <strong>
-                                      Test Level {screen?.testLevelId || 'N/A'} Screen {screen?.screenNumber || 'N/A'}:
+                                      {getLevelName(screen?.testLevelId || 0)} Screen {screen?.screenNumber || 'N/A'}:
                                     </strong>{' '}
                                     {question?.text || 'N/A'}
                                   </>

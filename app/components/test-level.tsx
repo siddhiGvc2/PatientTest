@@ -4,6 +4,23 @@ import { useEffect, useState } from "react";
 
 const patientTerm = process.env.NEXT_PUBLIC_PATIENT || 'Patient';
 
+const getLevelName = (level: number): string => {
+  switch (level) {
+    case 1:
+      return process.env.NEXT_PUBLIC_Level1 || 'One Word Level Pictures';
+    case 2:
+      return process.env.NEXT_PUBLIC_Level2 || 'One Word Action Pictures';
+    case 3:
+      return process.env.NEXT_PUBLIC_Level3 || 'Two Word Level';
+    case 4:
+      return process.env.NEXT_PUBLIC_Level4 || 'Three Word Level';
+    case 5:
+      return process.env.NEXT_PUBLIC_Level5 || 'Four Word Level';
+    default:
+      return `Level ${level}`;
+  }
+};
+
 interface Option {
   id: number;
   text: string;
@@ -317,7 +334,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
         </div>
       )}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Test Level {testLevel.level}</h2>
+        <h2 className="text-2xl font-bold">Test Level {currentLevel}-{getLevelName(testLevel.level)}</h2>
         <button
           onClick={() => {
             setTestEnded(true);
