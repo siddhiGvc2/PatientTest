@@ -1,3 +1,4 @@
 - [x] Define a function to retrieve level names from environment variables based on level number
 - [x] Update the h2 element in test-level.tsx to display the level name instead of "Test Level"
+- [x] Update the detailed report in report.tsx to display level names instead of "Test Level"
 - [x] Verify the changes work correctly
