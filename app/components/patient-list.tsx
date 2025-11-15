@@ -266,7 +266,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                 />
               </div>
 
-              <div className="mb-4">
+              {/* <div className="mb-4">
                 <label className="block text-[var(--foreground)]">Age</label>
                 <input
                   type="number"
@@ -275,7 +275,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                   className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
                   placeholder="Calculated from date of birth"
                 />
-              </div>
+              </div> */}
                <div className="mb-4">
                 <label className="block text-[var(--foreground)]">Caregiver Name</label>
                 <input
@@ -311,9 +311,18 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                 </select>
               </div>
 
-              
+               <div className="mb-4">
+                <label className="block text-[var(--foreground)]">Relation Remark</label>
+                <input
+                  value={formData.remark}
+                  onChange={(e) => setFormData({ ...formData, remark: e.target.value })}
+                  className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
+                  placeholder="Enter remark"
+                />
+              </div>
 
-              <div className="mb-4">
+
+              {/* <div className="mb-4">
                 <label className="block text-[var(--foreground)]">Relation Remark</label>
                 <textarea
                   value={formData.remark}
@@ -321,7 +330,7 @@ export default function PatientList({ userId, currentUser, onStartTest, onReport
                   className="w-full p-2 border border-[var(--border-color)] rounded bg-[var(--card-bg)] text-[var(--foreground)]"
                   placeholder="Enter remark"
                 />
-              </div>
+              </div> */}
 
               <div className="mb-4">
                 <label className="block text-[var(--foreground)]">AADI ID</label>
