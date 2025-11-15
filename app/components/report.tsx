@@ -187,7 +187,7 @@ export default function Report({ selectedPatient, currentUserId, onBack }: Repor
           </div>
           <div>
             <label className="block text-[var(--foreground)] font-medium">Date Of Birth</label>
-            <p className="text-[var(--foreground)]">{selectedPatient.dateOfBirth}</p>
+            <p className="text-[var(--foreground)]">{selectedPatient.dateOfBirth ? new Date(selectedPatient.dateOfBirth).toLocaleDateString('en-IN') : '-'}</p>
           </div>
           <div>
             <label className="block text-[var(--foreground)] font-medium">Age</label>
