@@ -11,7 +11,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Invalid patient ID' }, { status: 400 });
     }
 
-    const { userId, currentUserId, name, dateOfBirth, relation, address, aadiId, keyWorkerName, caregiverName, phoneNumber, score } = await request.json();
+    const { userId, currentUserId, name, dateOfBirth, relation, remark, address, aadiId, keyWorkerName, caregiverName, phoneNumber, score } = await request.json();
 
     if (!currentUserId) {
       return NextResponse.json({ error: 'currentUserId is required' }, { status: 400 });
@@ -128,6 +128,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         name: name !== undefined ? name : existingPatient.name,
         dateOfBirth: dateOfBirth !== undefined ? (dateOfBirth ? new Date(dateOfBirth) : null) : existingPatient.dateOfBirth,
         relation: relation !== undefined ? relation : existingPatient.relation,
+        remark: remark !== undefined ? remark : existingPatient.remark,
         address: address !== undefined ? address : existingPatient.address,
         aadiId: aadiId !== undefined ? aadiId : existingPatient.aadiId,
         keyWorkerName: keyWorkerName !== undefined ? keyWorkerName : existingPatient.keyWorkerName,
