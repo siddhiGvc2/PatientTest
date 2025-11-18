@@ -359,7 +359,8 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
              🔊
            </button>
          </div>
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-4">
+        <div className="flex justify-center mb-4">
+          <div className="grid grid-cols-2 gap-6 mx-auto">
           {currentScreen.images.map((image, index) => {
             const labels = ['A', 'B', 'C', 'D'];
 
@@ -370,7 +371,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
                   setSelectedOptions(prev => ({ ...prev, [currentQuestion.id]: image.id }));
                   saveResponse(currentQuestion.id, image.id);
                 }} // select option on image click and save response
-                className={`bg-white p-2 md:p-4 lg:p-4 rounded-lg shadow-md relative cursor-pointer  transition-all ${
+                className={`md:w-[200px] h-[200px]   bg-white p-0 rounded-lg shadow-md relative cursor-pointer transition-all ${
                   selectedOptions[currentQuestion.id] === image.id
                     ? 'ring-4 ring-blue-400'
                     : 'hover:shadow-lg'
@@ -382,11 +383,12 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
                 <img
                   src={image.url}
                   alt={`Image ${image.id}`}
-                  className="w-full h-38 md:h-77 lg:h-84 object-cover rounded-md"
+                  className="md:w-[200px] h-[200px]  object-content rounded-md border border-black"
                 />
               </div>
             );
           })}
+          </div>
         </div>
        
         {/* <div className="mb-4">
