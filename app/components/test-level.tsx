@@ -371,7 +371,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
                   setSelectedOptions(prev => ({ ...prev, [currentQuestion.id]: image.id }));
                   saveResponse(currentQuestion.id, image.id);
                 }} // select option on image click and save response
-                className={`md:w-[200px] h-[200px]   bg-white p-0 rounded-lg shadow-md relative cursor-pointer transition-all ${
+                className={`lg:w-[200px] lg:h-[200px]   bg-white p-0 rounded-lg shadow-md relative cursor-pointer transition-all ${
                   selectedOptions[currentQuestion.id] === image.id
                     ? 'ring-4 ring-blue-400'
                     : 'hover:shadow-lg'
@@ -383,7 +383,7 @@ export default function TestLevel({ onTestEnd, onExit, onRetake, selectedPatient
                 <img
                   src={image.url}
                   alt={`Image ${image.id}`}
-                  className="md:w-[200px] h-[200px]  object-content rounded-md border border-black"
+                  className="lg:w-[200px] lg:h-[200px]  object-content rounded-md border border-black"
                 />
               </div>
             );
