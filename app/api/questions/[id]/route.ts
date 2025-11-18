@@ -38,7 +38,12 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const { id } = await params;
     const idNum = parseInt(id);
 
-    // Delete associated options first
+    // Delete associated responses first
+    await prisma.userResponse.deleteMany({
+      where: { questionId: idNum },
+    });
+
+    // Delete associated options
     await prisma.option.deleteMany({
       where: { questionId: idNum },
     });
